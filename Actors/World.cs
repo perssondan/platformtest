@@ -1,54 +1,46 @@
 ﻿using Microsoft.Graphics.Canvas;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using uwpKarate.Models;
 
 namespace uwpKarate.Actors
 {
     public class World
     {
-        private const int _mapWidth = 14;
-        private const int _mapHeight = 10;
+        private const int _mapTileWidth = 14;
+        private const int _mapTileHeight = 10;
         private const int _tileWidth = 32;
         private const int _tileHeight = 32;
-        private GameObject[,] _tiles = new GameObject[_mapWidth, _mapHeight];
+        private GameObject[] _tiles = new GameObject[_mapTileWidth * _mapTileHeight];
         private GraphicsComponent _wallTile;
         private GraphicsComponent _floorTile;
         private GraphicsComponent _platformTile;
 
-
-        private int[,] _map = new[,]
+        private int[] _map = new[]
         {
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 3}
+            3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0,
+            3, 0, 0, 0, 3, 0, 0, 0, 0, 0, 3, 0, 0, 0,
+            3, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 0,
+            3, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0, 0, 0, 0,
+            3, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            3, 3, 3, 3, 3, 3, 3, 0, 0, 3, 3, 3, 3, 3
         };
 
         public World(CanvasBitmap canvasBitmap)
         {
             _floorTile = new GraphicsComponent(canvasBitmap, 96, 0);
             _platformTile = new GraphicsComponent(canvasBitmap, 32, 0);
-            for (var y = 0; y < _mapHeight; y++)
+            for (var x = 0; x < _mapTileWidth; x++)
             {
-                for (var x = 0; x < _mapWidth; x++)
+                for (var y = 0; y < _mapTileHeight; y++)
                 {
                     try
                     {
-                        _tiles[x, y] = new GameObject(x * _tileWidth, y * _tileHeight, GetGraphicsComponent((TileType)_map[x, y]));
+                        var offset = (y * _mapTileWidth) + x;
+                        _tiles[offset] = new GameObject(x * _tileWidth, y * _tileHeight, GetGraphicsComponent((TileType)_map[offset]));
                     }
                     catch (Exception)
                     {
@@ -59,11 +51,12 @@ namespace uwpKarate.Actors
 
         public void Draw(CanvasDrawingSession canvasDrawingSession)
         {
-            for (var y = 0; y < _mapHeight; y++)
+            for (var y = 0; y < _mapTileHeight; y++)
             {
-                for (var x = 0; x < _mapWidth; x++)
+                for (var x = 0; x < _mapTileWidth; x++)
                 {
-                    _tiles[x, y]?.GraphicsComponent?.Draw(canvasDrawingSession, _tiles[x, y]);
+                    var offset = (y * _mapTileWidth) + x;
+                    _tiles[offset]?.GraphicsComponent?.Draw(canvasDrawingSession, _tiles[offset]);
                 }
             }
         }
@@ -74,12 +67,16 @@ namespace uwpKarate.Actors
             {
                 case TileType.Nothing:
                     return null;
+
                 case TileType.Wall:
                     return _wallTile;
+
                 case TileType.Platform:
                     return _platformTile;
+
                 case TileType.Floor:
                     return _floorTile;
+
                 default:
                     return null;
             }
