@@ -1,0 +1,26 @@
+﻿<Page
+    x:Class="uwpKarate.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:uwpKarate"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:xaml="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    mc:Ignorable="d">
+    <!--  xmlns:viewmodels="using:uwpKarate.ViewModels"  -->
+    <!--<Page.DataContext>
+        <viewmodels:MainPageViewModel />
+    </Page.DataContext>-->
+
+    <Grid>
+        <xaml:CanvasAnimatedControl
+            x:Name="GameCanvas"
+            CreateResources="OnGameCanvasCreateResources"
+            Draw="OnGameCanvasDraw"
+            IsFixedTimeStep="True"
+            IsTapEnabled="True"
+            Tapped="OnGameCanvasTapped" />
+        <!--<xaml:CanvasAnimatedControl/>-->
+    </Grid>
+</Page>
