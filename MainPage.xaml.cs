@@ -3,7 +3,7 @@ using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using System;
 using System.Threading.Tasks;
-using uwpKarate.Actors;
+using uwpKarate.GameObjects;
 using uwpKarate.Utilities;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -34,7 +34,7 @@ namespace uwpKarate
         private void OnGameCanvasDraw(ICanvasAnimatedControl canvasControl, CanvasAnimatedDrawEventArgs args)
         {
             //var image = _scaling.ScaleBitmap(_backgroundBitmap);
-            _world?.Draw(args.DrawingSession);
+            _world?.Update(args.DrawingSession);
             //    args.DrawingSession.DrawImage(image);
             //args.DrawingSession.DrawImage(image, new System.Numerics.Vector2(0f, 0f));
             GameCanvas.Invalidate();

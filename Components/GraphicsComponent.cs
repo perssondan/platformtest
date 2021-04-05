@@ -1,10 +1,9 @@
 ﻿using Microsoft.Graphics.Canvas;
-using System;
 using System.Numerics;
-using uwpKarate.Actors;
+using uwpKarate.GameObjects;
 using Windows.Foundation;
 
-namespace uwpKarate.Models
+namespace uwpKarate.Components
 {
     public class GraphicsComponent
     {
@@ -21,7 +20,7 @@ namespace uwpKarate.Models
 
         public CanvasBitmap CanvasBitmap => _canvasBitmap;
 
-        public void Draw(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
+        public void Update(GameObject gameObject, CanvasDrawingSession canvasDrawingSession)
         {
             canvasDrawingSession.DrawImage(CanvasBitmap,
                                            new Vector2(gameObject.XPos, gameObject.YPos),

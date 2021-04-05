@@ -1,8 +1,8 @@
 ﻿using Microsoft.Graphics.Canvas;
 using System;
-using uwpKarate.Models;
+using uwpKarate.Components;
 
-namespace uwpKarate.Actors
+namespace uwpKarate.GameObjects
 {
     public class World
     {
@@ -33,14 +33,24 @@ namespace uwpKarate.Actors
         {
             _floorTile = new GraphicsComponent(canvasBitmap, 96, 0);
             _platformTile = new GraphicsComponent(canvasBitmap, 32, 0);
+            InitializeTileMap();
+        }
+
+        private void InitializeTileMap()
+        {
             for (var x = 0; x < _mapTileWidth; x++)
             {
                 for (var y = 0; y < _mapTileHeight; y++)
                 {
                     try
                     {
-                        var offset = (y * _mapTileWidth) + x;
-                        _tiles[offset] = new GameObject(x * _tileWidth, y * _tileHeight, GetGraphicsComponent((TileType)_map[offset]));
+                        var offset = y * _mapTileWidth + x;
+                        var graphicsComponent = GetGraphicsComponent((TileType)_map[offset]);
+                        _tiles[offset] = graphicsComponent == null ? null : new GameObject(graphicsComponent, null, null)
+                        {
+                            XPos = x * _tileWidth,
+                            YPos = y * _tileHeight
+                        };
                     }
                     catch (Exception)
                     {
@@ -49,14 +59,14 @@ namespace uwpKarate.Actors
             }
         }
 
-        public void Draw(CanvasDrawingSession canvasDrawingSession)
+        public void Update(CanvasDrawingSession canvasDrawingSession)
         {
             for (var y = 0; y < _mapTileHeight; y++)
             {
                 for (var x = 0; x < _mapTileWidth; x++)
                 {
-                    var offset = (y * _mapTileWidth) + x;
-                    _tiles[offset]?.GraphicsComponent?.Draw(canvasDrawingSession, _tiles[offset]);
+                    var offset = y * _mapTileWidth + x;
+                    _tiles[offset]?.Update(this, canvasDrawingSession);
                 }
             }
         }
