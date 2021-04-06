@@ -128,6 +128,9 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\GraphicsComponent.cs" />
+    <Compile Include="Models\Layer.cs" />
+    <Compile Include="Models\Map.cs" />
+    <Compile Include="Models\TileSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\GameStateManager.cs" />
     <Compile Include="Utilities\Scaling.cs" />
@@ -173,8 +176,8 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\GameAssets\images\mytilemap.json" />
-    <None Include="Assets\GameAssets\images\mytiles.json" />
+    <Content Include="Assets\GameAssets\images\mytilemap.json" />
+    <Content Include="Assets\GameAssets\images\mytiles.json" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

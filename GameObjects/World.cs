@@ -1,21 +1,24 @@
 ﻿using Microsoft.Graphics.Canvas;
 using System;
+using System.IO;
 using uwpKarate.Components;
+using uwpKarate.Models;
 
 namespace uwpKarate.GameObjects
 {
     public class World
     {
-        private const int _mapTileWidth = 14;
-        private const int _mapTileHeight = 10;
+        private readonly int _mapTileWidth = 14;
+        private readonly int _mapTileHeight = 10;
         private const int _tileWidth = 32;
         private const int _tileHeight = 32;
-        private GameObject[] _tiles = new GameObject[_mapTileWidth * _mapTileHeight];
+        private readonly Map _map;
+        private GameObject[] _tiles;
         private GraphicsComponent _wallTile;
         private GraphicsComponent _floorTile;
         private GraphicsComponent _platformTile;
 
-        private int[] _map = new[]
+        private int[] _mapData = new[]
         {
             3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0,
@@ -29,10 +32,18 @@ namespace uwpKarate.GameObjects
             3, 3, 3, 3, 3, 3, 3, 0, 0, 3, 3, 3, 3, 3
         };
 
-        public World(CanvasBitmap canvasBitmap)
+        public World(CanvasBitmap canvasBitmap, Map map)
         {
             _floorTile = new GraphicsComponent(canvasBitmap, 96, 0);
             _platformTile = new GraphicsComponent(canvasBitmap, 32, 0);
+
+            _map = map;
+            _mapData = _map.Layers[0].Data;
+
+            _mapTileWidth = _map.Width;
+            _mapTileHeight = _map.Height;
+            _tiles = new GameObject[_mapTileWidth * _mapTileHeight];
+
             InitializeTileMap();
         }
 
@@ -45,7 +56,7 @@ namespace uwpKarate.GameObjects
                     try
                     {
                         var offset = y * _mapTileWidth + x;
-                        var graphicsComponent = GetGraphicsComponent((TileType)_map[offset]);
+                        var graphicsComponent = GetGraphicsComponent((TileType)_mapData[offset]);
                         _tiles[offset] = graphicsComponent == null ? null : new GameObject(graphicsComponent, null, null)
                         {
                             XPos = x * _tileWidth,
@@ -78,10 +89,9 @@ namespace uwpKarate.GameObjects
                 case TileType.Nothing:
                     return null;
 
-                case TileType.Wall:
-                    return _wallTile;
-
-                case TileType.Platform:
+                case TileType.PlatformLeft:
+                case TileType.PlatformCenter:
+                case TileType.PlatformRight:
                     return _platformTile;
 
                 case TileType.Floor:
@@ -96,8 +106,9 @@ namespace uwpKarate.GameObjects
     public enum TileType
     {
         Nothing,
-        Wall,
-        Platform,
-        Floor
+        PlatformLeft,
+        PlatformCenter,
+        PlatformRight,
+        Floor,
     }
 }
