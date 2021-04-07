@@ -9,6 +9,7 @@ using uwpKarate.GameObjects;
 using uwpKarate.Models;
 using uwpKarate.Utilities;
 using Windows.Storage;
+using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -38,11 +39,27 @@ namespace uwpKarate
         private void OnGameCanvasDraw(ICanvasAnimatedControl canvasControl, CanvasAnimatedDrawEventArgs args)
         {
             //var image = _scaling.ScaleBitmap(_backgroundBitmap);
-            _world?.Update(args.DrawingSession);
+            _world?.Draw(args.DrawingSession);
             //    args.DrawingSession.DrawImage(image);
             //args.DrawingSession.DrawImage(image, new System.Numerics.Vector2(0f, 0f));
+
+            args.DrawingSession.DrawText($"GameCount: {_count}, elapsed: {_elapsed}", new System.Numerics.Vector2(10, 10), Colors.AliceBlue);
+            // TODO: Do we need this?
             GameCanvas.Invalidate();
         }
+
+        private void OnGameCanvasUpdate(ICanvasAnimatedControl sender, CanvasAnimatedUpdateEventArgs args)
+        {
+            _count = args.Timing.UpdateCount;
+            _elapsed = args.Timing.ElapsedTime.TotalMilliseconds;
+            if (!sender.Paused)
+            {
+                _world?.Update(args.Timing.ElapsedTime);
+            }
+        }
+
+        private long _count = 0;
+        private double _elapsed = 0d;
 
         private void OnGameCanvasCreateResources(ICanvasAnimatedControl canvasControl, CanvasCreateResourcesEventArgs args)
         {

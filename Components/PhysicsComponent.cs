@@ -4,7 +4,14 @@ namespace uwpKarate.Components
 {
     public class PhysicsComponent
     {
-        public void Update(GameObject gameObject, World world)
+        private readonly GameObject _gameObject;
+
+        public PhysicsComponent(GameObject gameObject)
+        {
+            _gameObject = gameObject;
+        }
+
+        public void Update(World world)
         {
         }
     }

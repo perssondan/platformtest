@@ -116,8 +116,10 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Components\IGameObjectComponent.cs" />
     <Compile Include="Components\InputComponent.cs" />
     <Compile Include="Components\PhysicsComponent.cs" />
+    <Compile Include="Components\TransformComponent.cs" />
     <Compile Include="GameObjects\GameObject.cs" />
     <Compile Include="GameObjects\World.cs" />
     <Compile Include="App.xaml.cs">

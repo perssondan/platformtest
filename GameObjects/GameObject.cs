@@ -1,4 +1,5 @@
 ﻿using Microsoft.Graphics.Canvas;
+using System;
 using uwpKarate.Components;
 
 namespace uwpKarate.GameObjects
@@ -7,25 +8,29 @@ namespace uwpKarate.GameObjects
     {
         public GameObject(GraphicsComponent graphicsComponent,
                           PhysicsComponent physicsComponent,
-                          InputComponent inputComponent)
+                          InputComponent inputComponent,
+                          TransformComponent transformComponent)
         {
             GraphicsComponent = graphicsComponent;
             PhysicsComponent = physicsComponent;
             InputComponent = inputComponent;
+            TransformComponent = transformComponent ?? new TransformComponent();
         }
 
-        public void Update(World world, CanvasDrawingSession canvasDrawingSession)
+        public void Update(World world, TimeSpan timeSpan)
         {
-            InputComponent?.Update(this);
-            PhysicsComponent?.Update(this, world);
-            GraphicsComponent?.Update(this, canvasDrawingSession);
+            InputComponent?.Update();
+            PhysicsComponent?.Update(world);
         }
 
-        public int XPos { get; set; }
-        public int YPos { get; set; }
-        public int Velocity { get; set; }
+        public void Draw(CanvasDrawingSession canvasDrawingSession)
+        {
+            GraphicsComponent?.Update(canvasDrawingSession);
+        }
+
         public GraphicsComponent GraphicsComponent { get; set; }
         public PhysicsComponent PhysicsComponent { get; set; }
         public InputComponent InputComponent { get; set; }
+        public TransformComponent TransformComponent { get; }
     }
 }

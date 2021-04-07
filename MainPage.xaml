@@ -20,7 +20,8 @@
             Draw="OnGameCanvasDraw"
             IsFixedTimeStep="True"
             IsTapEnabled="True"
-            Tapped="OnGameCanvasTapped" />
+            Tapped="OnGameCanvasTapped"
+            Update="OnGameCanvasUpdate"/>
         <!--<xaml:CanvasAnimatedControl/>-->
     </Grid>
 </Page>

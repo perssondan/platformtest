@@ -12,6 +12,7 @@ namespace uwpKarate.GameObjects
         private readonly int _mapTileHeight = 10;
         private const int _tileWidth = 32;
         private const int _tileHeight = 32;
+        private readonly CanvasBitmap _canvasBitmap;
         private readonly Map _map;
         private GameObject[] _tiles;
         private GraphicsComponent _wallTile;
@@ -34,9 +35,7 @@ namespace uwpKarate.GameObjects
 
         public World(CanvasBitmap canvasBitmap, Map map)
         {
-            _floorTile = new GraphicsComponent(canvasBitmap, 96, 0);
-            _platformTile = new GraphicsComponent(canvasBitmap, 32, 0);
-
+            _canvasBitmap = canvasBitmap;
             _map = map;
             _mapData = _map.Layers[0].Data;
 
@@ -56,12 +55,21 @@ namespace uwpKarate.GameObjects
                     try
                     {
                         var offset = y * _mapTileWidth + x;
-                        var graphicsComponent = GetGraphicsComponent((TileType)_mapData[offset]);
-                        _tiles[offset] = graphicsComponent == null ? null : new GameObject(graphicsComponent, null, null)
+                        if (_mapData[offset] == 0)
+                        {
+                            continue;
+                        }
+
+                        var transformComponent = new TransformComponent
                         {
                             XPos = x * _tileWidth,
                             YPos = y * _tileHeight
                         };
+                        var gameObject = new GameObject(null, null, null, transformComponent);
+                        var graphicsComponent = CreateGraphicsComponent(gameObject, (TileType)_mapData[offset], _canvasBitmap);
+                        gameObject.GraphicsComponent = graphicsComponent;
+
+                        _tiles[offset] = gameObject;
                     }
                     catch (Exception)
                     {
@@ -70,19 +78,31 @@ namespace uwpKarate.GameObjects
             }
         }
 
-        public void Update(CanvasDrawingSession canvasDrawingSession)
+        public void Update(TimeSpan timeSpan)
         {
             for (var y = 0; y < _mapTileHeight; y++)
             {
                 for (var x = 0; x < _mapTileWidth; x++)
                 {
                     var offset = y * _mapTileWidth + x;
-                    _tiles[offset]?.Update(this, canvasDrawingSession);
+                    _tiles[offset]?.Update(this, timeSpan);
                 }
             }
         }
 
-        private GraphicsComponent GetGraphicsComponent(TileType tileType)
+        public void Draw(CanvasDrawingSession canvasDrawingSession)
+        {
+            for (var y = 0; y < _mapTileHeight; y++)
+            {
+                for (var x = 0; x < _mapTileWidth; x++)
+                {
+                    var offset = y * _mapTileWidth + x;
+                    _tiles[offset]?.Draw(canvasDrawingSession);
+                }
+            }
+        }
+
+        private GraphicsComponent CreateGraphicsComponent(GameObject gameObject, TileType tileType, CanvasBitmap canvasBitmap)
         {
             switch (tileType)
             {
@@ -92,10 +112,10 @@ namespace uwpKarate.GameObjects
                 case TileType.PlatformLeft:
                 case TileType.PlatformCenter:
                 case TileType.PlatformRight:
-                    return _platformTile;
+                    return new GraphicsComponent(gameObject, canvasBitmap, 32, 0);
 
                 case TileType.Floor:
-                    return _floorTile;
+                    return new GraphicsComponent(gameObject, canvasBitmap, 96, 0);
 
                 default:
                     return null;

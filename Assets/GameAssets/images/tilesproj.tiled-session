@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "mytiles.json",
+    "activeFile": "mytilemap.json",
     "expandedProjectPaths": [
     ],
     "fileStates": {
@@ -11,8 +11,8 @@
             "scale": 3.0934375,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 21.17385594504495,
-                "y": 158.39983836751188
+                "x": 391.47388625113655,
+                "y": 255.70259622184062
             }
         },
         "mytiles.json": {
@@ -42,8 +42,8 @@
     "property.type": "int",
     "recentFiles": [
         "tilestest2.json",
-        "mytilemap.json",
         "mytiles.json",
+        "mytilemap.json",
         "tiledtest.tsx"
     ],
     "tileset.lastUsedFormat": "json",

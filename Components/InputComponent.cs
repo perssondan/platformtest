@@ -4,9 +4,15 @@ namespace uwpKarate.Components
 {
     public class InputComponent
     {
-        public void Update(GameObject gameObject)
-        {
+        private readonly GameObject _gameObject;
 
+        public InputComponent(GameObject gameObject)
+        {
+            _gameObject = gameObject;
+        }
+
+        public void Update()
+        {
         }
     }
 }
