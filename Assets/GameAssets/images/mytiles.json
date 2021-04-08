@@ -10,42 +10,6 @@
  "tileheight":32,
  "tiles":[
         {
-         "id":0,
-         "properties":[
-                {
-                 "name":"tileType",
-                 "type":"int",
-                 "value":2
-                }]
-        }, 
-        {
-         "id":1,
-         "properties":[
-                {
-                 "name":"tileType",
-                 "type":"int",
-                 "value":2
-                }]
-        }, 
-        {
-         "id":2,
-         "properties":[
-                {
-                 "name":"tileType",
-                 "type":"int",
-                 "value":2
-                }]
-        }, 
-        {
-         "id":3,
-         "properties":[
-                {
-                 "name":"tileType",
-                 "type":"int",
-                 "value":3
-                }]
-        }, 
-        {
          "animation":[
                 {
                  "duration":150,
