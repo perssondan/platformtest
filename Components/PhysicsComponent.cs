@@ -11,7 +11,7 @@ namespace uwpKarate.Components
             _gameObject = gameObject;
         }
 
-        public void Update(World world)
+        public void Update(World world, TimeSpan timeSpan)
         {
         }
     }
