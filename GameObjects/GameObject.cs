@@ -24,13 +24,9 @@ namespace uwpKarate.GameObjects
 
         public void Update(World world, TimeSpan timeSpan)
         {
-            InputComponent?.Update();
-            PhysicsComponent?.Update(world);
-        }
-
-        public void Draw(CanvasDrawingSession canvasDrawingSession)
-        {
-            GraphicsComponent?.Update(canvasDrawingSession);
+            InputComponent?.Update(timeSpan);
+            PhysicsComponent?.Update(world, timeSpan);
+            TransformComponent?.Update(world, timeSpan);
         }
 
         public GraphicsComponent GraphicsComponent { get; set; }
