@@ -4,7 +4,7 @@ using Windows.Foundation;
 
 namespace uwpKarate.Components
 {
-    public class GraphicsComponent : IGameObjectComponent<CanvasDrawingSession>
+    public class GraphicsComponent
     {
         private readonly GameObject _gameObject;
         private readonly CanvasBitmap _canvasBitmap;
@@ -23,16 +23,13 @@ namespace uwpKarate.Components
         }
 
         public CanvasBitmap CanvasBitmap => _canvasBitmap;
+        public Rect Rect => _rect;
 
-        public void Update(CanvasDrawingSession canvasDrawingSession)
+        public void Draw(CanvasDrawingSession canvasDrawingSession)
         {
             canvasDrawingSession.DrawImage(CanvasBitmap,
-                                           _gameObject.TransformComponent.Vector,
+                                           _gameObject.TransformComponent.Position,
                                            _rect);
-        }
-
-        public void Update()
-        {
         }
     }
 }
