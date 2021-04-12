@@ -6,6 +6,11 @@ namespace uwpKarate.GameObjects
 {
     public class GameObject
     {
+        public GameObject()
+        {
+            TransformComponent = new TransformComponent();
+        }
+
         public GameObject(GraphicsComponent graphicsComponent,
                           PhysicsComponent physicsComponent,
                           InputComponent inputComponent,
