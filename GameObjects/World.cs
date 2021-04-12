@@ -1,8 +1,11 @@
 ﻿using Microsoft.Graphics.Canvas;
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 using uwpKarate.Components;
 using uwpKarate.Models;
+using Windows.Foundation;
 
 namespace uwpKarate.GameObjects
 {
@@ -12,12 +15,12 @@ namespace uwpKarate.GameObjects
         private readonly int _mapTileHeight = 10;
         private const int _tileWidth = 32;
         private const int _tileHeight = 32;
-        private readonly CanvasBitmap _canvasBitmap;
+        private readonly IReadOnlyList<CanvasBitmap> _canvasBitmaps;
         private readonly Map _map;
+        private readonly TileAtlas[] _tileAtlases;
         private GameObject[] _tiles;
-        private GraphicsComponent _wallTile;
-        private GraphicsComponent _floorTile;
-        private GraphicsComponent _platformTile;
+
+        private List<GraphicsComponent> _graphicsComponents = new List<GraphicsComponent>();
 
         private int[] _mapData = new[]
         {
@@ -33,10 +36,11 @@ namespace uwpKarate.GameObjects
             3, 3, 3, 3, 3, 3, 3, 0, 0, 3, 3, 3, 3, 3
         };
 
-        public World(CanvasBitmap canvasBitmap, Map map)
+        public World(CanvasBitmap[] canvasBitmaps, Map map, TileAtlas[] tileAtlases, Windows.UI.Xaml.Window current)
         {
-            _canvasBitmap = canvasBitmap;
+            _canvasBitmaps = canvasBitmaps;
             _map = map;
+            _tileAtlases = tileAtlases;
             _mapData = _map.Layers[0].Data;
 
             _mapTileWidth = _map.Width;
@@ -46,7 +50,11 @@ namespace uwpKarate.GameObjects
             InitializeTileMap();
         }
 
-        private void InitializeTileMap()
+        public int WorldPixelHeight => _map.Height * _map.TileHeight;
+        public int WorldPixelWidth => _map.Width * _map.TileWidth;
+
+        public Rect WorldRect => new Rect(0, 0, WorldPixelWidth, WorldPixelHeight);
+
         {
             for (var x = 0; x < _mapTileWidth; x++)
             {
@@ -110,9 +118,13 @@ namespace uwpKarate.GameObjects
                     return null;
 
                 case TileType.PlatformLeft:
+                    return new GraphicsComponent(gameObject, canvasBitmap, 0, 0);
+
                 case TileType.PlatformCenter:
-                case TileType.PlatformRight:
                     return new GraphicsComponent(gameObject, canvasBitmap, 32, 0);
+
+                case TileType.PlatformRight:
+                    return new GraphicsComponent(gameObject, canvasBitmap, 64, 0);
 
                 case TileType.Floor:
                     return new GraphicsComponent(gameObject, canvasBitmap, 96, 0);

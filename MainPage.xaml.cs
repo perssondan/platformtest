@@ -3,7 +3,9 @@ using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using uwpKarate.GameObjects;
 using uwpKarate.Models;
@@ -19,8 +21,7 @@ namespace uwpKarate
 {
     public sealed partial class MainPage : Page
     {
-        private CanvasBitmap _backgroundBitmap;
-        private CanvasBitmap _tileAtlas;
+        private CanvasBitmap _tileAtlasBitmap;
         private Scaling _scaling = new Scaling();
         private GameStateManager _gameStateManager = new GameStateManager();
         private World _world;
@@ -38,9 +39,10 @@ namespace uwpKarate
 
         private void OnGameCanvasDraw(ICanvasAnimatedControl canvasControl, CanvasAnimatedDrawEventArgs args)
         {
-            //var image = _scaling.ScaleBitmap(_backgroundBitmap);
             _world?.Draw(args.DrawingSession);
-            //    args.DrawingSession.DrawImage(image);
+
+            //var image = _scaling.ScaleBitmap(_tileAtlasBitmap);
+            //args.DrawingSession.DrawImage(image);
             //args.DrawingSession.DrawImage(image, new System.Numerics.Vector2(0f, 0f));
 
             args.DrawingSession.DrawText($"GameCount: {_count}, elapsed: {_elapsed}", new System.Numerics.Vector2(10, 10), Colors.AliceBlue);
@@ -68,19 +70,16 @@ namespace uwpKarate
 
         private async Task CreateResourceAsync(ICanvasAnimatedControl canvasControl)
         {
-            _backgroundBitmap = await CanvasBitmap.LoadAsync(canvasControl, new Uri("ms-appx:///Assets/GameAssets/images/ikplusbakdrop.png"));
-            _tileAtlas = await CanvasBitmap.LoadAsync(canvasControl, new Uri("ms-appx:///Assets/GameAssets/images/tiles.png"));
+            var tiledLoader = new TiledLoader();
+            var map = await tiledLoader.LoadResourceAsync<Map>(new Uri("ms-appx:///Assets/GameAssets/images/mytilemap.json"));
 
-            var storageFile = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/GameAssets/images/mytilemap.json"));
+            var tileAtlases = await Task.WhenAll(map.TileSets
+                .Select(tileSet => tiledLoader.LoadResourceAsync<TileAtlas>(new Uri($"ms-appx:///Assets/GameAssets/images/{tileSet.Source}"))));
 
-            var jsonSerializer = new JsonSerializer();
-            using (var randomAccessStream = await storageFile.OpenReadAsync())
-            using (var streamReader = new StreamReader(randomAccessStream.AsStream()))
-            using (var jsonTextReader = new JsonTextReader(streamReader))
-            {
-                var map = jsonSerializer.Deserialize<Map>(jsonTextReader);
-                _world = new World(_tileAtlas, map);
-            }
+            var bitmaps = await Task.WhenAll(tileAtlases
+                .Select(tileAtlas => CanvasBitmap.LoadAsync(canvasControl, new Uri($"ms-appx:///Assets/GameAssets/images/{tileAtlas.ImageSource}")).AsTask()));
+
+            _world = new World(bitmaps, map, tileAtlases, Window.Current);
         }
 
         private void OnGameCanvasTapped(object sender, TappedRoutedEventArgs args)

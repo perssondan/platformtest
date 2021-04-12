@@ -4,6 +4,7 @@
  "imagewidth":128,
  "margin":0,
  "name":"mytiles",
+ "objectalignment":"center",
  "spacing":0,
  "tilecount":16,
  "tiledversion":"1.5.0",
