@@ -48,6 +48,7 @@ namespace uwpKarate.GameObjects
             _tiles = new GameObject[_mapTileWidth * _mapTileHeight];
 
             InitializeTileMap();
+            InitializeHeroine(current);
         }
 
         public int WorldPixelHeight => _map.Height * _map.TileHeight;
@@ -55,59 +56,96 @@ namespace uwpKarate.GameObjects
 
         public Rect WorldRect => new Rect(0, 0, WorldPixelWidth, WorldPixelHeight);
 
+        public bool IsOnGround(GameObject gameObject)
+        {
+            if (TryGetTileGameObject(gameObject.TransformComponent.Position, out var tileGameObject))
+            {
+                if (tileGameObject != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool TryGetTileGameObject(Vector2 position, out GameObject gameObject)
+        {
+            // TODO: Get collision points from heroin
+            var topLeft = position.ToPoint();
+            var topRight = (position + new Vector2(_tileWidth, 0)).ToPoint();
+            var bottomLeft = (position + new Vector2(0, _tileHeight)).ToPoint();
+            var bottomRight = (position + new Vector2(_tileWidth, _tileHeight)).ToPoint();
+            gameObject = null;
+            foreach (var tile in _tiles.Where(tile => tile != null && tile.TransformComponent != null))
+            {
+                var rect = new Rect(tile.TransformComponent.Position.X, tile.TransformComponent.Position.Y, _tileWidth, _tileHeight);
+                if (rect.Contains(topLeft) || rect.Contains(topRight) || rect.Contains(bottomLeft) || rect.Contains(bottomRight))
+                {
+                    gameObject = tile;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private GameObject _heroine;
+
+        private void InitializeHeroine(Windows.UI.Xaml.Window current)
+        {
+            var gameObject = new GameObject();
+            new GraphicsComponent(gameObject, _canvasBitmaps[0], 0, 0);
+            gameObject.GraphicsComponent = new GraphicsComponent(gameObject, _canvasBitmaps[0], 0, 96);
+            gameObject.PhysicsComponent = new PhysicsComponent(gameObject);
+            gameObject.InputComponent = new InputComponent(gameObject, current);
+            _graphicsComponents.Add(gameObject.GraphicsComponent);
+            _heroine = gameObject;
+        }
+
+        private void InitializeTileMap()
+        {
+            TileMapIterator((data) =>
+            {
+                if (_mapData[data.offset] == 0) return;
+
+                var transformComponent = new TransformComponent
+                {
+                    Position = new Vector2(data.x * _tileWidth, data.y * _tileHeight)
+                };
+                var gameObject = new GameObject(null, null, null, transformComponent);
+                var graphicsComponent = CreateGraphicsComponent(gameObject, (TileType)_mapData[data.offset], _canvasBitmaps[0]);
+                gameObject.GraphicsComponent = graphicsComponent;
+                _graphicsComponents.Add(gameObject.GraphicsComponent);
+
+                _tiles[data.offset] = gameObject;
+            });
+        }
+
+        private void TileMapIterator(Action<(int offset, int x, int y)> action)
         {
             for (var x = 0; x < _mapTileWidth; x++)
             {
                 for (var y = 0; y < _mapTileHeight; y++)
                 {
-                    try
-                    {
-                        var offset = y * _mapTileWidth + x;
-                        if (_mapData[offset] == 0)
-                        {
-                            continue;
-                        }
-
-                        var transformComponent = new TransformComponent
-                        {
-                            XPos = x * _tileWidth,
-                            YPos = y * _tileHeight
-                        };
-                        var gameObject = new GameObject(null, null, null, transformComponent);
-                        var graphicsComponent = CreateGraphicsComponent(gameObject, (TileType)_mapData[offset], _canvasBitmap);
-                        gameObject.GraphicsComponent = graphicsComponent;
-
-                        _tiles[offset] = gameObject;
-                    }
-                    catch (Exception)
-                    {
-                    }
+                    var offset = y * _mapTileWidth + x;
+                    action?.Invoke((offset, x, y));
                 }
             }
         }
 
         public void Update(TimeSpan timeSpan)
         {
-            for (var y = 0; y < _mapTileHeight; y++)
+            TileMapIterator((data) =>
             {
-                for (var x = 0; x < _mapTileWidth; x++)
-                {
-                    var offset = y * _mapTileWidth + x;
-                    _tiles[offset]?.Update(this, timeSpan);
-                }
-            }
+                _tiles[data.offset]?.Update(this, timeSpan);
+            });
+            _heroine?.Update(this, timeSpan);
         }
 
         public void Draw(CanvasDrawingSession canvasDrawingSession)
         {
-            for (var y = 0; y < _mapTileHeight; y++)
-            {
-                for (var x = 0; x < _mapTileWidth; x++)
-                {
-                    var offset = y * _mapTileWidth + x;
-                    _tiles[offset]?.Draw(canvasDrawingSession);
-                }
-            }
+            _graphicsComponents.ForEach(graphicsComponent => graphicsComponent.Draw(canvasDrawingSession));
         }
 
         private GraphicsComponent CreateGraphicsComponent(GameObject gameObject, TileType tileType, CanvasBitmap canvasBitmap)
