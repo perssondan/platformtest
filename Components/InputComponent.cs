@@ -14,7 +14,8 @@ namespace uwpKarate.Components
         private float _walkingForce = 1f;
         private Vector2 _jumpingForce = new Vector2(0f, -140f);
         private VirtualKey _virtualKey;
-        private VirtualKey _previousVirtualKey;
+        private double _jumpPressedRememberTime = 0.4f;
+        private double _jumpPressedAt;
 
         public InputComponent(GameObject gameObject, Window current)
         {
@@ -26,24 +27,13 @@ namespace uwpKarate.Components
 
         public void Update(TimeSpan timeSpan)
         {
+            _jumpPressedAt -= timeSpan.TotalMilliseconds;
             var force = default(Vector2);
             switch (_virtualKey)
             {
-                //case VirtualKey.S:
-                //case VirtualKey.GamepadDPadDown:
-                //    force.Y = 10;
-                //    break;
-                //case VirtualKey.W:
-                case VirtualKey.GamepadDPadUp:
-                    // Only jump when stationary
-                    if (!IsJumping && !IsFalling)
-                    {
-                        // Accelaration
-                        //_gameObject.TransformComponent.Velocity += (float)timeSpan.TotalSeconds * _jumpingForce;
-                        // Impulse
-                        _gameObject.TransformComponent.Velocity += _jumpingForce;
-                    }
-                    
+                case VirtualKey.W:
+                case VirtualKey.GamepadA:
+                    _jumpPressedAt = _jumpPressedRememberTime;
                     break;
                 case VirtualKey.D:
                 case VirtualKey.GamepadDPadRight:
@@ -57,8 +47,15 @@ namespace uwpKarate.Components
                     break;
             }
 
-            
-            _previousVirtualKey = _virtualKey;
+            // Only jump when stationary
+            if (!IsJumping && !IsFalling && _jumpPressedAt > 0f)
+            {
+                _jumpPressedAt = 0f;
+                // Accelaration
+                //_gameObject.TransformComponent.Velocity += (float)timeSpan.TotalSeconds * _jumpingForce;
+                // Impulse
+                _gameObject.TransformComponent.Velocity += _jumpingForce;
+            }
         }
 
         private bool IsJumping => _gameObject.TransformComponent.Velocity.Y < 0f;
