@@ -17,8 +17,8 @@ namespace uwpKarate.Components
             get => _velocity;
             set
             {
-                if (value.LengthSquared() > _maxVelocity.LengthSquared())
-                    return;
+                //if (value.LengthSquared() > _maxVelocity.LengthSquared())
+                //    return;
 
                 _velocity = value;
             }
