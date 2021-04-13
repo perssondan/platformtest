@@ -12,7 +12,7 @@ namespace uwpKarate.Components
         {
             _gameObject = gameObject;
 
-            Gravity = new Vector2(0f, 80f);
+            Gravity = new Vector2(0f, 250f);
         }
 
         public void Update(World world, TimeSpan timeSpan)
