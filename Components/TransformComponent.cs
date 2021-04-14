@@ -6,23 +6,10 @@ namespace uwpKarate.Components
 {
     public class TransformComponent
     {
-        private Vector2 _velocity;
-        private Vector2 _maxVelocity = new Vector2(200, 200);
-
         /// <summary>
         /// px/sec
         /// </summary>
-        public Vector2 Velocity
-        {
-            get => _velocity;
-            set
-            {
-                //if (value.LengthSquared() > _maxVelocity.LengthSquared())
-                //    return;
-
-                _velocity = value;
-            }
-        }
+        public Vector2 Velocity { get; set; }
 
         public Vector2 Position { get; set; }
 
@@ -34,6 +21,7 @@ namespace uwpKarate.Components
             {
                 Position = Vector2.Zero;
             }
+            Velocity = Vector2.Zero;
         }
     }
 }
