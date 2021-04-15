@@ -7,6 +7,7 @@ namespace uwpKarate.Components
 {
     public class TransformComponent
     {
+        private float _maxVelocity = 200f;
         /// <summary>
         /// px/sec
         /// </summary>
@@ -16,6 +17,12 @@ namespace uwpKarate.Components
 
         public void Update(World world, TimeSpan timeSpan)
         {
+            //var velocity = Velocity.Length();
+            //if (velocity > _maxVelocity)
+            //{
+            //    var factor = _maxVelocity / velocity;
+            //    Velocity *= factor;
+            //}
             Position += (float)timeSpan.TotalSeconds * Velocity;
             if (!world.WorldRect.Contains(Position.ToPoint()))
             {
