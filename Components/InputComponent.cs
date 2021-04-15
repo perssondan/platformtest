@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using uwpKarate.GameObjects;
 using Windows.System;
@@ -11,11 +13,14 @@ namespace uwpKarate.Components
     {
         private readonly GameObject _gameObject;
         private readonly Window _window;
-        private float _walkingForce = 1f;
-        private Vector2 _jumpingForce = new Vector2(0f, -140f);
-        private VirtualKey _virtualKey;
-        private double _jumpPressedRememberTime = 0.4f;
-        private double _jumpPressedAt;
+        private Vector2 _walkingSpeed = new Vector2(100f, 0f);
+        private Vector2 _initialJumpSpeed = new Vector2(0f, -85f);
+        private UserInput _userInput;
+        private readonly TimeSpan _jumpPressedRememberTime = TimeSpan.FromSeconds(0.4f);
+        private TimeSpan _jumpPressedAt;
+        private readonly TimeSpan _walkPressedRememberTime = TimeSpan.FromSeconds(1.7f);
+        private TimeSpan _walkPressedAt;
+        private TimeSpan _timeToApex = TimeSpan.Zero;
 
         public InputComponent(GameObject gameObject, Window current)
         {
@@ -27,34 +32,42 @@ namespace uwpKarate.Components
 
         public void Update(TimeSpan timeSpan)
         {
-            _jumpPressedAt -= timeSpan.TotalMilliseconds;
-            var force = default(Vector2);
-            switch (_virtualKey)
+            _jumpPressedAt -= timeSpan;
+            _walkPressedAt -= timeSpan;
+            _timeToApex -= timeSpan;
+
+            var walkVector = Vector2.Zero;
+            if ((_userInput & UserInput.Jump) == UserInput.Jump)
             {
-                case VirtualKey.W:
-                case VirtualKey.GamepadA:
-                    _jumpPressedAt = _jumpPressedRememberTime;
-                    break;
-                case VirtualKey.D:
-                case VirtualKey.GamepadDPadRight:
-                    force.X = _walkingForce;
-                    _gameObject.TransformComponent.Position += force;
-                    break;
-                case VirtualKey.A:
-                case VirtualKey.GamepadDPadLeft:
-                    force.X = -_walkingForce;
-                    _gameObject.TransformComponent.Position += force;
-                    break;
+                _jumpPressedAt = _jumpPressedRememberTime;
+                if (_timeToApex <= TimeSpan.Zero)
+                {
+                    var timeToApex = _initialJumpSpeed.LengthSquared() / _gameObject.PhysicsComponent.Gravity.LengthSquared();
+                    //_timeToApex = TimeSpan.FromSeconds((_initialJumpSpeed / _gameObject.PhysicsComponent.Gravity).Length());
+                }
+            }
+            if ((_userInput & UserInput.Right) == UserInput.Right)
+            {
+                _walkPressedAt = _walkPressedRememberTime;
+                walkVector = _walkingSpeed;
+            }
+            else if ((_userInput & UserInput.Left) == UserInput.Left)
+            {
+                _walkPressedAt = _walkPressedRememberTime;
+                walkVector = -_walkingSpeed;
             }
 
-            // Only jump when stationary
-            if (!IsJumping && !IsFalling && _jumpPressedAt > 0f)
+            if (_walkPressedAt.TotalMilliseconds > 0f)
             {
-                _jumpPressedAt = 0f;
-                // Accelaration
-                //_gameObject.TransformComponent.Velocity += (float)timeSpan.TotalSeconds * _jumpingForce;
-                // Impulse
-                _gameObject.TransformComponent.Velocity += _jumpingForce;
+                _walkPressedAt = TimeSpan.Zero;
+                _gameObject.TransformComponent.Velocity += walkVector;
+            }
+
+            //Only jump when stationary
+            if (!IsJumping && !IsFalling && _jumpPressedAt.TotalMilliseconds > 0f)
+            {
+                _jumpPressedAt = TimeSpan.Zero;
+                _gameObject.TransformComponent.Velocity += _initialJumpSpeed;
             }
         }
 
@@ -71,13 +84,45 @@ namespace uwpKarate.Components
             var coreWindow = _window?.CoreWindow;
             if (coreWindow == null) return;
 
-            coreWindow.KeyDown += OnKeyDown;
-            coreWindow.KeyUp += (a, b) => _virtualKey = VirtualKey.None;
+            coreWindow.KeyDown += (sender, args) => UpdateUserInput(args.VirtualKey, true);
+            coreWindow.KeyUp += (sender, args) => UpdateUserInput(args.VirtualKey, false);
         }
 
-        private void OnKeyDown(CoreWindow sender, KeyEventArgs args)
+        private void UpdateUserInput(VirtualKey virtualKey, bool keyDown)
         {
-            _virtualKey = args.VirtualKey;
+            var userInput = UserInput.None;
+            switch (virtualKey)
+            {
+                case VirtualKey.W:
+                case VirtualKey.GamepadA:
+                    userInput = UserInput.Jump;
+                    break;
+                case VirtualKey.D:
+                case VirtualKey.GamepadDPadRight:
+                    userInput = UserInput.Right;
+                    break;
+                case VirtualKey.A:
+                case VirtualKey.GamepadDPadLeft:
+                    userInput = UserInput.Left;
+                    break;
+            }
+
+            if (keyDown)
+            {
+                _userInput |= userInput;
+            }
+            else// if ((_userInput & userInput) > 0)
+            {
+                _userInput &= ~userInput;
+            }
+        }
+
+        private enum UserInput
+        {
+            None = 0,
+            Left = 1,
+            Right = 2,
+            Jump = 4
         }
     }
 }
