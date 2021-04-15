@@ -20,7 +20,7 @@ namespace uwpKarate.GameObjects
         private readonly TileAtlas[] _tileAtlases;
         private GameObject[] _tiles;
 
-        private List<GraphicsComponent> _graphicsComponents = new List<GraphicsComponent>();
+        private List<IGameObjectComponent<CanvasDrawingSession>> _graphicsComponents = new List<IGameObjectComponent<CanvasDrawingSession>>();
 
         private int[] _mapData = new[]
         {
@@ -143,9 +143,9 @@ namespace uwpKarate.GameObjects
             _heroine?.Update(this, timeSpan);
         }
 
-        public void Draw(CanvasDrawingSession canvasDrawingSession)
+        public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
         {
-            _graphicsComponents.ForEach(graphicsComponent => graphicsComponent.Draw(canvasDrawingSession));
+            _graphicsComponents.ForEach(graphicsComponent => graphicsComponent.Update(canvasDrawingSession, timeSpan));
         }
 
         private GraphicsComponent CreateGraphicsComponent(GameObject gameObject, TileType tileType, CanvasBitmap canvasBitmap)

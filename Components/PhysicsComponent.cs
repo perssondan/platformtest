@@ -4,7 +4,7 @@ using uwpKarate.GameObjects;
 
 namespace uwpKarate.Components
 {
-    public class PhysicsComponent
+    public class PhysicsComponent : IGameObjectComponent<World>
     {
         private readonly GameObject _gameObject;
         private Vector2 _previousAppliedVelocity = Vector2.Zero;

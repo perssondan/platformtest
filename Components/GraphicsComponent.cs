@@ -1,10 +1,11 @@
 ﻿using Microsoft.Graphics.Canvas;
+using System;
 using uwpKarate.GameObjects;
 using Windows.Foundation;
 
 namespace uwpKarate.Components
 {
-    public class GraphicsComponent
+    public class GraphicsComponent : IGameObjectComponent<CanvasDrawingSession>
     {
         private readonly GameObject _gameObject;
         private readonly CanvasBitmap _canvasBitmap;
@@ -25,7 +26,7 @@ namespace uwpKarate.Components
         public CanvasBitmap CanvasBitmap => _canvasBitmap;
         public Rect Rect => _rect;
 
-        public void Draw(CanvasDrawingSession canvasDrawingSession)
+        public void Update(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
         {
             canvasDrawingSession.DrawImage(CanvasBitmap,
                                            _gameObject.TransformComponent.Position,

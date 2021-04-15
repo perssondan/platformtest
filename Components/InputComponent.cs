@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using uwpKarate.GameObjects;
 using Windows.System;
@@ -9,7 +7,7 @@ using Windows.UI.Xaml;
 
 namespace uwpKarate.Components
 {
-    public class InputComponent
+    public class InputComponent : IGameObjectComponent<World>
     {
         private readonly GameObject _gameObject;
         private readonly Window _window;
@@ -30,7 +28,7 @@ namespace uwpKarate.Components
             HookupKeyListener();
         }
 
-        public void Update(TimeSpan timeSpan)
+        public void Update(World world, TimeSpan timeSpan)
         {
             _jumpPressedAt -= timeSpan;
             _walkPressedAt -= timeSpan;
@@ -97,10 +95,12 @@ namespace uwpKarate.Components
                 case VirtualKey.GamepadA:
                     userInput = UserInput.Jump;
                     break;
+
                 case VirtualKey.D:
                 case VirtualKey.GamepadDPadRight:
                     userInput = UserInput.Right;
                     break;
+
                 case VirtualKey.A:
                 case VirtualKey.GamepadDPadLeft:
                     userInput = UserInput.Left;
@@ -111,7 +111,7 @@ namespace uwpKarate.Components
             {
                 _userInput |= userInput;
             }
-            else// if ((_userInput & userInput) > 0)
+            else
             {
                 _userInput &= ~userInput;
             }

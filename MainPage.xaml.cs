@@ -39,7 +39,7 @@ namespace uwpKarate
 
         private void OnGameCanvasDraw(ICanvasAnimatedControl canvasControl, CanvasAnimatedDrawEventArgs args)
         {
-            _world?.Draw(args.DrawingSession);
+            _world?.Draw(args.DrawingSession, args.Timing.ElapsedTime);
 
             //var image = _scaling.ScaleBitmap(_tileAtlasBitmap);
             //args.DrawingSession.DrawImage(image);

@@ -1,28 +1,17 @@
 ﻿using System;
-using System.Drawing;
 using System.Numerics;
 using uwpKarate.GameObjects;
 
 namespace uwpKarate.Components
 {
-    public class TransformComponent
+    public class TransformComponent : IGameObjectComponent<World>
     {
-        private float _maxVelocity = 200f;
-        /// <summary>
-        /// px/sec
-        /// </summary>
         public Vector2 Velocity { get; set; }
 
         public Vector2 Position { get; set; }
 
         public void Update(World world, TimeSpan timeSpan)
         {
-            //var velocity = Velocity.Length();
-            //if (velocity > _maxVelocity)
-            //{
-            //    var factor = _maxVelocity / velocity;
-            //    Velocity *= factor;
-            //}
             Position += (float)timeSpan.TotalSeconds * Velocity;
             if (!world.WorldRect.Contains(Position.ToPoint()))
             {

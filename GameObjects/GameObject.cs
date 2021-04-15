@@ -24,7 +24,7 @@ namespace uwpKarate.GameObjects
 
         public void Update(World world, TimeSpan timeSpan)
         {
-            InputComponent?.Update(timeSpan);
+            InputComponent?.Update(world, timeSpan);
             PhysicsComponent?.Update(world, timeSpan);
             // Must be last
             TransformComponent?.Update(world, timeSpan);

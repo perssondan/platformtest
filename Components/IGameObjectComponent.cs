@@ -1,12 +1,13 @@
-﻿namespace uwpKarate.Components
+﻿using System;
+
+namespace uwpKarate.Components
 {
     public interface IGameObjectComponent
     {
-        //void Update();
     }
 
     public interface IGameObjectComponent<T> : IGameObjectComponent
     {
-        void Update(T target);
+        void Update(T target, TimeSpan timeSpan);
     }
 }
