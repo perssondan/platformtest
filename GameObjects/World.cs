@@ -56,9 +56,9 @@ namespace uwpKarate.GameObjects
 
         public Rect WorldRect => new Rect(0, 0, WorldPixelWidth, WorldPixelHeight);
 
-        public bool IsOnGround(GameObject gameObject)
+        public bool TryGetGroundedTile(GameObject gameObject, out GameObject tileGameObject)
         {
-            if (TryGetTileGameObject(gameObject.TransformComponent.Position, out var tileGameObject))
+            if (TryGetTileGameObject(gameObject.TransformComponent.Position, out tileGameObject))
             {
                 if (tileGameObject != null)
                 {
