@@ -12,7 +12,7 @@ namespace uwpKarate.Components
         private readonly GameObject _gameObject;
         private readonly Window _window;
         private Vector2 _walkingSpeed = new Vector2(100f, 0f);
-        private Vector2 _initialJumpSpeed = new Vector2(0f, -85f);
+        private Vector2 _initialJumpSpeed = new Vector2(0f, -192f);
         private UserInput _userInput;
         private readonly TimeSpan _jumpPressedRememberTime = TimeSpan.FromSeconds(0.4f);
         private TimeSpan _jumpPressedAt;

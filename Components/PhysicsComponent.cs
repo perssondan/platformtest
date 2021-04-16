@@ -8,13 +8,13 @@ namespace uwpKarate.Components
     {
         private readonly GameObject _gameObject;
         private Vector2 _previousAppliedVelocity = Vector2.Zero;
-        private float _maxVelocity = 200f;
+        private float _maxVelocity = 600f;
 
         public PhysicsComponent(GameObject gameObject)
         {
             _gameObject = gameObject;
 
-            Gravity = new Vector2(0f, 56.8f);
+            Gravity = new Vector2(0f, 192f);
         }
 
         public void Update(World world, TimeSpan timeSpan)
@@ -30,9 +30,9 @@ namespace uwpKarate.Components
             // snap to ground
             if (world.TryGetGroundedTile(_gameObject, out var tileGameObject))
             {
-                _gameObject.TransformComponent.Position *= Vector2.UnitX;
-                _gameObject.TransformComponent.Position += (Vector2.UnitY * tileGameObject.TransformComponent.Position) - (32f * Vector2.UnitY);
-                velocityToAdd = Vector2.Zero;
+                var xMemory = _gameObject.TransformComponent.Position * Vector2.UnitX;
+                _gameObject.TransformComponent.Position = xMemory + (Vector2.UnitY * tileGameObject.TransformComponent.Position) - (32f * Vector2.UnitY);
+                velocityToAdd *= Vector2.UnitX;
             }
 
             //if (!IsJumping)
