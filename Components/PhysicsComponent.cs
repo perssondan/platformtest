@@ -7,47 +7,46 @@ namespace uwpKarate.Components
     public class PhysicsComponent : IGameObjectComponent<World>
     {
         private readonly GameObject _gameObject;
-        private Vector2 _previousAppliedVelocity = Vector2.Zero;
-        private float _maxVelocity = 600f;
 
         public PhysicsComponent(GameObject gameObject)
         {
             _gameObject = gameObject;
-
-            Gravity = new Vector2(0f, 192f);
         }
 
         public void Update(World world, TimeSpan timeSpan)
         {
-            // velocity should increase over time when gravity is applied (no impulse)
-            var velocityToAdd = _previousAppliedVelocity + (float)timeSpan.TotalSeconds * Gravity;
-            var velocity = velocityToAdd.Length();
-            if (velocity > _maxVelocity)
-            {
-                var factor = _maxVelocity / velocity;
-                velocityToAdd *= factor;
-            }
-            // snap to ground
-            if (world.TryGetGroundedTile(_gameObject, out var tileGameObject))
-            {
-                var xMemory = _gameObject.TransformComponent.Position * Vector2.UnitX;
-                _gameObject.TransformComponent.Position = xMemory + (Vector2.UnitY * tileGameObject.TransformComponent.Position) - (32f * Vector2.UnitY);
-                velocityToAdd *= Vector2.UnitX;
-            }
+            var deltaTime = (float)timeSpan.TotalSeconds;
+            // Apply gravity
+            var newVelocity = _gameObject.TransformComponent.Velocity + (deltaTime * Gravity);
+            // TODO: Limit velocity
+            _gameObject.TransformComponent.Velocity = newVelocity;
+            // TODO: is this right?
+            _gameObject.TransformComponent.Position += (0.5f * (newVelocity + OldVelocity) * deltaTime);
 
-            //if (!IsJumping)
-            //{
-            //    velocityToAdd = Vector2.Zero;
-            //}
-
-            _gameObject.TransformComponent.Velocity += velocityToAdd;
-            _previousAppliedVelocity = velocityToAdd;
+            OldVelocity = _gameObject.TransformComponent.Velocity;
         }
 
-        public Vector2 Gravity { get; private set; }
+        private Vector2 OldVelocity { get; set; }
 
-        private bool IsJumping => _gameObject.TransformComponent.Velocity.Y < 0f;
+        private void DampHorizontalSpeed(float deltaTime)
+        {
+            _horizontalLerpTime += deltaTime;
 
-        private bool IsFalling => _gameObject.TransformComponent.Velocity.Y > 0f;
+            if (_gameObject.TransformComponent.Velocity.X != 0f)
+            {
+                var lerpVector = Vector2.Lerp(_gameObject.TransformComponent.Velocity * Vector2.UnitX, Vector2.Zero, _horizontalLerpTime);
+                // damp or set horizontal velocity to zero
+                _gameObject.TransformComponent.Velocity = lerpVector + (Vector2.UnitY * _gameObject.TransformComponent.Velocity);
+            }
+            else
+            {
+                _horizontalLerpTime = 0f;
+            }
+        }
+
+        private float _horizontalLerpTime = 0f;
+
+        public Vector2 Gravity { get; set; }
+        public Vector2 MaximumVelocity { get; set; }// TODO: Implement limit
     }
 }

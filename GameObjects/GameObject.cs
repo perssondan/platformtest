@@ -1,5 +1,4 @@
-﻿using Microsoft.Graphics.Canvas;
-using System;
+﻿using System;
 using uwpKarate.Components;
 
 namespace uwpKarate.GameObjects
@@ -24,10 +23,22 @@ namespace uwpKarate.GameObjects
 
         public void Update(World world, TimeSpan timeSpan)
         {
+            OnBeforeUpdate(world, timeSpan);
+
             InputComponent?.Update(world, timeSpan);
             PhysicsComponent?.Update(world, timeSpan);
             // Must be last
             TransformComponent?.Update(world, timeSpan);
+
+            OnAfterUpdate(world, timeSpan);
+        }
+
+        public virtual void OnBeforeUpdate(World world, TimeSpan timeSpan)
+        {
+        }
+
+        public virtual void OnAfterUpdate(World world, TimeSpan timeSpan)
+        {
         }
 
         public GraphicsComponent GraphicsComponent { get; set; }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Numerics;
 using uwpKarate.GameObjects;
 using Windows.System;
 using Windows.UI.Core;
@@ -11,14 +10,7 @@ namespace uwpKarate.Components
     {
         private readonly GameObject _gameObject;
         private readonly Window _window;
-        private Vector2 _walkingSpeed = new Vector2(100f, 0f);
-        private Vector2 _initialJumpSpeed = new Vector2(0f, -192f);
-        private UserInput _userInput;
-        private readonly TimeSpan _jumpPressedRememberTime = TimeSpan.FromSeconds(0.4f);
-        private TimeSpan _jumpPressedAt;
-        private readonly TimeSpan _walkPressedRememberTime = TimeSpan.FromSeconds(1.7f);
-        private TimeSpan _walkPressedAt;
-        private TimeSpan _timeToApex = TimeSpan.Zero;
+        private UserInput _userInputs;
 
         public InputComponent(GameObject gameObject, Window current)
         {
@@ -30,47 +22,7 @@ namespace uwpKarate.Components
 
         public void Update(World world, TimeSpan timeSpan)
         {
-            _jumpPressedAt -= timeSpan;
-            _walkPressedAt -= timeSpan;
-            _timeToApex -= timeSpan;
-
-            var walkVector = Vector2.Zero;
-            if ((_userInput & UserInput.Jump) == UserInput.Jump)
-            {
-                _jumpPressedAt = _jumpPressedRememberTime;
-                if (_timeToApex <= TimeSpan.Zero)
-                {
-                    var timeToApex = _initialJumpSpeed.LengthSquared() / _gameObject.PhysicsComponent.Gravity.LengthSquared();
-                    //_timeToApex = TimeSpan.FromSeconds((_initialJumpSpeed / _gameObject.PhysicsComponent.Gravity).Length());
-                }
-            }
-            if ((_userInput & UserInput.Right) == UserInput.Right)
-            {
-                _walkPressedAt = _walkPressedRememberTime;
-                walkVector = _walkingSpeed;
-            }
-            else if ((_userInput & UserInput.Left) == UserInput.Left)
-            {
-                _walkPressedAt = _walkPressedRememberTime;
-                walkVector = -_walkingSpeed;
-            }
-
-            if (_walkPressedAt.TotalMilliseconds > 0f)
-            {
-                _walkPressedAt = TimeSpan.Zero;
-                _gameObject.TransformComponent.Velocity += walkVector;
-            }
-
-            //Only jump when stationary
-            if (!IsJumping && !IsFalling && _jumpPressedAt.TotalMilliseconds > 0f)
-            {
-                _jumpPressedAt = TimeSpan.Zero;
-                _gameObject.TransformComponent.Velocity += _initialJumpSpeed;
-            }
         }
-
-        private bool IsJumping => _gameObject.TransformComponent.Velocity.Y < 0f;
-        private bool IsFalling => _gameObject.TransformComponent.Velocity.Y > 0f;
 
         private void HookupKeyListener()
         {
@@ -109,15 +61,18 @@ namespace uwpKarate.Components
 
             if (keyDown)
             {
-                _userInput |= userInput;
+                _userInputs |= userInput;
             }
             else
             {
-                _userInput &= ~userInput;
+                _userInputs &= ~userInput;
             }
         }
 
-        private enum UserInput
+        public UserInput UserInputs => _userInputs;
+
+        [Flags]
+        public enum UserInput
         {
             None = 0,
             Left = 1,

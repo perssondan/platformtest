@@ -90,11 +90,11 @@ namespace uwpKarate.GameObjects
             return false;
         }
 
-        private GameObject _heroine;
+        private PlayerGameObject _heroine;
 
         private void InitializeHeroine(Windows.UI.Xaml.Window current)
         {
-            var gameObject = new GameObject();
+            var gameObject = new PlayerGameObject();
             new GraphicsComponent(gameObject, _canvasBitmaps[0], 0, 0);
             gameObject.GraphicsComponent = new GraphicsComponent(gameObject, _canvasBitmaps[0], 0, 96);
             gameObject.PhysicsComponent = new PhysicsComponent(gameObject);
@@ -141,6 +141,15 @@ namespace uwpKarate.GameObjects
                 _tiles[data.offset]?.Update(this, timeSpan);
             });
             _heroine?.Update(this, timeSpan);
+            // snap to ground if we are falling
+            if (TryGetGroundedTile(_heroine, out var tileGameObject)
+                && _heroine.TransformComponent.Velocity.Y > 0f)
+            {
+                var xMemory = _heroine.TransformComponent.Position * Vector2.UnitX;
+                _heroine.TransformComponent.Position = xMemory + (Vector2.UnitY * tileGameObject.TransformComponent.Position) - (32f * Vector2.UnitY);
+                _heroine.TransformComponent.Velocity *= Vector2.UnitX;
+                    //newVelocity *= Vector2.UnitX;
+            }
         }
 
         public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)

@@ -30,7 +30,7 @@ namespace uwpKarate.Components
 
         public void Update(World world, TimeSpan timeSpan)
         {
-            Position += (float)timeSpan.TotalSeconds * Velocity;
+            //Position += (float)timeSpan.TotalSeconds * Velocity;
             if (!world.WorldRect.Contains(Position.ToPoint()))
             {
                 if (Position.Y < world.WorldRect.Top)//above
@@ -58,8 +58,6 @@ namespace uwpKarate.Components
                     Position += (float)world.WorldRect.Right * Vector2.UnitX;
                 }
             }
-            // reset speed each update
-            Velocity = Vector2.Zero;
         }
     }
 }
