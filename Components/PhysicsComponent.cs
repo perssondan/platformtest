@@ -26,7 +26,13 @@ namespace uwpKarate.Components
             OldVelocity = _gameObject.TransformComponent.Velocity;
         }
 
+        private Vector2 Force(Vector2 position)
+        {
+            return Gravity;
+        }
+
         private Vector2 OldVelocity { get; set; }
+        private Vector2 Acceleration { get; set; }
 
         private void DampHorizontalSpeed(float deltaTime)
         {

@@ -24,71 +24,69 @@ namespace uwpKarate.GameObjects
             _jumpPressedAt -= timeSpan;
             _walkPressedAt -= timeSpan;
 
-            PhysicsComponent.Gravity = _normalGravity;
+            var userInputs = InputComponent.UserInputs;
 
-            var _userInputs = InputComponent.UserInputs;
-
-            if ((_userInputs & UserInput.Jump) == UserInput.Jump)
+            if ((userInputs & UserInput.Jump) == UserInput.Jump)
             {
                 _jumpPressedAt = _jumpPressedRememberTime;
             }
 
-            if ((_userInputs & UserInput.Right) == UserInput.Right || _walkPressedAt.TotalMilliseconds > 0f)
+            if ((userInputs & UserInput.Right) == UserInput.Right || _walkPressedAt.TotalMilliseconds > 0f)
             {
-                GoRight();
+                WalkOrientation = 1f;
             }
-            else if ((_userInputs & UserInput.Left) == UserInput.Left || _walkPressedAt.TotalMilliseconds > 0f)
+            else if ((userInputs & UserInput.Left) == UserInput.Left || _walkPressedAt.TotalMilliseconds > 0f)
             {
-                GoLeft();
+                WalkOrientation = -1f;
             }
             else
             {
-                StopWalk();
+                WalkOrientation = 0f;
             }
+
+            Walk(WalkOrientation);
 
             //Only jump when stationary
             if (!IsFalling && !IsJumping && _jumpPressedAt.TotalMilliseconds > 0f)
             {
+                PhysicsComponent.Gravity = new Vector2(PhysicsComponent.Gravity.X, PlayerConstants.Gravity);
                 _jumpPressedAt = TimeSpan.Zero;
                 TransformComponent.Velocity += InitialJumpVelocity;
             }
         }
 
-            /// <summary>
-            /// Initial jump velocity
-            /// </summary>
-        public Vector2 InitialJumpVelocity => new Vector2(0, PlayerConstants.V_0);
+        private float WalkOrientation { get; set; }
+
+        /// <summary>
+        /// Initial jump velocity
+        /// </summary>
+        public Vector2 InitialJumpVelocity => new Vector2(0, PlayerConstants.InitialVerticalVelocity);
 
         private void GoRight()
         {
-            _walkPressedAt = _walkPressedRememberTime;
-            var walkVector = _walkingSpeed;
-            Walk(walkVector);
+            Walk(1f);
         }
 
         private void GoLeft()
         {
-            _walkPressedAt = _walkPressedRememberTime;
-            var walkVector = -_walkingSpeed;
-            Walk(walkVector);
+            Walk(-1f);
         }
 
-        private void Walk(Vector2 walkVector)
+        private void Walk(float orientation)
         {
-            if (IsFalling) // Or increase gravity, this can be done on short jumps too
+            if (orientation > 0f || orientation < 0f)
             {
-                walkVector /= 3f;
+                var horizontalVector = new Vector2(orientation * PlayerConstants.InitialHorizontalVelocity, 0f);
+                TransformComponent.Velocity = TransformComponent.Velocity * Vector2.UnitY + horizontalVector;
+                var gravity = new Vector2(orientation * PlayerConstants.Drag, PlayerConstants.Gravity);
+                PhysicsComponent.Gravity = gravity;
             }
-
-            if (TransformComponent.Velocity.X != walkVector.X)
+            else if ((TransformComponent.Velocity.X < 0f && PhysicsComponent.Gravity.X < 0)
+                || (TransformComponent.Velocity.X > 0f && PhysicsComponent.Gravity.X > 0))
             {
-                TransformComponent.Velocity = TransformComponent.Velocity * Vector2.UnitY + walkVector;
+                TransformComponent.Velocity *= Vector2.UnitY;
+                PhysicsComponent.Gravity *= Vector2.UnitY;
             }
-        }
-
-        private void StopWalk()
-        {
-            TransformComponent.Velocity *= Vector2.UnitY;
         }
 
         private bool IsJumping => TransformComponent.Velocity.Y < 0f;
