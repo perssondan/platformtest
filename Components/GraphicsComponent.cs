@@ -2,8 +2,10 @@
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Geometry;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using uwpKarate.Extensions;
 using uwpKarate.GameObjects;
 using Windows.Foundation;
 using Windows.UI;
@@ -15,7 +17,7 @@ namespace uwpKarate.Components
         private readonly GameObject _gameObject;
         private readonly CanvasBitmap _canvasBitmap;
         private readonly Rect _rect;
-        private CanvasSolidColorBrush _canvasSolidColorBrush;
+        private Dictionary<Color, CanvasSolidColorBrush> _brushes = new Dictionary<Color, CanvasSolidColorBrush>();
 
         public GraphicsComponent(GameObject gameObject,
                                  CanvasBitmap canvasBitmap,
@@ -48,20 +50,29 @@ namespace uwpKarate.Components
                 canvasPathBuilder.AddLine(vector);
                 return true;
             });
+
             canvasPathBuilder.EndFigure(CanvasFigureLoop.Open);
             var pathGeometry = CanvasGeometry.CreatePath(canvasPathBuilder);
-            //var geometry = CanvasGeometry.CreatePolygon(canvasDrawingSession, _gameObject.TransformComponent.PositionHistory);
-            canvasDrawingSession.DrawGeometry(pathGeometry, GetBrush(canvasDrawingSession));
+            canvasDrawingSession.DrawGeometry(pathGeometry, GetBrush(canvasDrawingSession, Colors.Red));
+
+            if (_gameObject?.ColliderComponent?.IsColliding == true)
+            {
+                canvasDrawingSession.DrawRectangle(_gameObject.TransformComponent.Position.ToRect(32f, 32f), GetBrush(canvasDrawingSession, Colors.Blue));
+            }
         }
 
-        private ICanvasBrush GetBrush(ICanvasResourceCreator canvasResourceCreator)
+        private ICanvasBrush GetBrush(ICanvasResourceCreator canvasResourceCreator, Color colors)
         {
-            if (_canvasSolidColorBrush == null)
+            if (_brushes.TryGetValue(colors, out var brush))
             {
-                _canvasSolidColorBrush = new CanvasSolidColorBrush(canvasResourceCreator, Colors.Red);
+                return brush;
             }
 
-            return _canvasSolidColorBrush;
+            brush = new CanvasSolidColorBrush(canvasResourceCreator, colors);
+
+            _brushes[colors] = brush;
+
+            return brush;
         }
     }
 }

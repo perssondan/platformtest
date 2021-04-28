@@ -116,11 +116,15 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Components\ColliderComponent.cs" />
     <Compile Include="Components\IGameObjectComponent.cs" />
     <Compile Include="Components\InputComponent.cs" />
     <Compile Include="Components\PhysicsComponent.cs" />
     <Compile Include="Components\TransformComponent.cs" />
     <Compile Include="Constants\PlayerConstants.cs" />
+    <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="Extensions\RectExtensions.cs" />
+    <Compile Include="Extensions\Vector2Extensions.cs" />
     <Compile Include="GameObjects\GameObject.cs" />
     <Compile Include="GameObjects\PlayerGameObject.cs" />
     <Compile Include="GameObjects\World.cs" />

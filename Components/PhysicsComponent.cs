@@ -95,6 +95,31 @@ namespace uwpKarate.Components
             var acceleration = ApplyForces();
             var newVelocity = _gameObject.TransformComponent.Velocity + ((Acceleration + acceleration) * (deltaTime * 0.5f));
 
+            Vector2 resolvedPosition = Vector2.Zero;
+            if (_gameObject?.ColliderComponent.IsCollidingTest(OldPosition, newPosition, out resolvedPosition) == true)
+            {
+                var resolveVector = Vector2.One;
+                if (resolvedPosition.X != newPosition.X)
+                {
+                    resolveVector *= Vector2.UnitY;
+                    newVelocity *= Vector2.UnitY;
+                }
+                if (resolvedPosition.Y != newPosition.Y)
+                {
+                    resolveVector *= Vector2.UnitX;
+                    newVelocity *= Vector2.UnitX;
+                }
+                newPosition = resolvedPosition;
+                
+                //newVelocity = OldVelocity * resolveVector;
+                //acceleration *= resolveVector;
+            }
+
+            if (Math.Abs(newVelocity.X) < 5f)
+            {
+                newVelocity.X = 0f;
+            }
+
             OldPosition = newPosition;
             OldVelocity = newVelocity;
             Acceleration = acceleration;
@@ -125,9 +150,13 @@ namespace uwpKarate.Components
             }
         }
 
-        private void ResolveContraints()
+        private void ResolveConstraints(World world, float deltaTime)
         {
             // TODO: Collisions
+            if (world.TryGetGroundedTile(_gameObject, out _, deltaTime))
+            {
+
+            }
         }
 
         private Vector2 ApplyForces()
