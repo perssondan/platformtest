@@ -4,15 +4,13 @@ using uwpKarate.GameObjects;
 
 namespace uwpKarate.Components
 {
-    public class PhysicsComponent : IGameObjectComponent<World>
+    public class PhysicsComponent : GameObjectComponent, IGameObjectComponent<World>
     {
-        private readonly GameObject _gameObject;
         private Action<World, TimeSpan> _integrateFunc;
         private IntegrationType _integration;
 
-        public PhysicsComponent(GameObject gameObject)
+        public PhysicsComponent(GameObject gameObject) : base(gameObject)
         {
-            _gameObject = gameObject;
             Integration = IntegrationType.VelocityVerlet;
         }
 
@@ -43,10 +41,10 @@ namespace uwpKarate.Components
         {
             var acceleration = ApplyForces();
             var deltaTime = (float)timeSpan.TotalSeconds;
-            OldPosition = _gameObject.TransformComponent.Position;
-            _gameObject.TransformComponent.Position += (deltaTime * _gameObject.TransformComponent.Velocity);
-            OldVelocity = _gameObject.TransformComponent.Velocity;
-            _gameObject.TransformComponent.Velocity += (deltaTime * acceleration);
+            OldPosition = GameObject.TransformComponent.Position;
+            GameObject.TransformComponent.Position += (deltaTime * GameObject.TransformComponent.Velocity);
+            OldVelocity = GameObject.TransformComponent.Velocity;
+            GameObject.TransformComponent.Velocity += (deltaTime * acceleration);
             Acceleration = acceleration;
     }
 
@@ -54,10 +52,10 @@ namespace uwpKarate.Components
         {
             var acceleration = ApplyForces();
             var deltaTime = (float)timeSpan.TotalSeconds;
-            OldVelocity = _gameObject.TransformComponent.Velocity;
-            _gameObject.TransformComponent.Velocity += (deltaTime * acceleration);
-            OldPosition = _gameObject.TransformComponent.Position;
-            _gameObject.TransformComponent.Position += (deltaTime * _gameObject.TransformComponent.Velocity);
+            OldVelocity = GameObject.TransformComponent.Velocity;
+            GameObject.TransformComponent.Velocity += (deltaTime * acceleration);
+            OldPosition = GameObject.TransformComponent.Position;
+            GameObject.TransformComponent.Position += (deltaTime * GameObject.TransformComponent.Velocity);
             Acceleration = acceleration;
         }
 
@@ -66,23 +64,23 @@ namespace uwpKarate.Components
             var acceleration = ApplyForces();
             var deltaTime = (float)timeSpan.TotalSeconds;
             // Apply acceleration
-            var newVelocity = _gameObject.TransformComponent.Velocity + (deltaTime * acceleration);
+            var newVelocity = GameObject.TransformComponent.Velocity + (deltaTime * acceleration);
             // TODO: Limit velocity
-            _gameObject.TransformComponent.Velocity = newVelocity;
+            GameObject.TransformComponent.Velocity = newVelocity;
 
-            OldPosition = _gameObject.TransformComponent.Position;
-            _gameObject.TransformComponent.Position += (0.5f * (newVelocity + OldVelocity) * deltaTime);
+            OldPosition = GameObject.TransformComponent.Position;
+            GameObject.TransformComponent.Position += (0.5f * (newVelocity + OldVelocity) * deltaTime);
 
-            OldVelocity = _gameObject.TransformComponent.Velocity;
+            OldVelocity = GameObject.TransformComponent.Velocity;
             Acceleration = acceleration;
         }
 
         private void PositionVerletIntegration(World world, TimeSpan timeSpan)
         {
             var deltaTime = (float)timeSpan.TotalSeconds;
-            var currentPosition = _gameObject.TransformComponent.Position;
+            var currentPosition = GameObject.TransformComponent.Position;
             var acceleration = ApplyForces();
-            _gameObject.TransformComponent.Position += (_gameObject.TransformComponent.Position - OldPosition) + (acceleration * deltaTime * deltaTime);
+            GameObject.TransformComponent.Position += (GameObject.TransformComponent.Position - OldPosition) + (acceleration * deltaTime * deltaTime);
             OldPosition = currentPosition;
             Acceleration = acceleration;
         }
@@ -90,29 +88,23 @@ namespace uwpKarate.Components
         private void VelocityVerletIntegration(World world, TimeSpan timeSpan)
         {
             var deltaTime = (float)timeSpan.TotalSeconds;
-            var currentPosition = _gameObject.TransformComponent.Position;
-            var newPosition = currentPosition + (_gameObject.TransformComponent.Velocity * deltaTime) + (Acceleration * deltaTime * deltaTime * 0.5f);
+            var currentPosition = GameObject.TransformComponent.Position;
+            var newPosition = currentPosition + (GameObject.TransformComponent.Velocity * deltaTime) + (Acceleration * deltaTime * deltaTime * 0.5f);
             var acceleration = ApplyForces();
-            var newVelocity = _gameObject.TransformComponent.Velocity + ((Acceleration + acceleration) * (deltaTime * 0.5f));
+            var newVelocity = GameObject.TransformComponent.Velocity + ((Acceleration + acceleration) * (deltaTime * 0.5f));
 
             Vector2 resolvedPosition = Vector2.Zero;
-            if (_gameObject?.ColliderComponent.IsCollidingTest(OldPosition, newPosition, out resolvedPosition) == true)
+            if (GameObject?.ColliderComponent.IsCollidingTest(OldPosition, newPosition, out resolvedPosition) == true)
             {
-                var resolveVector = Vector2.One;
                 if (resolvedPosition.X != newPosition.X)
                 {
-                    resolveVector *= Vector2.UnitY;
                     newVelocity *= Vector2.UnitY;
                 }
                 if (resolvedPosition.Y != newPosition.Y)
                 {
-                    resolveVector *= Vector2.UnitX;
                     newVelocity *= Vector2.UnitX;
                 }
                 newPosition = resolvedPosition;
-                
-                //newVelocity = OldVelocity * resolveVector;
-                //acceleration *= resolveVector;
             }
 
             if (Math.Abs(newVelocity.X) < 5f)
@@ -124,8 +116,8 @@ namespace uwpKarate.Components
             OldVelocity = newVelocity;
             Acceleration = acceleration;
 
-            _gameObject.TransformComponent.Position = newPosition;
-            _gameObject.TransformComponent.Velocity = newVelocity;
+            GameObject.TransformComponent.Position = newPosition;
+            GameObject.TransformComponent.Velocity = newVelocity;
         }
 
         private void ChangeIntegration(IntegrationType integration)
@@ -150,19 +142,10 @@ namespace uwpKarate.Components
             }
         }
 
-        private void ResolveConstraints(World world, float deltaTime)
-        {
-            // TODO: Collisions
-            if (world.TryGetGroundedTile(_gameObject, out _, deltaTime))
-            {
-
-            }
-        }
-
         private Vector2 ApplyForces()
         {
             var gravityForce = Gravity;
-            var dragForce = 0.5f * Drag * (_gameObject.TransformComponent.Velocity.Length() * _gameObject.TransformComponent.Velocity);
+            var dragForce = 0.5f * Drag * (GameObject.TransformComponent.Velocity.Length() * GameObject.TransformComponent.Velocity);
             return gravityForce - dragForce;
         }
 

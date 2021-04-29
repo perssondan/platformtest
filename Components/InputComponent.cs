@@ -6,15 +6,14 @@ using Windows.UI.Xaml;
 
 namespace uwpKarate.Components
 {
-    public class InputComponent : IGameObjectComponent<World>
+    public class InputComponent : GameObjectComponent, IGameObjectComponent<World>
     {
-        private readonly GameObject _gameObject;
         private readonly Window _window;
         private UserInput _userInputs;
 
         public InputComponent(GameObject gameObject, Window current)
+            : base(gameObject)
         {
-            _gameObject = gameObject;
             _window = current;
 
             HookupKeyListener();
