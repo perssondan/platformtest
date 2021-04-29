@@ -117,6 +117,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Components\ColliderComponent.cs" />
+    <Compile Include="Components\GameObjectComponent.cs" />
     <Compile Include="Components\IGameObjectComponent.cs" />
     <Compile Include="Components\InputComponent.cs" />
     <Compile Include="Components\PhysicsComponent.cs" />
