@@ -10,20 +10,7 @@ namespace uwpKarate.GameObjects
 
         public GameObject()
         {
-            TransformComponent = new TransformComponent();
-        }
-
-        public GameObject(GraphicsComponent graphicsComponent,
-                          PhysicsComponent physicsComponent,
-                          InputComponent inputComponent,
-                          ColliderComponent colliderComponent,
-                          TransformComponent transformComponent)
-        {
-            GraphicsComponent = graphicsComponent;
-            PhysicsComponent = physicsComponent;
-            InputComponent = inputComponent;
-            ColliderComponent = colliderComponent;
-            TransformComponent = transformComponent ?? new TransformComponent();
+            AddComponent(new TransformComponent(this));
         }
 
         public void AddComponent<T>(T gameObjectComponent)
@@ -66,10 +53,10 @@ namespace uwpKarate.GameObjects
         {
         }
 
-        public GraphicsComponent GraphicsComponent { get; set; }
-        public PhysicsComponent PhysicsComponent { get; set; }
-        public InputComponent InputComponent { get; set; }
-        public TransformComponent TransformComponent { get; }
-        public ColliderComponent ColliderComponent { get; set; }
+        public GraphicsComponent GraphicsComponent => GetComponent<GraphicsComponent>();
+        public PhysicsComponent PhysicsComponent => GetComponent<PhysicsComponent>();
+        public InputComponent InputComponent => GetComponent<InputComponent>();
+        public TransformComponent TransformComponent => GetComponent<TransformComponent>();
+        public ColliderComponent ColliderComponent => GetComponent<ColliderComponent>();
     }
 }
