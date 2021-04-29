@@ -86,6 +86,31 @@ namespace uwpKarate.GameObjects
 
         public override void OnAfterUpdate(World world, TimeSpan timeSpan)
         {
+            if (TransformComponent.Position.Y < world.WorldRect.Top)//above
+            {
+                // zero y
+                TransformComponent.Velocity *= Vector2.UnitX;
+                TransformComponent.Position = TransformComponent.Position * Vector2.UnitX + (float)world.WorldRect.Top * Vector2.UnitY;
+            }
+            if (TransformComponent.Position.Y > world.WorldRect.Bottom)//below
+            {
+                // zero y
+                TransformComponent.Velocity *= Vector2.UnitX;
+                TransformComponent.Position = TransformComponent.Position * Vector2.UnitX + (float)world.WorldRect.Top * Vector2.UnitY;
+            }
+            if (TransformComponent.Position.X < world.WorldRect.Left)//left
+            {
+                // zero x
+                TransformComponent.Velocity *= Vector2.UnitY;
+                TransformComponent.Position = TransformComponent.Position * Vector2.UnitY + (float)world.WorldRect.Left * Vector2.UnitX;
+            }
+            if (TransformComponent.Position.X + ColliderComponent.Size.X > world.WorldRect.Right)//right
+            {
+                // zero x velocity
+                TransformComponent.Velocity *= Vector2.UnitY;
+                // set right position to the right limit of the world minus the width. Sprite or collider width?
+                TransformComponent.Position = TransformComponent.Position * Vector2.UnitY + (Vector2.UnitX * ((float)world.WorldRect.Right - ColliderComponent.Size.X));
+            }
         }
     }
 }

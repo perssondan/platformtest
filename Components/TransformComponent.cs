@@ -5,10 +5,14 @@ using uwpKarate.Utilities;
 
 namespace uwpKarate.Components
 {
-    public class TransformComponent : IGameObjectComponent<World>
+    public class TransformComponent : GameObjectComponent, IGameObjectComponent<World>
     {
         private HistoryStack<Vector2> _historyStack = new HistoryStack<Vector2>(100);
         private Vector2 _position;
+
+        public TransformComponent(GameObject gameObject) : base(gameObject)
+        {
+        }
 
         public Vector2 Velocity { get; set; }
         public Vector2[] PositionHistory => _historyStack.Items.ToArray();
@@ -29,37 +33,6 @@ namespace uwpKarate.Components
 
         public void Update(World world, TimeSpan timeSpan)
         {
-            if (!world.WorldRect.Contains(Position.ToPoint()))
-            {
-                if (Position.Y < world.WorldRect.Top)//above
-                {
-                    // zero y
-                    Position *= Vector2.UnitX;
-                    Velocity *= Vector2.UnitX;
-                    Position += (float)world.WorldRect.Top * Vector2.UnitY;
-                }
-                if (Position.Y > world.WorldRect.Bottom)//below
-                {
-                    // zero y
-                    Position *= Vector2.UnitX;
-                    Velocity *= Vector2.UnitX;
-                    Position += (float)world.WorldRect.Top * Vector2.UnitY;
-                }
-                if (Position.X < world.WorldRect.Left)//left
-                {
-                    // zero x
-                    Position *= Vector2.UnitY;
-                    Velocity *= Vector2.UnitY;
-                    Position += (float)world.WorldRect.Left * Vector2.UnitX;
-                }
-                if (Position.X > world.WorldRect.Right)//right
-                {
-                    // zero x
-                    Position *= Vector2.UnitY;
-                    Velocity *= Vector2.UnitY;
-                    Position += (float)world.WorldRect.Right * Vector2.UnitX;
-                }
-            }
         }
     }
 }
