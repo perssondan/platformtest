@@ -7,29 +7,32 @@ using Windows.Foundation;
 
 namespace uwpKarate.Components
 {
-    public class ColliderComponent : IGameObjectComponent<World>
+    public class ColliderComponent : GameObjectComponent, IGameObjectComponent<World>
     {
         private World _world;
-        private readonly GameObject _gameObject;
-
         public ColliderComponent(GameObject gameObject)
+            : base(gameObject)
         {
-            _gameObject = gameObject;
         }
 
         public bool IsColliding { get; set; }
         public Vector2 Size { get; set; }
-        public Rect Rect => new Rect(_gameObject.TransformComponent.Position.ToPoint(), Size.ToSize());
+        public Rect Rect => new Rect(GameObject.TransformComponent.Position.ToPoint(), Size.ToSize());
 
         public void Update(World target, TimeSpan timeSpan)
         {
             _world = target;
         }
 
-        public bool IsPointInRect(Vector2 point, Rect rect)
+        public bool IsPointColliding(Vector2 point)
         {
-            return rect.Contains(point.ToPoint());
+            return IsColliding = Rect.Contains(point.ToPoint());
         }
+
+        //public bool IsPointInRect(Vector2 point, Rect rect)
+        //{
+        //    return rect.Contains(point.ToPoint());
+        //}
 
         public bool IsCollidingTest(Vector2 oldPosition, Vector2 newPosition, out Vector2 resolvedPosition)
         {
@@ -96,10 +99,10 @@ namespace uwpKarate.Components
             return IsColliding;
         }
 
-        public bool IsRectInRect(Rect firstRect, Rect secondRect)
+        public bool IsRectColliding(Rect opponentRect)
         {
-            return (firstRect.Left < secondRect.Right && firstRect.Right > secondRect.Left &&
-                    firstRect.Top < secondRect.Bottom && firstRect.Bottom > secondRect.Top);
+            return IsColliding = (Rect.Left < opponentRect.Right && Rect.Right > opponentRect.Left &&
+                    Rect.Top < opponentRect.Bottom && Rect.Bottom > opponentRect.Top);
         }
 
         public bool IsRayInRect(Vector2 rayOrigin,
@@ -170,6 +173,11 @@ namespace uwpKarate.Components
             }
 
             return true;
+        }
+
+        private bool IsGrounded(World world)
+        {
+            return false;
         }
 
         private bool IsRectInRect(Rect dynamicRect,
