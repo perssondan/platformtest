@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using uwpKarate.Components;
+using uwpKarate.Extensions;
 using uwpKarate.Models;
 using Windows.Foundation;
 
@@ -19,8 +20,9 @@ namespace uwpKarate.GameObjects
         private readonly Map _map;
         private readonly TileAtlas[] _tileAtlases;
         private GameObject[] _tiles;
+        private PlayerGameObject _heroine;
 
-        private List<GraphicsComponent> _graphicsComponents = new List<GraphicsComponent>();
+        private List<IGameObjectComponent<CanvasDrawingSession>> _graphicsComponents = new List<IGameObjectComponent<CanvasDrawingSession>>();
 
         private int[] _mapData = new[]
         {
@@ -56,49 +58,33 @@ namespace uwpKarate.GameObjects
 
         public Rect WorldRect => new Rect(0, 0, WorldPixelWidth, WorldPixelHeight);
 
-        public bool TryGetGroundedTile(GameObject gameObject, out GameObject tileGameObject)
+        public bool TryGetOverlappingTiles(Rect rect, out IReadOnlyList<Rect> rects)
         {
-            if (TryGetTileGameObject(gameObject.TransformComponent.Position, out tileGameObject))
+            var tileRects = new List<Rect>();
+
+            foreach (var collider in _tiles.Where(tile => tile != null && tile.ColliderComponent != null).Select(tile => tile.ColliderComponent))
             {
-                if (tileGameObject != null)
+                if (collider.IsRectColliding(rect))
                 {
-                    return true;
+                    tileRects.Add(collider.Rect);
                 }
             }
 
-            return false;
+            rects = tileRects;
+
+            return tileRects.Any();
         }
-
-        private bool TryGetTileGameObject(Vector2 position, out GameObject gameObject)
-        {
-            // TODO: Get collision points from heroin
-            var topLeft = position.ToPoint();
-            var topRight = (position + new Vector2(_tileWidth, 0)).ToPoint();
-            var bottomLeft = (position + new Vector2(0, _tileHeight)).ToPoint();
-            var bottomRight = (position + new Vector2(_tileWidth, _tileHeight)).ToPoint();
-            gameObject = null;
-            foreach (var tile in _tiles.Where(tile => tile != null && tile.TransformComponent != null))
-            {
-                var rect = new Rect(tile.TransformComponent.Position.X, tile.TransformComponent.Position.Y, _tileWidth, _tileHeight);
-                if (rect.Contains(topLeft) || rect.Contains(topRight) || rect.Contains(bottomLeft) || rect.Contains(bottomRight))
-                {
-                    gameObject = tile;
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private GameObject _heroine;
 
         private void InitializeHeroine(Windows.UI.Xaml.Window current)
         {
-            var gameObject = new GameObject();
-            new GraphicsComponent(gameObject, _canvasBitmaps[0], 0, 0);
-            gameObject.GraphicsComponent = new GraphicsComponent(gameObject, _canvasBitmaps[0], 0, 96);
-            gameObject.PhysicsComponent = new PhysicsComponent(gameObject);
-            gameObject.InputComponent = new InputComponent(gameObject, current);
+            var gameObject = new PlayerGameObject();
+            gameObject.AddComponent(new GraphicsComponent(gameObject, _canvasBitmaps[0], 0, 96));
+            gameObject.AddComponent(new PhysicsComponent(gameObject));
+            gameObject.AddComponent(new InputComponent(gameObject, current));
+            gameObject.AddComponent(new ColliderComponent(gameObject)
+            {
+                Size = new Vector2(_tileWidth, _tileHeight)
+            });
             _graphicsComponents.Add(gameObject.GraphicsComponent);
             _heroine = gameObject;
         }
@@ -109,13 +95,18 @@ namespace uwpKarate.GameObjects
             {
                 if (_mapData[data.offset] == 0) return;
 
-                var transformComponent = new TransformComponent
+                var gameObject = new GameObject();
+                var transformComponent = new TransformComponent(gameObject)
                 {
                     Position = new Vector2(data.x * _tileWidth, data.y * _tileHeight)
                 };
-                var gameObject = new GameObject(null, null, null, transformComponent);
+
+                gameObject.AddComponent(transformComponent);
+                
                 var graphicsComponent = CreateGraphicsComponent(gameObject, (TileType)_mapData[data.offset], _canvasBitmaps[0]);
-                gameObject.GraphicsComponent = graphicsComponent;
+                gameObject.AddComponent(graphicsComponent);
+                // TODO: The currently loaded tiles are all collidables
+                gameObject.AddComponent(new ColliderComponent(gameObject) { Size = new Vector2(_tileWidth, _tileHeight) });
                 _graphicsComponents.Add(gameObject.GraphicsComponent);
 
                 _tiles[data.offset] = gameObject;
@@ -143,9 +134,9 @@ namespace uwpKarate.GameObjects
             _heroine?.Update(this, timeSpan);
         }
 
-        public void Draw(CanvasDrawingSession canvasDrawingSession)
+        public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
         {
-            _graphicsComponents.ForEach(graphicsComponent => graphicsComponent.Draw(canvasDrawingSession));
+            _graphicsComponents.ForEach(graphicsComponent => graphicsComponent.Update(canvasDrawingSession, timeSpan));
         }
 
         private GraphicsComponent CreateGraphicsComponent(GameObject gameObject, TileType tileType, CanvasBitmap canvasBitmap)

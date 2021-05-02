@@ -116,11 +116,18 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Components\ColliderComponent.cs" />
+    <Compile Include="Components\GameObjectComponent.cs" />
     <Compile Include="Components\IGameObjectComponent.cs" />
     <Compile Include="Components\InputComponent.cs" />
     <Compile Include="Components\PhysicsComponent.cs" />
     <Compile Include="Components\TransformComponent.cs" />
+    <Compile Include="Constants\PlayerConstants.cs" />
+    <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="Extensions\RectExtensions.cs" />
+    <Compile Include="Extensions\Vector2Extensions.cs" />
     <Compile Include="GameObjects\GameObject.cs" />
+    <Compile Include="GameObjects\PlayerGameObject.cs" />
     <Compile Include="GameObjects\World.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -138,6 +145,7 @@
     <Compile Include="Models\TileSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\GameStateManager.cs" />
+    <Compile Include="Utilities\HistoryStack.cs" />
     <Compile Include="Utilities\TiledLoader.cs" />
     <Compile Include="Utilities\Scaling.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
