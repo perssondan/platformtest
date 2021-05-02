@@ -38,8 +38,20 @@ namespace uwpKarate.Components
 
             DrawPositionHistory(canvasDrawingSession);
             DrawCollision(canvasDrawingSession);
+            DrawIsGrounded(canvasDrawingSession);
 
             #endregion Debugging stuff
+        }
+
+        private void DrawIsGrounded(CanvasDrawingSession canvasDrawingSession)
+        {
+            if (GameObject.InputComponent == null) return;
+            if (GameObject?.ColliderComponent?.IsGrounded() != true) return;
+
+            canvasDrawingSession.DrawRectangle(new Rect(GameObject.ColliderComponent.Rect.Left,
+                                                        GameObject.ColliderComponent.Rect.Bottom,
+                                                        GameObject.ColliderComponent.Rect.Width,
+                                                        1f), GetCachedBrush(canvasDrawingSession, Colors.Fuchsia));
         }
 
         private void DrawCollision(CanvasDrawingSession canvasDrawingSession)

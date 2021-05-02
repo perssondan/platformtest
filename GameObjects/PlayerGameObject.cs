@@ -11,57 +11,87 @@ namespace uwpKarate.GameObjects
 
         private readonly TimeSpan _jumpPressedRememberTime = TimeSpan.FromMilliseconds(150);
         private TimeSpan _jumpPressedAt;
+        private bool _isJumpButtonPressed;
 
         public PlayerGameObject()
         {
         }
 
+        /// <summary>
+        /// Initial jump velocity
+        /// </summary>
+        public Vector2 InitialJumpVelocity => new Vector2(0, PlayerConstants.InitialVerticalVelocity);
+
         public override void OnBeforeUpdate(World world, TimeSpan timeSpan)
+        {
+            EnforceGravity();
+
+            var userInputs = InputComponent.UserInputs;
+            WalkHandler(userInputs);
+            JumpHandler(userInputs, timeSpan);
+        }
+
+        public override void OnAfterUpdate(World world, TimeSpan timeSpan)
+        {
+            EnforceInsideWorld(world);
+        }
+
+        private void JumpHandler(UserInput userInputs, TimeSpan timeSpan)
+        {
+            _jumpPressedAt -= timeSpan;
+
+            if ((userInputs & UserInput.Jump) == UserInput.Jump)
+            {
+                if (_isJumpButtonPressed == false)
+                {
+                    _isJumpButtonPressed = true;
+                    _jumpPressedAt = _jumpPressedRememberTime;
+                }
+            }
+            else
+            {
+                _isJumpButtonPressed = false;
+                _jumpPressedAt = TimeSpan.Zero;
+            }
+
+            if (_jumpPressedAt.TotalMilliseconds <= 0f) return;
+
+            //Only jump when grounded
+            if (ColliderComponent.IsGrounded() == false) return;
+
+            _jumpPressedAt = TimeSpan.Zero;
+
+            Jump();
+        }
+
+        private void WalkHandler(UserInput userInputs)
+        {
+            var walkOrientation = GetWalkOrientationFromUserInput(userInputs);
+
+            Walk(walkOrientation);
+        }
+
+        private float GetWalkOrientationFromUserInput(UserInput userInputs)
+        {
+            if ((userInputs & UserInput.Right) == UserInput.Right) return 1f;
+
+            if ((userInputs & UserInput.Left) == UserInput.Left) return -1f;
+
+            return 0f;
+        }
+
+        private void Jump()
+        {
+            TransformComponent.Velocity += InitialJumpVelocity;
+        }
+
+        private void EnforceGravity()
         {
             if (PhysicsComponent?.Gravity == Vector2.Zero)
             {
                 PhysicsComponent.Gravity = _normalGravity;
             }
-
-            _jumpPressedAt -= timeSpan;
-
-            var userInputs = InputComponent.UserInputs;
-
-            if ((userInputs & UserInput.Jump) == UserInput.Jump)
-            {
-                _jumpPressedAt = _jumpPressedRememberTime;
-            }
-
-            if ((userInputs & UserInput.Right) == UserInput.Right)
-            {
-                WalkOrientation = 1f;
-            }
-            else if ((userInputs & UserInput.Left) == UserInput.Left)
-            {
-                WalkOrientation = -1f;
-            }
-            else
-            {
-                WalkOrientation = 0f;
-            }
-
-            Walk(WalkOrientation);
-
-            //Only jump when stationary
-            if (!IsFalling && !IsJumping && _jumpPressedAt.TotalMilliseconds > 0f)
-            {
-                PhysicsComponent.Gravity = new Vector2(PhysicsComponent.Gravity.X, PlayerConstants.Gravity);
-                _jumpPressedAt = TimeSpan.Zero;
-                TransformComponent.Velocity += InitialJumpVelocity;
-            }
         }
-
-        private float WalkOrientation { get; set; }
-
-        /// <summary>
-        /// Initial jump velocity
-        /// </summary>
-        public Vector2 InitialJumpVelocity => new Vector2(0, PlayerConstants.InitialVerticalVelocity);
 
         private void Walk(float orientation)
         {
@@ -81,10 +111,7 @@ namespace uwpKarate.GameObjects
             }
         }
 
-        private bool IsJumping => TransformComponent.Velocity.Y < 0f;
-        private bool IsFalling => TransformComponent.Velocity.Y > 0f;
-
-        public override void OnAfterUpdate(World world, TimeSpan timeSpan)
+        private void EnforceInsideWorld(World world)
         {
             if (TransformComponent.Position.Y < world.WorldRect.Top)//above
             {

@@ -83,7 +83,7 @@ namespace uwpKarate.GameObjects
             gameObject.AddComponent(new InputComponent(gameObject, current));
             gameObject.AddComponent(new ColliderComponent(gameObject)
             {
-                Size = new Vector2(32f, 32f)
+                Size = new Vector2(_tileWidth, _tileHeight)
             });
             _graphicsComponents.Add(gameObject.GraphicsComponent);
             _heroine = gameObject;
@@ -105,6 +105,7 @@ namespace uwpKarate.GameObjects
                 
                 var graphicsComponent = CreateGraphicsComponent(gameObject, (TileType)_mapData[data.offset], _canvasBitmaps[0]);
                 gameObject.AddComponent(graphicsComponent);
+                // TODO: The currently loaded tiles are all collidables
                 gameObject.AddComponent(new ColliderComponent(gameObject) { Size = new Vector2(_tileWidth, _tileHeight) });
                 _graphicsComponents.Add(gameObject.GraphicsComponent);
 

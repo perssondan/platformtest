@@ -29,10 +29,16 @@ namespace uwpKarate.Components
             return IsColliding = Rect.Contains(point.ToPoint());
         }
 
-        //public bool IsPointInRect(Vector2 point, Rect rect)
-        //{
-        //    return rect.Contains(point.ToPoint());
-        //}
+        public bool IsGrounded()
+        {
+            var bottomLeft = new Vector2(GameObject.TransformComponent.Position.X, GameObject.TransformComponent.Position.Y + Size.Y);
+            var bottomRight = new Vector2(GameObject.TransformComponent.Position.X + Size.X, GameObject.TransformComponent.Position.Y + Size.Y);
+
+            var bottomRect = bottomLeft.ToRect(Size.X, 1f);
+            if (_world?.TryGetOverlappingTiles(bottomRect, out var rects) == true) return true;
+
+            return false;
+        }
 
         public bool IsCollidingTest(Vector2 oldPosition, Vector2 newPosition, out Vector2 resolvedPosition)
         {
@@ -43,12 +49,12 @@ namespace uwpKarate.Components
 
             if (newPosition.X > oldPosition.X) // going right
             {
-                if (_world.TryGetOverlappingTiles(resolvedPosition.ToRect(32f, 32f), out var rects))
+                if (_world.TryGetOverlappingTiles(resolvedPosition.ToRect(Size.X, Size.Y), out var collidingRects))
                 {
-                    var minimumX = rects.Min(rect => rect.Left);
-                    if (resolvedPosition.X + 32f > minimumX)
+                    var minimumX = collidingRects.Min(rect => rect.Left);
+                    if (resolvedPosition.X + Size.X > minimumX)
                     {
-                        resolvedPosition.X = (float)minimumX - 32f;
+                        resolvedPosition.X = (float)minimumX - Size.X;
                         if (resolvedPosition.X < 0)
                             resolvedPosition.X = 0f;
                         IsColliding = true;
@@ -57,9 +63,9 @@ namespace uwpKarate.Components
             }
             else if (newPosition.X < oldPosition.X) // going left
             {
-                if (_world.TryGetOverlappingTiles(resolvedPosition.ToRect(32f, 32f), out var rects))
+                if (_world.TryGetOverlappingTiles(resolvedPosition.ToRect(Size.X, Size.Y), out var collidingRects))
                 {
-                    var maximumX = rects.Max(rect => rect.Right);
+                    var maximumX = collidingRects.Max(rect => rect.Right);
                     if (resolvedPosition.X < maximumX)
                     {
                         resolvedPosition.X = (float)maximumX;
@@ -71,21 +77,21 @@ namespace uwpKarate.Components
             resolvedPosition.Y =  newPosition.Y;
             if (newPosition.Y > oldPosition.Y) // going down
             {
-                if (_world.TryGetOverlappingTiles(resolvedPosition.ToRect(32f, 32f), out var rects))
+                if (_world.TryGetOverlappingTiles(resolvedPosition.ToRect(Size.X, Size.Y), out var collidingRects))
                 {
-                    var minimumY = rects.Min(rect => rect.Top);
-                    if (resolvedPosition.Y + 32f > minimumY)
+                    var minimumY = collidingRects.Min(rect => rect.Top);
+                    if (resolvedPosition.Y + Size.Y > minimumY)
                     {
-                        resolvedPosition.Y = (float)minimumY - 32f;
+                        resolvedPosition.Y = (float)minimumY - Size.Y;
                         IsColliding = true;
                     }
                 }
             }
             else if (newPosition.Y < oldPosition.Y) // going up
             {
-                if (_world.TryGetOverlappingTiles(resolvedPosition.ToRect(32f, 32f), out var rects))
+                if (_world.TryGetOverlappingTiles(resolvedPosition.ToRect(Size.X, Size.Y), out var collidingRects))
                 {
-                    var maximumY = rects.Max(rect => rect.Bottom);
+                    var maximumY = collidingRects.Max(rect => rect.Bottom);
                     {
                         if (resolvedPosition.Y < maximumY)
                         {
@@ -173,11 +179,6 @@ namespace uwpKarate.Components
             }
 
             return true;
-        }
-
-        private bool IsGrounded(World world)
-        {
-            return false;
         }
 
         private bool IsRectInRect(Rect dynamicRect,
