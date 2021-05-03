@@ -2,7 +2,7 @@
 
 namespace uwpKarate.Components
 {
-    public class GameObjectComponent : IGameObjectComponent
+    public abstract class GameObjectComponent : IGameObjectComponent
     {
         public GameObjectComponent(GameObject gameObject)
         {

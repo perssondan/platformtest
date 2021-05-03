@@ -53,7 +53,7 @@ namespace uwpKarate.GameObjects
         {
         }
 
-        public GraphicsComponent GraphicsComponent => GetComponent<GraphicsComponent>();
+        public GraphicsComponentBase GraphicsComponent => GetComponent<GraphicsComponentBase>();
         public PhysicsComponent PhysicsComponent => GetComponent<PhysicsComponent>();
         public InputComponent InputComponent => GetComponent<InputComponent>();
         public TransformComponent TransformComponent => GetComponent<TransformComponent>();

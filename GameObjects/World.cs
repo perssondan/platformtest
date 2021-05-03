@@ -78,7 +78,16 @@ namespace uwpKarate.GameObjects
         private void InitializeHeroine(Windows.UI.Xaml.Window current)
         {
             var gameObject = new PlayerGameObject();
-            gameObject.AddComponent(new GraphicsComponent(gameObject, _canvasBitmaps[0], 0, 96));
+            var sourceRects = new Rect[]
+            {
+                new Rect(0,32f,32,32),
+                new Rect(32f,32f,32f,32f),
+                new Rect(64f,32f,32f,32f),
+                new Rect(96f,32f,32f,32f),
+            };
+            var animatedGraphicsComponent = new AnimatedGraphicsComponent(gameObject, _canvasBitmaps[0], sourceRects, TimeSpan.FromMilliseconds(150));
+            //gameObject.AddComponent(new GraphicsComponent(gameObject, _canvasBitmaps[0], 0, 96));
+            gameObject.AddComponent<GraphicsComponentBase>(animatedGraphicsComponent);
             gameObject.AddComponent(new PhysicsComponent(gameObject));
             gameObject.AddComponent(new InputComponent(gameObject, current));
             gameObject.AddComponent(new ColliderComponent(gameObject)
@@ -104,7 +113,7 @@ namespace uwpKarate.GameObjects
                 gameObject.AddComponent(transformComponent);
                 
                 var graphicsComponent = CreateGraphicsComponent(gameObject, (TileType)_mapData[data.offset], _canvasBitmaps[0]);
-                gameObject.AddComponent(graphicsComponent);
+                gameObject.AddComponent<GraphicsComponentBase>(graphicsComponent);
                 // TODO: The currently loaded tiles are all collidables
                 gameObject.AddComponent(new ColliderComponent(gameObject) { Size = new Vector2(_tileWidth, _tileHeight) });
                 _graphicsComponents.Add(gameObject.GraphicsComponent);

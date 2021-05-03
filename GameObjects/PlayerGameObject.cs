@@ -1,12 +1,26 @@
 ﻿using System;
 using System.Numerics;
 using uwpKarate.Constants;
+using Windows.Foundation;
 using static uwpKarate.Components.InputComponent;
 
 namespace uwpKarate.GameObjects
 {
     public class PlayerGameObject : GameObject
     {
+        private static readonly Rect[] _walkSourceRects = new Rect[]
+            {
+                new Rect(0, 32f, 32f, 32f),
+                new Rect(32f, 32f, 32f, 32f),
+                new Rect(64f, 32f, 32f, 32f),
+                new Rect(96f, 32f, 32f, 32f),
+            };
+
+        private static readonly Rect[] _staticSourceRects = new Rect[]
+            {
+                new Rect(0f, 96f, 32f, 32f)
+            };
+
         private Vector2 _normalGravity = new Vector2(0, PlayerConstants.Gravity);
 
         private readonly TimeSpan _jumpPressedRememberTime = TimeSpan.FromMilliseconds(150);
@@ -67,8 +81,27 @@ namespace uwpKarate.GameObjects
         private void WalkHandler(UserInput userInputs)
         {
             var walkOrientation = GetWalkOrientationFromUserInput(userInputs);
-
+            UpdateWalkAnimation(walkOrientation);
             Walk(walkOrientation);
+        }
+
+        private void UpdateWalkAnimation(float walkOrientation)
+        {
+            if (walkOrientation < 0f)
+            {
+                GraphicsComponent.InvertTile = true;
+                GraphicsComponent.SourceRects = _walkSourceRects;
+            }
+            else if (walkOrientation > 0f)
+            {
+                GraphicsComponent.InvertTile = false;
+                GraphicsComponent.SourceRects = _walkSourceRects;
+            }
+            else
+            {
+                GraphicsComponent.InvertTile = false;
+                GraphicsComponent.SourceRects = _staticSourceRects;
+            }
         }
 
         private float GetWalkOrientationFromUserInput(UserInput userInputs)

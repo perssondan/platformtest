@@ -116,8 +116,10 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Components\AnimatedGraphicsComponent.cs" />
     <Compile Include="Components\ColliderComponent.cs" />
     <Compile Include="Components\GameObjectComponent.cs" />
+    <Compile Include="Components\GraphicsComponentBase.cs" />
     <Compile Include="Components\IGameObjectComponent.cs" />
     <Compile Include="Components\InputComponent.cs" />
     <Compile Include="Components\PhysicsComponent.cs" />
@@ -192,6 +194,9 @@
   <ItemGroup>
     <Content Include="Assets\GameAssets\images\mytilemap.json" />
     <Content Include="Assets\GameAssets\images\mytiles.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Systems\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
