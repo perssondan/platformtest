@@ -1,5 +1,6 @@
 ﻿using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Effects;
+using System;
 using System.Numerics;
 using Windows.UI.ViewManagement;
 
@@ -9,8 +10,6 @@ namespace uwpKarate.Utilities
     {
         private float _scaleWidth;
         private float _scaleHeight;
-        private readonly float DesignWidth = 640;
-        private readonly float DesignHeight = 400;
 
         public void SetScale()
         {
@@ -26,7 +25,17 @@ namespace uwpKarate.Utilities
             return image;
         }
 
+        public Transform2DEffect ScaleBitmapKeepAspectRatio(CanvasBitmap canvasBitmap)
+        {
+            var scale = Math.Min(_scaleWidth, _scaleHeight);
+            var image = new Transform2DEffect { Source = canvasBitmap };
+            image.TransformMatrix = Matrix3x2.CreateScale(scale, scale);
+            return image;
+        }
+
         public float ScaleWidth => _scaleWidth;
         public float ScaleHeight => _scaleHeight;
+        public float DesignWidth { get; set; } = 448f;
+        public float DesignHeight { get; set; } = 320f;
     }
 }

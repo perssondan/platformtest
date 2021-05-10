@@ -26,8 +26,6 @@ namespace uwpKarate.GameObjects
         private MoveSystem _moveSystem = MoveSystem.Instance;
         private PhysicsSystem _physicsSystem = PhysicsSystem.Instance;
 
-        private List<IGameObjectComponent<CanvasDrawingSession>> _graphicsComponents = new List<IGameObjectComponent<CanvasDrawingSession>>();
-
         private int[] _mapData = new[]
         {
             3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3,
@@ -62,23 +60,6 @@ namespace uwpKarate.GameObjects
 
         public Rect WorldRect => new Rect(0, 0, WorldPixelWidth, WorldPixelHeight);
 
-        public bool TryGetOverlappingTiles(Rect rect, out IReadOnlyList<Rect> rects)
-        {
-            var tileRects = new List<Rect>();
-
-            //foreach (var collider in _tiles.Where(tile => tile != null && tile.ColliderComponent != null).Select(tile => tile.ColliderComponent))
-            //{
-            //    if (collider.IsRectColliding(rect))
-            //    {
-            //        tileRects.Add(collider.Rect);
-            //    }
-            //}
-
-            rects = tileRects;
-
-            return tileRects.Any();
-        }
-
         private void InitializeHeroine(Windows.UI.Xaml.Window current)
         {
             var gameObject = new PlayerGameObject();
@@ -100,7 +81,6 @@ namespace uwpKarate.GameObjects
                 Size = new Vector2(_tileWidth, _tileHeight),
                 CollisionType = ColliderComponent.CollisionTypes.Dynamic
             });
-            _graphicsComponents.Add(gameObject.GraphicsComponent);
             _heroine = gameObject;
             _heroine.TransformComponent.Position = new Vector2(288f, 256f);
         }
@@ -121,13 +101,12 @@ namespace uwpKarate.GameObjects
                 
                 var graphicsComponent = CreateGraphicsComponent(gameObject, (TileType)_mapData[data.offset], _canvasBitmaps[0]);
                 gameObject.AddComponent<GraphicsComponentBase>(graphicsComponent);
-                // TODO: The currently loaded tiles are all collidables
+                // TODO: The currently loaded tiles are all collidables, so when making the sky or what ever we need to fix this
                 gameObject.AddComponent(new ColliderComponent(gameObject)
                 {
                     Size = new Vector2(_tileWidth, _tileHeight),
                     CollisionType = ColliderComponent.CollisionTypes.Static
                 });
-                _graphicsComponents.Add(gameObject.GraphicsComponent);
 
                 _tiles[data.offset] = gameObject;
             });
@@ -158,7 +137,7 @@ namespace uwpKarate.GameObjects
 
         public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
         {
-            _graphicsComponents.ForEach(graphicsComponent => graphicsComponent.Update(canvasDrawingSession, timeSpan));
+            GraphicsComponentManager.Instance.Components.ForEach(graphicsComponent => graphicsComponent.Update(canvasDrawingSession, timeSpan));
         }
 
         private GraphicsComponent CreateGraphicsComponent(GameObject gameObject, TileType tileType, CanvasBitmap canvasBitmap)

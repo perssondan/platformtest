@@ -19,6 +19,7 @@ namespace uwpKarate.Components
         public GraphicsComponentBase(GameObject gameObject)
             : base(gameObject)
         {
+            GraphicsComponentManager.Instance.AddComponent(this);
         }
 
         public bool InvertTile { get; set; }
@@ -56,7 +57,9 @@ namespace uwpKarate.Components
         {
             if (GameObject.TransformComponent.Velocity.LengthSquared() > 0f)
             {
-                canvasDrawingSession.DrawLine(GameObject.ColliderComponent.Center, GameObject.ColliderComponent.Center + (GameObject.TransformComponent.Velocity.Normalize() * 20f), GetCachedBrush(canvasDrawingSession, Colors.Aquamarine));
+                canvasDrawingSession.DrawLine(GameObject.ColliderComponent.Center,
+                                              GameObject.ColliderComponent.Center + (GameObject.TransformComponent.Velocity.Normalize() * 20f),
+                                              GetCachedBrush(canvasDrawingSession, Colors.Aquamarine));
             }
         }
 
@@ -68,9 +71,14 @@ namespace uwpKarate.Components
             foreach(var collisionInfo in collisionInfos)
             {
                 canvasDrawingSession.FillCircle(collisionInfo.CollisionPoint,
-                                                        5f, GetCachedBrush(canvasDrawingSession, Colors.Yellow));
+                                                        3f, GetCachedBrush(canvasDrawingSession, Colors.Orange));
 
-                canvasDrawingSession.DrawRectangle(collisionInfo.ContactRect, GetCachedBrush(canvasDrawingSession, Colors.Yellow));
+                canvasDrawingSession.DrawRectangle(collisionInfo.ContactRect, GetCachedBrush(canvasDrawingSession, Colors.Orange));
+
+                var startPoint = collisionInfo.CollisionPoint - (collisionInfo.CollisionNormal * GameObject.ColliderComponent.Size / 2f);
+                canvasDrawingSession.DrawLine(startPoint,
+                                              startPoint - (collisionInfo.CollisionNormal * 15f),
+                                              GetCachedBrush(canvasDrawingSession, Colors.Orange));
             }
         }
 

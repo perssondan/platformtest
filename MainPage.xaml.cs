@@ -1,16 +1,13 @@
 ﻿using Microsoft.Graphics.Canvas;
+using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using uwpKarate.GameObjects;
 using uwpKarate.Models;
 using uwpKarate.Utilities;
-using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -25,6 +22,7 @@ namespace uwpKarate
         private Scaling _scaling = new Scaling();
         private GameStateManager _gameStateManager = new GameStateManager();
         private World _world;
+        private CanvasRenderTarget _offscreen;
 
         public MainPage()
         {
@@ -39,15 +37,54 @@ namespace uwpKarate
 
         private void OnGameCanvasDraw(ICanvasAnimatedControl canvasControl, CanvasAnimatedDrawEventArgs args)
         {
-            _world?.Draw(args.DrawingSession, args.Timing.ElapsedTime);
+            try
+            {
+                args.DrawingSession.Clear(Colors.Black);
 
-            //var image = _scaling.ScaleBitmap(_tileAtlasBitmap);
-            //args.DrawingSession.DrawImage(image);
-            //args.DrawingSession.DrawImage(image, new System.Numerics.Vector2(0f, 0f));
+                if (TryGetRenderedOffscreen(args.DrawingSession.Device, args.Timing.ElapsedTime, out var renderedBitmap))
+                {
+                    var effect = _scaling.ScaleBitmapKeepAspectRatio(renderedBitmap);
+                    args.DrawingSession.DrawImage(effect);
+                }
+            }
+            finally
+            {
+                GameCanvas.Invalidate();
+            }
 
             args.DrawingSession.DrawText($"GameCount: {_count}, elapsed: {_elapsed}", new System.Numerics.Vector2(10, 10), Colors.AliceBlue);
-            // TODO: Do we need this?
-            GameCanvas.Invalidate();
+        }
+
+        private bool TryGetRenderedOffscreen(CanvasDevice canvasDevice, TimeSpan elapsedTime, out CanvasRenderTarget canvasRenderTarget)
+        {
+            canvasRenderTarget = null;
+
+            if (_world == null) return false;
+
+            EnforceOffScreenCreated(canvasDevice, _world.WorldPixelWidth, _world.WorldPixelHeight);
+            if (_offscreen == null) return false;
+
+            using (var drawingSession = _offscreen.CreateDrawingSession())
+            {
+                drawingSession.Clear(Colors.Black);
+                _world.Draw(drawingSession, elapsedTime);
+            }
+
+            canvasRenderTarget = _offscreen;
+
+            return true;
+        }
+
+        private void EnforceOffScreenCreated(CanvasDevice canvasDevice, float width, float height)
+        {
+            if (_offscreen != null)
+                return;
+
+            _offscreen = new CanvasRenderTarget(canvasDevice, width, height, dpi: 96);
+
+            _scaling.DesignWidth = width;
+            _scaling.DesignHeight = height;
+
         }
 
         private void OnGameCanvasUpdate(ICanvasAnimatedControl sender, CanvasAnimatedUpdateEventArgs args)
@@ -83,6 +120,9 @@ namespace uwpKarate
             {
                 _world = new World(bitmaps, map, tileAtlases, Window.Current);
             }
+
+            //CanvasDevice device = CanvasDevice.GetSharedDevice();
+            //_offscreen = new CanvasRenderTarget(device, 320, 448, 96);
         }
 
         private void OnGameCanvasTapped(object sender, TappedRoutedEventArgs args)
