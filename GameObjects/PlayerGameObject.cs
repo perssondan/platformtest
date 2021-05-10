@@ -8,6 +8,7 @@ namespace uwpKarate.GameObjects
 {
     public class PlayerGameObject : GameObject
     {
+        // TODO: fix these static sprites
         private static readonly Rect[] _walkSourceRects = new Rect[]
             {
                 new Rect(0, 32f, 32f, 32f),
@@ -20,8 +21,6 @@ namespace uwpKarate.GameObjects
             {
                 new Rect(0f, 96f, 32f, 32f)
             };
-
-        private Vector2 _normalGravity = new Vector2(0, PlayerConstants.Gravity);
 
         private readonly TimeSpan _jumpPressedRememberTime = TimeSpan.FromMilliseconds(150);
         private TimeSpan _jumpPressedAt;
@@ -38,8 +37,6 @@ namespace uwpKarate.GameObjects
 
         public override void OnBeforeUpdate(World world, TimeSpan timeSpan)
         {
-            EnforceGravity();
-
             var userInputs = InputComponent.UserInputs;
             WalkHandler(userInputs);
             JumpHandler(userInputs, timeSpan);
@@ -47,7 +44,7 @@ namespace uwpKarate.GameObjects
 
         public override void OnAfterUpdate(World world, TimeSpan timeSpan)
         {
-            EnforceInsideWorld(world);
+            //EnforceInsideWorld(world);
         }
 
         private void JumpHandler(UserInput userInputs, TimeSpan timeSpan)
@@ -71,7 +68,7 @@ namespace uwpKarate.GameObjects
             if (_jumpPressedAt.TotalMilliseconds <= 0f) return;
 
             //Only jump when grounded
-            if (ColliderComponent.IsGrounded() == false) return;
+            if (ColliderComponent.IsColliding == false) return;
 
             _jumpPressedAt = TimeSpan.Zero;
 
@@ -118,14 +115,6 @@ namespace uwpKarate.GameObjects
             TransformComponent.Velocity += InitialJumpVelocity;
         }
 
-        private void EnforceGravity()
-        {
-            if (PhysicsComponent?.Gravity == Vector2.Zero)
-            {
-                PhysicsComponent.Gravity = _normalGravity;
-            }
-        }
-
         private void Walk(float orientation)
         {
             if (orientation > 0f || orientation < 0f)
@@ -141,35 +130,6 @@ namespace uwpKarate.GameObjects
             else
             {
                 TransformComponent.Velocity *= Vector2.UnitY;
-            }
-        }
-
-        private void EnforceInsideWorld(World world)
-        {
-            if (TransformComponent.Position.Y < world.WorldRect.Top)//above
-            {
-                // zero y
-                TransformComponent.Velocity *= Vector2.UnitX;
-                TransformComponent.Position = TransformComponent.Position * Vector2.UnitX + (float)world.WorldRect.Top * Vector2.UnitY;
-            }
-            if (TransformComponent.Position.Y > world.WorldRect.Bottom)//below
-            {
-                // zero y
-                TransformComponent.Velocity *= Vector2.UnitX;
-                TransformComponent.Position = TransformComponent.Position * Vector2.UnitX + (float)world.WorldRect.Top * Vector2.UnitY;
-            }
-            if (TransformComponent.Position.X < world.WorldRect.Left)//left
-            {
-                // zero x
-                TransformComponent.Velocity *= Vector2.UnitY;
-                TransformComponent.Position = TransformComponent.Position * Vector2.UnitY + (float)world.WorldRect.Left * Vector2.UnitX;
-            }
-            if (TransformComponent.Position.X + ColliderComponent.Size.X > world.WorldRect.Right)//right
-            {
-                // zero x velocity
-                TransformComponent.Velocity *= Vector2.UnitY;
-                // set right position to the right limit of the world minus the width. Sprite or collider width?
-                TransformComponent.Position = TransformComponent.Position * Vector2.UnitY + (Vector2.UnitX * ((float)world.WorldRect.Right - ColliderComponent.Size.X));
             }
         }
     }

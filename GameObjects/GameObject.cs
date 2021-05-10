@@ -4,12 +4,13 @@ using uwpKarate.Components;
 
 namespace uwpKarate.GameObjects
 {
-    public class GameObject
+    public class GameObject : IDisposable
     {
         private IDictionary<Type, IGameObjectComponent> _components = new Dictionary<Type, IGameObjectComponent>();
 
         public GameObject()
         {
+            GameObjectManager.AddGameObject(this);
             AddComponent(new TransformComponent(this));
         }
 
@@ -36,12 +37,6 @@ namespace uwpKarate.GameObjects
         {
             OnBeforeUpdate(world, timeSpan);
 
-            InputComponent?.Update(world, timeSpan);
-            PhysicsComponent?.Update(world, timeSpan);
-            ColliderComponent?.Update(world, timeSpan);
-            // Must be last
-            TransformComponent?.Update(world, timeSpan);
-
             OnAfterUpdate(world, timeSpan);
         }
 
@@ -51,6 +46,11 @@ namespace uwpKarate.GameObjects
 
         public virtual void OnAfterUpdate(World world, TimeSpan timeSpan)
         {
+        }
+
+        public void Dispose()
+        {
+            GameObjectManager.RemoveGameObject(this);
         }
 
         public GraphicsComponentBase GraphicsComponent => GetComponent<GraphicsComponentBase>();

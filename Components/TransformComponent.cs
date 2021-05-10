@@ -1,21 +1,20 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using uwpKarate.GameObjects;
 using uwpKarate.Utilities;
 
 namespace uwpKarate.Components
 {
-    public class TransformComponent : GameObjectComponent, IGameObjectComponent<World>
+    public class TransformComponent : GameObjectComponent, IGameObjectComponent
     {
         private HistoryStack<Vector2> _historyStack = new HistoryStack<Vector2>(100);
         private Vector2 _position;
 
         public TransformComponent(GameObject gameObject) : base(gameObject)
         {
+            TransformComponentManager.Instance.AddComponent(this);
         }
 
         public Vector2 Velocity { get; set; }
-        public Vector2[] PositionHistory => _historyStack.Items.ToArray();
 
         public Vector2 Position
         {
@@ -31,8 +30,11 @@ namespace uwpKarate.Components
             }
         }
 
-        public void Update(World world, TimeSpan timeSpan)
+        public Vector2[] PositionHistory => _historyStack.Items.ToArray();
+
+        protected override void OnDispose()
         {
+            TransformComponentManager.Instance.RemoveComponent(this);
         }
     }
 }

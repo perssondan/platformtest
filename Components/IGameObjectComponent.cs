@@ -1,9 +1,11 @@
 ﻿using System;
+using uwpKarate.GameObjects;
 
 namespace uwpKarate.Components
 {
-    public interface IGameObjectComponent
+    public interface IGameObjectComponent : IDisposable
     {
+        GameObject GameObject { get; set; }
     }
 
     public interface IGameObjectComponent<T> : IGameObjectComponent

@@ -9,6 +9,19 @@ namespace uwpKarate.Components
             GameObject = gameObject;
         }
 
-        protected GameObject GameObject { get; }
+        public GameObject GameObject { get; set; }
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            OnDispose();
+            GameObject = null;
+            IsDisposed = true;
+        }
+
+        protected virtual void OnDispose()
+        {
+
+        }
     }
 }

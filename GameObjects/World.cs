@@ -6,6 +6,7 @@ using System.Numerics;
 using uwpKarate.Components;
 using uwpKarate.Extensions;
 using uwpKarate.Models;
+using uwpKarate.Systems;
 using Windows.Foundation;
 
 namespace uwpKarate.GameObjects
@@ -21,6 +22,9 @@ namespace uwpKarate.GameObjects
         private readonly TileAtlas[] _tileAtlases;
         private GameObject[] _tiles;
         private PlayerGameObject _heroine;
+        private ColliderSystem _colliderSystem = ColliderSystem.Instance;
+        private MoveSystem _moveSystem = MoveSystem.Instance;
+        private PhysicsSystem _physicsSystem = PhysicsSystem.Instance;
 
         private List<IGameObjectComponent<CanvasDrawingSession>> _graphicsComponents = new List<IGameObjectComponent<CanvasDrawingSession>>();
 
@@ -62,13 +66,13 @@ namespace uwpKarate.GameObjects
         {
             var tileRects = new List<Rect>();
 
-            foreach (var collider in _tiles.Where(tile => tile != null && tile.ColliderComponent != null).Select(tile => tile.ColliderComponent))
-            {
-                if (collider.IsRectColliding(rect))
-                {
-                    tileRects.Add(collider.Rect);
-                }
-            }
+            //foreach (var collider in _tiles.Where(tile => tile != null && tile.ColliderComponent != null).Select(tile => tile.ColliderComponent))
+            //{
+            //    if (collider.IsRectColliding(rect))
+            //    {
+            //        tileRects.Add(collider.Rect);
+            //    }
+            //}
 
             rects = tileRects;
 
@@ -90,12 +94,15 @@ namespace uwpKarate.GameObjects
             gameObject.AddComponent<GraphicsComponentBase>(animatedGraphicsComponent);
             gameObject.AddComponent(new PhysicsComponent(gameObject));
             gameObject.AddComponent(new InputComponent(gameObject, current));
+            gameObject.AddComponent(new PlayerComponent(gameObject));
             gameObject.AddComponent(new ColliderComponent(gameObject)
             {
-                Size = new Vector2(_tileWidth, _tileHeight)
+                Size = new Vector2(_tileWidth, _tileHeight),
+                CollisionType = ColliderComponent.CollisionTypes.Dynamic
             });
             _graphicsComponents.Add(gameObject.GraphicsComponent);
             _heroine = gameObject;
+            _heroine.TransformComponent.Position = new Vector2(288f, 256f);
         }
 
         private void InitializeTileMap()
@@ -115,7 +122,11 @@ namespace uwpKarate.GameObjects
                 var graphicsComponent = CreateGraphicsComponent(gameObject, (TileType)_mapData[data.offset], _canvasBitmaps[0]);
                 gameObject.AddComponent<GraphicsComponentBase>(graphicsComponent);
                 // TODO: The currently loaded tiles are all collidables
-                gameObject.AddComponent(new ColliderComponent(gameObject) { Size = new Vector2(_tileWidth, _tileHeight) });
+                gameObject.AddComponent(new ColliderComponent(gameObject)
+                {
+                    Size = new Vector2(_tileWidth, _tileHeight),
+                    CollisionType = ColliderComponent.CollisionTypes.Static
+                });
                 _graphicsComponents.Add(gameObject.GraphicsComponent);
 
                 _tiles[data.offset] = gameObject;
@@ -136,11 +147,13 @@ namespace uwpKarate.GameObjects
 
         public void Update(TimeSpan timeSpan)
         {
-            TileMapIterator((data) =>
-            {
-                _tiles[data.offset]?.Update(this, timeSpan);
-            });
             _heroine?.Update(this, timeSpan);
+            _physicsSystem.Update(this, timeSpan);
+            _colliderSystem.Update(this, timeSpan);
+            // We might have collisions, resolve them now!
+            // enforce player is inside world
+            _physicsSystem.Resolve(this, timeSpan);
+            _moveSystem.Update(this, timeSpan);
         }
 
         public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)

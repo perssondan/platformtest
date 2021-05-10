@@ -1,214 +1,119 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
-using uwpKarate.Extensions;
+using System.Runtime.CompilerServices;
 using uwpKarate.GameObjects;
 using Windows.Foundation;
 
 namespace uwpKarate.Components
 {
-    public class ColliderComponent : GameObjectComponent, IGameObjectComponent<World>
+    public class ColliderComponent : GameObjectComponent, IGameObjectComponent
     {
-        private World _world;
         public ColliderComponent(GameObject gameObject)
             : base(gameObject)
         {
+            ColliderComponentManager.Instance.AddComponent(this);
         }
 
         public bool IsColliding { get; set; }
-        public Vector2 Size { get; set; }
-        public Rect Rect => new Rect(GameObject.TransformComponent.Position.ToPoint(), Size.ToSize());
+        public bool IsGrounded { get; set; }
 
-        public void Update(World target, TimeSpan timeSpan)
+        public CollisionInfo[] CollisionInfos { get; set; } = Array.Empty<CollisionInfo>();
+
+        /// <summary>
+        /// Get or set <see cref="CollisionTypes"/>. Default value is <see cref="CollisionTypes.Static"/>
+        /// </summary>
+        public CollisionTypes CollisionType { get; set; } = CollisionTypes.Static;
+
+        public Vector2 Size { get; set; } = Vector2.Zero;
+        public Rect BoundingBox => new Rect(Position.ToPoint(), Size.ToSize());
+        public Vector2 Center => new Vector2(Position.X + Size.X / 2f, Position.Y + Size.Y / 2f);
+        public Vector2 LastValidPosition { get; set; } = Vector2.Zero;
+
+        protected Vector2 Position => GameObject.TransformComponent.Position;
+
+        public enum CollisionTypes
         {
-            _world = target;
+            /// <summary>
+            /// Value if the <see cref="GameObject"/> is static, cannot move
+            /// </summary>
+            Static,
+
+            /// <summary>
+            /// Value if the <see cref="GameObject"/> is dynamic, can move
+            /// </summary>
+            Dynamic
+        }
+    }
+
+    public struct CollisionInfo : IEquatable<CollisionInfo>, IFormattable
+    {
+        public static CollisionInfo Zero => new CollisionInfo();
+
+        public CollisionInfo(Vector2 collisionPoint, Vector2 collisionNormal, float collisionTime)
+        {
+            CollisionPoint = collisionPoint;
+            CollisionNormal = collisionNormal;
+            CollisionTime = collisionTime;
         }
 
-        public bool IsPointColliding(Vector2 point)
+        public Vector2 CollisionPoint;
+        public Vector2 CollisionNormal;
+        public float CollisionTime;
+        public Rect ContactRect;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override bool Equals(object obj)
         {
-            return IsColliding = Rect.Contains(point.ToPoint());
+            if (!(obj is CollisionInfo))
+                return false;
+            return Equals((CollisionInfo)obj);
         }
 
-        public bool IsGrounded()
+        public override int GetHashCode()
         {
-            var bottomLeft = new Vector2(GameObject.TransformComponent.Position.X, GameObject.TransformComponent.Position.Y + Size.Y);
-            var bottomRight = new Vector2(GameObject.TransformComponent.Position.X + Size.X, GameObject.TransformComponent.Position.Y + Size.Y);
-
-            var bottomRect = bottomLeft.ToRect(Size.X, 1f);
-            if (_world?.TryGetOverlappingTiles(bottomRect, out var rects) == true) return true;
-
-            return false;
+            int hash = CollisionPoint.GetHashCode();
+            hash = HashCodeHelper.CombineHashCodes(hash, CollisionNormal.GetHashCode());
+            hash = HashCodeHelper.CombineHashCodes(hash, CollisionTime.GetHashCode());
+            return hash;
         }
 
-        public bool IsCollidingTest(Vector2 oldPosition, Vector2 newPosition, out Vector2 resolvedPosition)
+        public bool Equals(CollisionInfo other)
         {
-            IsColliding = false;
-            resolvedPosition.Y = oldPosition.Y;
-            resolvedPosition.X = newPosition.X;
-            if (_world is null) return false;
-
-            if (newPosition.X > oldPosition.X) // going right
-            {
-                if (_world.TryGetOverlappingTiles(resolvedPosition.ToRect(Size.X, Size.Y), out var collidingRects))
-                {
-                    var minimumX = collidingRects.Min(rect => rect.Left);
-                    if (resolvedPosition.X + Size.X > minimumX)
-                    {
-                        resolvedPosition.X = (float)minimumX - Size.X;
-                        if (resolvedPosition.X < 0)
-                            resolvedPosition.X = 0f;
-                        IsColliding = true;
-                    }
-                }
-            }
-            else if (newPosition.X < oldPosition.X) // going left
-            {
-                if (_world.TryGetOverlappingTiles(resolvedPosition.ToRect(Size.X, Size.Y), out var collidingRects))
-                {
-                    var maximumX = collidingRects.Max(rect => rect.Right);
-                    if (resolvedPosition.X < maximumX)
-                    {
-                        resolvedPosition.X = (float)maximumX;
-                        IsColliding = true;
-                    }
-                }
-            }
-
-            resolvedPosition.Y =  newPosition.Y;
-            if (newPosition.Y > oldPosition.Y) // going down
-            {
-                if (_world.TryGetOverlappingTiles(resolvedPosition.ToRect(Size.X, Size.Y), out var collidingRects))
-                {
-                    var minimumY = collidingRects.Min(rect => rect.Top);
-                    if (resolvedPosition.Y + Size.Y > minimumY)
-                    {
-                        resolvedPosition.Y = (float)minimumY - Size.Y;
-                        IsColliding = true;
-                    }
-                }
-            }
-            else if (newPosition.Y < oldPosition.Y) // going up
-            {
-                if (_world.TryGetOverlappingTiles(resolvedPosition.ToRect(Size.X, Size.Y), out var collidingRects))
-                {
-                    var maximumY = collidingRects.Max(rect => rect.Bottom);
-                    {
-                        if (resolvedPosition.Y < maximumY)
-                        {
-                            resolvedPosition.Y = (float)maximumY;
-                            IsColliding = true;
-                        }
-                    }
-                }
-            }
-
-            return IsColliding;
+            return CollisionNormal == other.CollisionNormal && CollisionPoint == other.CollisionPoint && CollisionTime == other.CollisionTime;
         }
 
-        public bool IsRectColliding(Rect opponentRect)
+        public string ToString(string format, IFormatProvider formatProvider)
         {
-            return IsColliding = (Rect.Left < opponentRect.Right && Rect.Right > opponentRect.Left &&
-                    Rect.Top < opponentRect.Bottom && Rect.Bottom > opponentRect.Top);
+            return $"{nameof(CollisionNormal)}:{CollisionNormal};{nameof(CollisionPoint)}:{CollisionPoint};{nameof(CollisionTime)}:{CollisionTime}";
         }
 
-        public bool IsRayInRect(Vector2 rayOrigin,
-                                Vector2 rayDirection,
-                                Rect staticRect,
-                                out Vector2 contactPoint,
-                                out Vector2 contactNormal,
-                                out float nearestContactTime)
+        public override string ToString()
         {
-            contactPoint = Vector2.Zero;
-            contactNormal = Vector2.Zero;
-            nearestContactTime = 0f;
-
-            // Cache division
-            var inverseRayDirection = Vector2.One / rayDirection;
-
-            var targetPos = staticRect.Pos();
-            var targetSize = staticRect.Size();
-
-            // Calculate intersection with rectangle bounding axes
-            var nearestContactPoint = (targetPos - rayOrigin) * inverseRayDirection;
-            var furthestContactPoint = (targetPos + targetSize - rayOrigin) * inverseRayDirection;
-
-            if (float.IsNaN(furthestContactPoint.X) || float.IsNaN(furthestContactPoint.Y)) return false;
-            if (float.IsNaN(nearestContactPoint.X) || float.IsNaN(nearestContactPoint.Y)) return false;
-
-            // Swap
-            if (nearestContactPoint.X > furthestContactPoint.X) ObjectExtensions.Swap(ref nearestContactPoint.X, ref furthestContactPoint.X);
-
-            // Swap
-            if (nearestContactPoint.Y > furthestContactPoint.Y) ObjectExtensions.Swap(ref nearestContactPoint.Y, ref furthestContactPoint.Y);
-
-            if (nearestContactPoint.X > furthestContactPoint.Y || nearestContactPoint.Y > furthestContactPoint.X) return false;
-
-            // Nearest 'time' will be the first contact
-            nearestContactTime = Math.Max(nearestContactPoint.X, nearestContactPoint.Y);
-
-            // Furthest 'time' will contact on the opposite side of the target
-            var furhestContactTime = Math.Min(furthestContactPoint.X, nearestContactPoint.Y);
-
-            // If negative it is pointing away from target
-            if (furhestContactTime < 0) return false;
-
-            // Contact point of collision from parametric line equation
-            contactPoint = rayOrigin + nearestContactTime * rayDirection;
-
-            if (nearestContactPoint.X > nearestContactPoint.Y)
-            {
-                if (inverseRayDirection.X < 0f)
-                {
-                    contactNormal = new Vector2(1, 0);
-                }
-                else
-                {
-                    contactNormal = new Vector2(-1, 0);
-                }
-            }
-            else if (nearestContactPoint.X < nearestContactPoint.Y)
-            {
-                if (inverseRayDirection.Y < 0f)
-                {
-                    contactNormal = new Vector2(0, 1);
-                }
-                else
-                {
-                    contactNormal = new Vector2(0, -1);
-                }
-            }
-
-            return true;
+            return $"{nameof(CollisionNormal)}:{CollisionNormal};{nameof(CollisionPoint)}:{CollisionPoint};{nameof(CollisionTime)}:{CollisionTime}";
         }
 
-        private bool IsRectInRect(Rect dynamicRect,
-                                  Vector2 sourceVelocity,
-                                  Rect staticRect,
-                                  out Vector2 contactPoint,
-                                  out Vector2 contactNormal,
-                                  out float contactTime,
-                                  float elapsedTime)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator ==(CollisionInfo left, CollisionInfo right)
         {
-            contactPoint = Vector2.Zero;
-            contactNormal = Vector2.Zero;
-            contactTime = 0f;
+            return left.Equals(right);
+        }
 
-            if (sourceVelocity == Vector2.Zero) return false;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator !=(CollisionInfo left, CollisionInfo right)
+        {
+            return !(left == right);
+        }
+    }
 
-            var expandedTarger = staticRect.Add(dynamicRect.Size());
-
-            if (IsRayInRect(
-                            dynamicRect.Pos() + dynamicRect.Size() / 2f,
-                            sourceVelocity * elapsedTime,
-                            expandedTarger,
-                            out contactPoint,
-                            out contactNormal,
-                            out contactTime))
-            {
-                if (contactTime >= 0f && contactTime <= 1f) return true;
-            }
-
-            return false;
+    internal static class HashCodeHelper
+    {
+        /// <summary>
+        /// Combines two hash codes, useful for combining hash codes of individual vector elements
+        /// </summary>
+        internal static int CombineHashCodes(int h1, int h2)
+        {
+            return (((h1 << 5) + h1) ^ h2);
         }
     }
 }

@@ -6,7 +6,7 @@ using Windows.UI.Xaml;
 
 namespace uwpKarate.Components
 {
-    public class InputComponent : GameObjectComponent, IGameObjectComponent<World>
+    public class InputComponent : GameObjectComponent, IGameObjectComponent
     {
         private readonly Window _window;
         private UserInput _userInputs;
@@ -17,10 +17,6 @@ namespace uwpKarate.Components
             _window = current;
 
             HookupKeyListener();
-        }
-
-        public void Update(World world, TimeSpan timeSpan)
-        {
         }
 
         private void HookupKeyListener()
