@@ -79,7 +79,10 @@ namespace uwpKarate
             var bitmaps = await Task.WhenAll(tileAtlases
                 .Select(tileAtlas => CanvasBitmap.LoadAsync(canvasControl, new Uri($"ms-appx:///Assets/GameAssets/images/{tileAtlas.ImageSource}")).AsTask()));
 
-            _world = new World(bitmaps, map, tileAtlases, Window.Current);
+            if (_world == null)
+            {
+                _world = new World(bitmaps, map, tileAtlases, Window.Current);
+            }
         }
 
         private void OnGameCanvasTapped(object sender, TappedRoutedEventArgs args)
