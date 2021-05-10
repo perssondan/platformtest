@@ -31,5 +31,11 @@ namespace uwpKarate.Extensions
         {
             return new Rect(topLeft.ToPoint(), bottomRight.ToSize());
         }
+
+        public static Vector2 Normalize(this Vector2 source)
+        {
+            var reverseLenght = 1f / source.Length();
+            return reverseLenght * source;
+        }
     }
 }
