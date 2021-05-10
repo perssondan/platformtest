@@ -4,6 +4,7 @@ using Microsoft.Graphics.Canvas.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using uwpKarate.Extensions;
 using uwpKarate.GameObjects;
 using Windows.Foundation;
 using Windows.UI;
@@ -30,8 +31,10 @@ namespace uwpKarate.Components
             #region Debugging stuff
 
             DrawPositionHistory(canvasDrawingSession);
-            DrawCollision(canvasDrawingSession);
-            DrawIsGrounded(canvasDrawingSession);
+            //DrawCollision(canvasDrawingSession);
+            //DrawIsGrounded(canvasDrawingSession);
+            DrawCollisionPoint(canvasDrawingSession);
+            DrawVelocityVector(canvasDrawingSession);
 
             #endregion Debugging stuff
         }
@@ -41,19 +44,41 @@ namespace uwpKarate.Components
         protected void DrawIsGrounded(CanvasDrawingSession canvasDrawingSession)
         {
             if (GameObject.InputComponent == null) return;
-            if (GameObject?.ColliderComponent?.IsGrounded() != true) return;
+            if (GameObject?.ColliderComponent.IsColliding != true) return;
 
-            canvasDrawingSession.DrawRectangle(new Rect(GameObject.ColliderComponent.Rect.Left,
-                                                        GameObject.ColliderComponent.Rect.Bottom,
-                                                        GameObject.ColliderComponent.Rect.Width,
+            canvasDrawingSession.DrawRectangle(new Rect(GameObject.ColliderComponent.BoundingBox.Left,
+                                                        GameObject.ColliderComponent.BoundingBox.Bottom,
+                                                        GameObject.ColliderComponent.BoundingBox.Width,
                                                         1f), GetCachedBrush(canvasDrawingSession, Colors.Fuchsia));
+        }
+
+        protected void DrawVelocityVector(CanvasDrawingSession canvasDrawingSession)
+        {
+            if (GameObject.TransformComponent.Velocity.LengthSquared() > 0f)
+            {
+                canvasDrawingSession.DrawLine(GameObject.ColliderComponent.Center, GameObject.ColliderComponent.Center + (GameObject.TransformComponent.Velocity.Normalize() * 20f), GetCachedBrush(canvasDrawingSession, Colors.Aquamarine));
+            }
+        }
+
+        protected void DrawCollisionPoint(CanvasDrawingSession canvasDrawingSession)
+        {
+            var collisionInfos = GameObject?.ColliderComponent?.CollisionInfos;
+            if (collisionInfos == null) return;
+
+            foreach(var collisionInfo in collisionInfos)
+            {
+                canvasDrawingSession.FillCircle(collisionInfo.CollisionPoint,
+                                                        5f, GetCachedBrush(canvasDrawingSession, Colors.Yellow));
+
+                canvasDrawingSession.DrawRectangle(collisionInfo.ContactRect, GetCachedBrush(canvasDrawingSession, Colors.Yellow));
+            }
         }
 
         protected void DrawCollision(CanvasDrawingSession canvasDrawingSession)
         {
             if (GameObject?.ColliderComponent?.IsColliding != true) return;
 
-            canvasDrawingSession.DrawRectangle(GameObject.ColliderComponent.Rect, GetCachedBrush(canvasDrawingSession, GameObject.InputComponent != null ? Colors.Yellow : Colors.Blue));
+            canvasDrawingSession.DrawRectangle(GameObject.ColliderComponent.BoundingBox, GetCachedBrush(canvasDrawingSession, GameObject.InputComponent != null ? Colors.Yellow : Colors.Blue));
         }
 
         protected void DrawPositionHistory(CanvasDrawingSession canvasDrawingSession)
