@@ -127,6 +127,7 @@
     <Compile Include="Components\HashCodeHelper.cs" />
     <Compile Include="Components\IGameObjectComponent.cs" />
     <Compile Include="Components\InputComponent.cs" />
+    <Compile Include="Components\InputComponentManager.cs" />
     <Compile Include="Components\PhysicsComponent.cs" />
     <Compile Include="Components\PhysicsComponentManager.cs" />
     <Compile Include="Components\PlayerComponent.cs" />
@@ -157,10 +158,12 @@
     <Compile Include="Models\TileSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Systems\ColliderSystem.cs" />
+    <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\ISystem.cs" />
     <Compile Include="Systems\MoveSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\SystemBase.cs" />
+    <Compile Include="Systems\UserInput.cs" />
     <Compile Include="Utilities\GameStateManager.cs" />
     <Compile Include="Utilities\HistoryStack.cs" />
     <Compile Include="Utilities\TiledLoader.cs" />
@@ -210,7 +213,9 @@
     <Content Include="Assets\GameAssets\images\mytilemap.json" />
     <Content Include="Assets\GameAssets\images\mytiles.json" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Entities\" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

@@ -21,7 +21,7 @@
             IsFixedTimeStep="True"
             IsTapEnabled="True"
             Tapped="OnGameCanvasTapped"
-            Update="OnGameCanvasUpdate"/>
+            Update="OnGameCanvasUpdate" />
         <!--<xaml:CanvasAnimatedControl/>-->
     </Grid>
 </Page>

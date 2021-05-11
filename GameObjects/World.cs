@@ -25,6 +25,7 @@ namespace uwpKarate.GameObjects
         private ColliderSystem _colliderSystem = ColliderSystem.Instance;
         private MoveSystem _moveSystem = MoveSystem.Instance;
         private PhysicsSystem _physicsSystem = PhysicsSystem.Instance;
+        private InputSystem _inputSystem = InputSystem.Instance;
 
         private int[] _mapData = new[]
         {
@@ -42,6 +43,7 @@ namespace uwpKarate.GameObjects
 
         public World(CanvasBitmap[] canvasBitmaps, Map map, TileAtlas[] tileAtlases, Windows.UI.Xaml.Window current)
         {
+            _inputSystem.Current = current;
             _canvasBitmaps = canvasBitmaps;
             _map = map;
             _tileAtlases = tileAtlases;
@@ -52,7 +54,7 @@ namespace uwpKarate.GameObjects
             _tiles = new GameObject[_mapTileWidth * _mapTileHeight];
 
             InitializeTileMap();
-            InitializeHeroine(current);
+            InitializeHeroine();
         }
 
         public int WorldPixelHeight => _map.Height * _map.TileHeight;
@@ -60,7 +62,7 @@ namespace uwpKarate.GameObjects
 
         public Rect WorldRect => new Rect(0, 0, WorldPixelWidth, WorldPixelHeight);
 
-        private void InitializeHeroine(Windows.UI.Xaml.Window current)
+        private void InitializeHeroine()
         {
             var gameObject = new PlayerGameObject();
             var sourceRects = new Rect[]
@@ -74,7 +76,7 @@ namespace uwpKarate.GameObjects
             //gameObject.AddComponent(new GraphicsComponent(gameObject, _canvasBitmaps[0], 0, 96));
             gameObject.AddComponent<GraphicsComponentBase>(animatedGraphicsComponent);
             gameObject.AddComponent(new PhysicsComponent(gameObject));
-            gameObject.AddComponent(new InputComponent(gameObject, current));
+            gameObject.AddComponent(new InputComponent(gameObject));
             gameObject.AddComponent(new PlayerComponent(gameObject));
             gameObject.AddComponent(new ColliderComponent(gameObject)
             {
@@ -126,6 +128,7 @@ namespace uwpKarate.GameObjects
 
         public void Update(TimeSpan timeSpan)
         {
+            _inputSystem.Update(this, timeSpan);
             _heroine?.Update(this, timeSpan);
             _physicsSystem.Update(this, timeSpan);
             _colliderSystem.Update(this, timeSpan);

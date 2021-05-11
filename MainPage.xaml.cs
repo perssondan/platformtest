@@ -66,7 +66,7 @@ namespace uwpKarate
 
             using (var drawingSession = _offscreen.CreateDrawingSession())
             {
-                drawingSession.Clear(Colors.Black);
+                drawingSession.Clear(Colors.DarkBlue);
                 _world.Draw(drawingSession, elapsedTime);
             }
 
