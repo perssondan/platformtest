@@ -1,6 +1,6 @@
 ﻿namespace uwpKarate.Components
 {
-    public class GraphicsComponentManager : ComponentManager<GraphicsComponentBase>
+    public class GraphicsComponentManager : ComponentManager<AnimatedGraphicsComponent>
     {
         protected GraphicsComponentManager()
         {

@@ -6,7 +6,7 @@ namespace uwpKarate.GameObjects
 {
     public class GameObject : IDisposable
     {
-        private IDictionary<Type, IGameObjectComponent> _components = new Dictionary<Type, IGameObjectComponent>();
+        private readonly IDictionary<Type, IGameObjectComponent> _components = new Dictionary<Type, IGameObjectComponent>();
 
         public GameObject()
         {
@@ -51,9 +51,13 @@ namespace uwpKarate.GameObjects
         public void Dispose()
         {
             GameObjectManager.RemoveGameObject(this);
+            foreach (var component in _components.Values)
+            {
+                component.Dispose();
+            }
         }
 
-        public GraphicsComponentBase GraphicsComponent => GetComponent<GraphicsComponentBase>();
+        public AnimatedGraphicsComponent GraphicsComponent => GetComponent<AnimatedGraphicsComponent>();
         public PhysicsComponent PhysicsComponent => GetComponent<PhysicsComponent>();
         public InputComponent InputComponent => GetComponent<InputComponent>();
         public TransformComponent TransformComponent => GetComponent<TransformComponent>();

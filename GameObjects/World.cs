@@ -1,10 +1,8 @@
 ﻿using Microsoft.Graphics.Canvas;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using uwpKarate.Components;
-using uwpKarate.Extensions;
 using uwpKarate.Models;
 using uwpKarate.Systems;
 using Windows.Foundation;
@@ -22,10 +20,12 @@ namespace uwpKarate.GameObjects
         private readonly TileAtlas[] _tileAtlases;
         private GameObject[] _tiles;
         private PlayerGameObject _heroine;
+
         private ColliderSystem _colliderSystem = ColliderSystem.Instance;
         private MoveSystem _moveSystem = MoveSystem.Instance;
         private PhysicsSystem _physicsSystem = PhysicsSystem.Instance;
         private InputSystem _inputSystem = InputSystem.Instance;
+        private GraphicsSystem _graphicsSystem = GraphicsSystem.Instance;
 
         private int[] _mapData = new[]
         {
@@ -74,7 +74,7 @@ namespace uwpKarate.GameObjects
             };
             var animatedGraphicsComponent = new AnimatedGraphicsComponent(gameObject, _canvasBitmaps[0], sourceRects, TimeSpan.FromMilliseconds(150));
             //gameObject.AddComponent(new GraphicsComponent(gameObject, _canvasBitmaps[0], 0, 96));
-            gameObject.AddComponent<GraphicsComponentBase>(animatedGraphicsComponent);
+            gameObject.AddComponent(animatedGraphicsComponent);
             gameObject.AddComponent(new PhysicsComponent(gameObject));
             gameObject.AddComponent(new InputComponent(gameObject));
             gameObject.AddComponent(new PlayerComponent(gameObject));
@@ -100,9 +100,9 @@ namespace uwpKarate.GameObjects
                 };
 
                 gameObject.AddComponent(transformComponent);
-                
+
                 var graphicsComponent = CreateGraphicsComponent(gameObject, (TileType)_mapData[data.offset], _canvasBitmaps[0]);
-                gameObject.AddComponent<GraphicsComponentBase>(graphicsComponent);
+                gameObject.AddComponent(graphicsComponent);
                 // TODO: The currently loaded tiles are all collidables, so when making the sky or what ever we need to fix this
                 gameObject.AddComponent(new ColliderComponent(gameObject)
                 {
@@ -129,6 +129,7 @@ namespace uwpKarate.GameObjects
         public void Update(TimeSpan timeSpan)
         {
             _inputSystem.Update(this, timeSpan);
+            _graphicsSystem.Update(this, timeSpan);
             _heroine?.Update(this, timeSpan);
             _physicsSystem.Update(this, timeSpan);
             _colliderSystem.Update(this, timeSpan);
@@ -140,10 +141,11 @@ namespace uwpKarate.GameObjects
 
         public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
         {
-            GraphicsComponentManager.Instance.Components.ForEach(graphicsComponent => graphicsComponent.Update(canvasDrawingSession, timeSpan));
+            //GraphicsComponentManager.Instance.Components.ForEach(graphicsComponent => graphicsComponent.Update(canvasDrawingSession, timeSpan));
+            _graphicsSystem.Draw(canvasDrawingSession, timeSpan);
         }
 
-        private GraphicsComponent CreateGraphicsComponent(GameObject gameObject, TileType tileType, CanvasBitmap canvasBitmap)
+        private AnimatedGraphicsComponent CreateGraphicsComponent(GameObject gameObject, TileType tileType, CanvasBitmap canvasBitmap)
         {
             switch (tileType)
             {
@@ -151,16 +153,16 @@ namespace uwpKarate.GameObjects
                     return null;
 
                 case TileType.PlatformLeft:
-                    return new GraphicsComponent(gameObject, canvasBitmap, 0, 0);
+                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new Rect(0, 0, 32f, 32f) }, TimeSpan.Zero);
 
                 case TileType.PlatformCenter:
-                    return new GraphicsComponent(gameObject, canvasBitmap, 32, 0);
+                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new Rect(32f, 0, 32f, 32f) }, TimeSpan.Zero);
 
                 case TileType.PlatformRight:
-                    return new GraphicsComponent(gameObject, canvasBitmap, 64, 0);
+                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new Rect(64f, 0, 32f, 32f) }, TimeSpan.Zero);
 
                 case TileType.Floor:
-                    return new GraphicsComponent(gameObject, canvasBitmap, 96, 0);
+                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new Rect(96f, 0, 32f, 32f) }, TimeSpan.Zero);
 
                 default:
                     return null;

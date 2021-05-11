@@ -122,12 +122,12 @@
     <Compile Include="Components\CollisionInfo.cs" />
     <Compile Include="Components\ComponentManager.cs" />
     <Compile Include="Components\GameObjectComponent.cs" />
-    <Compile Include="Components\GraphicsComponentBase.cs" />
     <Compile Include="Components\GraphicsComponentManager.cs" />
     <Compile Include="Components\HashCodeHelper.cs" />
     <Compile Include="Components\IGameObjectComponent.cs" />
     <Compile Include="Components\InputComponent.cs" />
     <Compile Include="Components\InputComponentManager.cs" />
+    <Compile Include="Components\ParticleComponent.cs" />
     <Compile Include="Components\PhysicsComponent.cs" />
     <Compile Include="Components\PhysicsComponentManager.cs" />
     <Compile Include="Components\PlayerComponent.cs" />
@@ -149,7 +149,6 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Components\GraphicsComponent.cs" />
     <Compile Include="Models\AnimationFrame.cs" />
     <Compile Include="Models\Layer.cs" />
     <Compile Include="Models\Map.cs" />
@@ -158,9 +157,11 @@
     <Compile Include="Models\TileSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Systems\ColliderSystem.cs" />
+    <Compile Include="Systems\GraphicsSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\ISystem.cs" />
     <Compile Include="Systems\MoveSystem.cs" />
+    <Compile Include="Systems\ParticleSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\SystemBase.cs" />
     <Compile Include="Systems\UserInput.cs" />

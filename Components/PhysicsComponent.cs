@@ -11,6 +11,11 @@ namespace uwpKarate.Components
             PhysicsComponentManager.Instance.AddComponent(this);
         }
 
+        protected override void OnDispose()
+        {
+            PhysicsComponentManager.Instance.RemoveComponent(this);
+        }
+
         public Vector2 OldVelocity { get; set; }
         public Vector2 OldPosition { get; set; }
         public Vector2 Drag { get; set; }

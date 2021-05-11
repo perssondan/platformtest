@@ -28,6 +28,11 @@ namespace uwpKarate.Components
         public Vector2 Center => new Vector2(Position.X + Size.X / 2f, Position.Y + Size.Y / 2f);
         public Vector2 LastValidPosition { get; set; } = Vector2.Zero;
 
+        protected override void OnDispose()
+        {
+            ColliderComponentManager.Instance.RemoveComponent(this);
+        }
+
         protected Vector2 Position => GameObject.TransformComponent.Position;
 
         public enum CollisionTypes
