@@ -1,17 +1,22 @@
-﻿namespace uwpKarate.Components
+﻿using System;
+using uwpKarate.GameObjects;
+
+namespace uwpKarate.Components
 {
-    public struct ParticleComponent
+    public class ParticleComponent : GameObjectComponent
     {
-        public ParticleComponent(int numberOfParticles = 0)
+        public ParticleComponent(GameObject gameObject) : base(gameObject)
         {
-            NumberOfParticles = numberOfParticles;
+            ParticleComponentManager.Instance.AddComponent(this);
         }
 
         public int NumberOfParticles { get; set; }
+        public TimeSpan TimeToLive { get; set; }
+        public TimeSpan EllapsedTime { get; set; } = TimeSpan.Zero;
 
-        //protected override void OnDispose()
-        //{
-        //    ParticleComponentManager.Instance.RemoveComponent(this);
-        //}
+        protected override void OnDispose()
+        {
+            ParticleComponentManager.Instance.RemoveComponent(this);
+        }
     }
 }

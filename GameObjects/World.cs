@@ -26,6 +26,7 @@ namespace uwpKarate.GameObjects
         private PhysicsSystem _physicsSystem = PhysicsSystem.Instance;
         private InputSystem _inputSystem = InputSystem.Instance;
         private GraphicsSystem _graphicsSystem = GraphicsSystem.Instance;
+        private ParticleSystem _particleSystem = ParticleSystem.Instance;
 
         private int[] _mapData = new[]
         {
@@ -133,6 +134,7 @@ namespace uwpKarate.GameObjects
             _heroine?.Update(this, timeSpan);
             _physicsSystem.Update(this, timeSpan);
             _colliderSystem.Update(this, timeSpan);
+            _particleSystem.Update(this, timeSpan);
             // We might have collisions, resolve them now!
             // enforce player is inside world
             _physicsSystem.Resolve(this, timeSpan);

@@ -25,9 +25,17 @@ namespace uwpKarate.Systems
             GraphicsComponentManager.Instance.Components
                 .OfType<AnimatedGraphicsComponent>()
                 .ForEach(graphicsComponent => DrawComponent(canvasDrawingSession, deltaTime, graphicsComponent));
+
+            ParticleComponentManager.Instance.Components.ForEach(x => DrawParticle(canvasDrawingSession, deltaTime, x));
         }
 
-        public void DrawComponent(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime, AnimatedGraphicsComponent animatedGraphicsComponent)
+        private void DrawParticle(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime, ParticleComponent particleComponent)
+        {
+            canvasDrawingSession.FillCircle(particleComponent.GameObject.TransformComponent.Position,
+                                                        1.5f, GetCachedBrush(canvasDrawingSession, Colors.White));
+        }
+
+        private void DrawComponent(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime, AnimatedGraphicsComponent animatedGraphicsComponent)
         {
             var sourceRects = animatedGraphicsComponent.SourceRects;
             var numberOfTiles = sourceRects.Count();

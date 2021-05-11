@@ -39,8 +39,8 @@ namespace uwpKarate.Systems
         {
             var fDeltaTime = (float)deltaTime.TotalSeconds;
             var dynamicPhysicsComponents = PhysicsComponentManager.Instance.Components
-                .Where(physicsComponent => physicsComponent?.GameObject?.ColliderComponent.IsColliding == true)
-                .Where(physicsComponent => physicsComponent?.GameObject?.ColliderComponent.CollisionType == ColliderComponent.CollisionTypes.Dynamic)
+                .Where(physicsComponent => physicsComponent?.GameObject?.ColliderComponent?.IsColliding == true)
+                .Where(physicsComponent => physicsComponent?.GameObject?.ColliderComponent?.CollisionType == ColliderComponent.CollisionTypes.Dynamic)
                 .ToArray();
 
             var noOfCollidingDynamicPhysicsComponents = dynamicPhysicsComponents.Length;

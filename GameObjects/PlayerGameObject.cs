@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using uwpKarate.Components;
 using uwpKarate.Constants;
 using uwpKarate.Systems;
 using Windows.Foundation;
@@ -114,6 +115,21 @@ namespace uwpKarate.GameObjects
         private void Jump()
         {
             TransformComponent.Velocity += InitialJumpVelocity;
+            CreateDustParticles();
+        }
+
+        private void CreateDustParticles()
+        {
+            var random = new Random((int)DateTime.Now.Ticks);
+            var position = new Vector2(ColliderComponent.Center.X, (float)ColliderComponent.BoundingBox.Bottom);
+            for (var particleIndex = 0; particleIndex < 20; particleIndex++)
+            {
+                var gameObject = new GameObject();
+                gameObject.TransformComponent.Position = position;
+                var velocity = new Vector2((float)random.NextDouble() * (float)random.Next(-1, 2), (float)random.NextDouble() * (float)random.Next(-1, 2));
+                gameObject.TransformComponent.Velocity = 75f * velocity;
+                gameObject.AddComponent(new ParticleComponent(gameObject) { TimeToLive = TimeSpan.FromMilliseconds(150) });
+            }
         }
 
         private void Walk(float orientation)

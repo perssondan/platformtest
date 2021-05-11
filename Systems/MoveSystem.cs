@@ -35,6 +35,8 @@ namespace uwpKarate.Systems
 
         private void EnforceInsideWorld(World world, TransformComponent transformComponent)
         {
+            if (transformComponent.GameObject.ColliderComponent == null) return;
+
             if (transformComponent.Position.Y < world.WorldRect.Top)//above
             {
                 // zero y
