@@ -7,7 +7,7 @@ using Windows.Foundation;
 
 namespace uwpKarate.Components
 {
-    public class AnimatedGraphicsComponent : GameObjectComponent, IGameObjectComponent
+    public class AnimatedGraphicsComponent : GameObjectComponent, IComponent
     {
         public AnimatedGraphicsComponent(GameObject gameObject,
                                  CanvasBitmap canvasBitmap,

@@ -5,7 +5,7 @@ using Windows.Foundation;
 
 namespace uwpKarate.Components
 {
-    public class ColliderComponent : GameObjectComponent, IGameObjectComponent
+    public class ColliderComponent : GameObjectComponent, IComponent
     {
         public ColliderComponent(GameObject gameObject)
             : base(gameObject)

@@ -4,7 +4,7 @@ using uwpKarate.Utilities;
 
 namespace uwpKarate.Components
 {
-    public class TransformComponent : GameObjectComponent, IGameObjectComponent
+    public class TransformComponent : GameObjectComponent, IComponent
     {
         private HistoryStack<Vector2> _historyStack = new HistoryStack<Vector2>(100);
         private Vector2 _position;

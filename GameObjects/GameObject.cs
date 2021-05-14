@@ -6,7 +6,7 @@ namespace uwpKarate.GameObjects
 {
     public class GameObject : IDisposable
     {
-        private readonly IDictionary<Type, IGameObjectComponent> _components = new Dictionary<Type, IGameObjectComponent>();
+        private readonly IDictionary<Type, IComponent> _components = new Dictionary<Type, IComponent>();
 
         public GameObject()
         {
@@ -15,7 +15,7 @@ namespace uwpKarate.GameObjects
         }
 
         public void AddComponent<T>(T gameObjectComponent)
-            where T : IGameObjectComponent
+            where T : IComponent
         {
             if (gameObjectComponent == null) return;
 
@@ -23,11 +23,23 @@ namespace uwpKarate.GameObjects
         }
 
         public T GetComponent<T>()
-            where T : IGameObjectComponent
+            where T : IComponent
         {
             if (_components.TryGetValue(typeof(T), out var component))
             {
                 return (T)component;
+            }
+
+            return default;
+        }
+
+        public (T, U) GetComponent<T, U>()
+            where T : IComponent
+            where U : IComponent
+        {
+            if (_components.TryGetValue(typeof(T), out var componentT) && _components.TryGetValue(typeof(U), out var componentU))
+            {
+                return ((T)componentT, (U)componentU);
             }
 
             return default;

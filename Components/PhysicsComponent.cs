@@ -4,7 +4,7 @@ using uwpKarate.GameObjects;
 
 namespace uwpKarate.Components
 {
-    public class PhysicsComponent : GameObjectComponent, IGameObjectComponent
+    public class PhysicsComponent : GameObjectComponent, IComponent
     {
         public PhysicsComponent(GameObject gameObject) : base(gameObject)
         {

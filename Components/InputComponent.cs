@@ -3,7 +3,7 @@ using uwpKarate.Systems;
 
 namespace uwpKarate.Components
 {
-    public class InputComponent : GameObjectComponent, IGameObjectComponent
+    public class InputComponent : GameObjectComponent, IComponent
     {
         public InputComponent(GameObject gameObject)
             : base(gameObject)
