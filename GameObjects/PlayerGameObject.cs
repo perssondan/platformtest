@@ -2,9 +2,9 @@
 using System.Numerics;
 using uwpKarate.Components;
 using uwpKarate.Constants;
+using uwpKarate.Factories;
 using uwpKarate.Systems;
 using Windows.Foundation;
-using static uwpKarate.Components.InputComponent;
 
 namespace uwpKarate.GameObjects
 {
@@ -27,6 +27,7 @@ namespace uwpKarate.GameObjects
         private readonly TimeSpan _jumpPressedRememberTime = TimeSpan.FromMilliseconds(150);
         private TimeSpan _jumpPressedAt;
         private bool _isJumpButtonPressed;
+        private DustEntityFactory _dustEntityFactory = new DustEntityFactory();
 
         public PlayerGameObject()
         {
@@ -120,16 +121,8 @@ namespace uwpKarate.GameObjects
 
         private void CreateDustParticles()
         {
-            var random = new Random((int)DateTime.Now.Ticks);
             var position = new Vector2(ColliderComponent.Center.X, (float)ColliderComponent.BoundingBox.Bottom);
-            for (var particleIndex = 0; particleIndex < 20; particleIndex++)
-            {
-                var gameObject = new GameObject();
-                gameObject.TransformComponent.Position = position;
-                var velocity = new Vector2((float)random.NextDouble() * (float)random.Next(-1, 2), (float)random.NextDouble() * (float)random.Next(-1, 2));
-                gameObject.TransformComponent.Velocity = 75f * velocity;
-                gameObject.AddComponent(new ParticleComponent(gameObject) { TimeToLive = TimeSpan.FromMilliseconds(150) });
-            }
+            _dustEntityFactory.CreateDustParticleEntitesAndUnwrap(position, 50, TimeSpan.FromMilliseconds(150), 50f);
         }
 
         private void Walk(float orientation)

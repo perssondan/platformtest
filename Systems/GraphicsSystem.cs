@@ -26,7 +26,32 @@ namespace uwpKarate.Systems
                 .OfType<AnimatedGraphicsComponent>()
                 .ForEach(graphicsComponent => DrawComponent(canvasDrawingSession, deltaTime, graphicsComponent));
 
-            ParticleComponentManager.Instance.Components.ForEach(x => DrawParticle(canvasDrawingSession, deltaTime, x));
+            ShapeGraphicsComponentManager.Instance.Components
+                .ForEach(shapeGraphicsComponent => DrawShapeComponent(canvasDrawingSession, deltaTime, shapeGraphicsComponent));
+        }
+
+        private void DrawShapeComponent(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime, ShapeGraphicsComponent shapeGraphicsComponent)
+        {
+            var position = shapeGraphicsComponent.GameObject.TransformComponent.Position;
+            switch (shapeGraphicsComponent.ShapeType)
+            {
+                case ShapeType.None:
+                    break;
+                case ShapeType.Rectangle:
+                    canvasDrawingSession.FillRectangle(position.X, position.Y, shapeGraphicsComponent.Size.X, shapeGraphicsComponent.Size.Y, GetCachedBrush(canvasDrawingSession, shapeGraphicsComponent.Color));
+                    break;
+                case ShapeType.Ellipse:
+                    canvasDrawingSession.FillEllipse(position, shapeGraphicsComponent.Size.X / 2f, shapeGraphicsComponent.Size.Y / 2f, GetCachedBrush(canvasDrawingSession, shapeGraphicsComponent.Color));
+                    break;
+                case ShapeType.Square:
+                    var size = Math.Max(shapeGraphicsComponent.Size.X, shapeGraphicsComponent.Size.Y);
+                    canvasDrawingSession.FillRectangle(position.X, position.Y, size, size, GetCachedBrush(canvasDrawingSession, shapeGraphicsComponent.Color));
+                    break;
+                case ShapeType.Circle:
+                    var radius = Math.Max(shapeGraphicsComponent.Size.X, shapeGraphicsComponent.Size.Y) / 2f;
+                    canvasDrawingSession.FillCircle(position, radius, GetCachedBrush(canvasDrawingSession, shapeGraphicsComponent.Color));
+                    break;
+            }
         }
 
         private void DrawParticle(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime, ParticleComponent particleComponent)
