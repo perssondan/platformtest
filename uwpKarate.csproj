@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -137,6 +137,7 @@
     <Compile Include="Components\TransformComponent.cs" />
     <Compile Include="Components\TransformComponentManager.cs" />
     <Compile Include="Constants\PlayerConstants.cs" />
+    <Compile Include="EventArguments\CollisionArgument.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\RectExtensions.cs" />
@@ -154,6 +155,8 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\AnimationFrame.cs" />
+    <Compile Include="Systems\EventSystem.cs" />
+    <Compile Include="Systems\IEventSystem.cs" />
     <Compile Include="Models\Layer.cs" />
     <Compile Include="Models\Map.cs" />
     <Compile Include="Models\Tile.cs" />
