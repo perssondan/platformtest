@@ -1,4 +1,4 @@
-﻿using Microsoft.Graphics.Canvas;
+using Microsoft.Graphics.Canvas;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -54,6 +54,7 @@ namespace uwpKarate.GameObjects
             _mapTileHeight = _map.Height;
             _tiles = new GameObject[_mapTileWidth * _mapTileHeight];
 
+            InitializeWorldBoundaries();
             InitializeTileMap();
             InitializeHeroine();
         }
@@ -86,6 +87,57 @@ namespace uwpKarate.GameObjects
             });
             _heroine = gameObject;
             _heroine.TransformComponent.Position = new Vector2(288f, 256f);
+        }
+
+        private void InitializeWorldBoundaries()
+        {
+            var leftBoundary = new GameObject();
+
+            leftBoundary.AddComponent(new TransformComponent(leftBoundary)
+            {
+                Position = new Vector2(-32f, -32f)
+            });
+            leftBoundary.AddComponent(new ColliderComponent(leftBoundary)
+            {
+                CollisionType = ColliderComponent.CollisionTypes.Static,
+                Size = new Vector2(32f, WorldPixelHeight + 32f + 32f)
+            });
+
+            var rightBoundary = new GameObject();
+
+            rightBoundary.AddComponent(new TransformComponent(rightBoundary)
+            {
+                Position = new Vector2(WorldPixelWidth, -32f)
+            });
+            rightBoundary.AddComponent(new ColliderComponent(rightBoundary)
+            {
+                CollisionType = ColliderComponent.CollisionTypes.Static,
+                Size = new Vector2(32f, WorldPixelHeight + 32f + 32f)
+            });
+
+            var topBoundary = new GameObject();
+
+            topBoundary.AddComponent(new TransformComponent(topBoundary)
+            {
+                Position = new Vector2(-32f, -32f)
+            });
+            topBoundary.AddComponent(new ColliderComponent(topBoundary)
+            {
+                CollisionType = ColliderComponent.CollisionTypes.Static,
+                Size = new Vector2(WorldPixelWidth + 32f + 32f, 32f)
+            });
+
+            var bottomBoundary = new GameObject();
+
+            bottomBoundary.AddComponent(new TransformComponent(bottomBoundary)
+            {
+                Position = new Vector2(-32f, WorldPixelHeight)
+            });
+            bottomBoundary.AddComponent(new ColliderComponent(bottomBoundary)
+            {
+                CollisionType = ColliderComponent.CollisionTypes.Static,
+                Size = new Vector2(WorldPixelWidth + 32f + 32f, 32f)
+            });
         }
 
         private void InitializeTileMap()

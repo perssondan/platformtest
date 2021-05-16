@@ -28,39 +28,6 @@ namespace uwpKarate.Systems
                 if (transform.Position == position) continue;
 
                 transform.Position += position;
-                // TODO: can we add do this with colliders added by the world instead?
-                EnforceInsideWorld(world, transform);
-            }
-        }
-
-        private void EnforceInsideWorld(World world, TransformComponent transformComponent)
-        {
-            if (transformComponent.GameObject.ColliderComponent == null) return;
-
-            if (transformComponent.Position.Y < world.WorldRect.Top)//above
-            {
-                // zero y
-                transformComponent.Velocity *= Vector2.UnitX;
-                transformComponent.Position = transformComponent.Position * Vector2.UnitX + (float)world.WorldRect.Top * Vector2.UnitY;
-            }
-            if (transformComponent.Position.Y > world.WorldRect.Bottom)//below
-            {
-                // zero y
-                transformComponent.Velocity *= Vector2.UnitX;
-                transformComponent.Position = transformComponent.Position * Vector2.UnitX + (float)world.WorldRect.Top * Vector2.UnitY;
-            }
-            if (transformComponent.Position.X < world.WorldRect.Left)//left
-            {
-                // zero x
-                transformComponent.Velocity *= Vector2.UnitY;
-                transformComponent.Position = transformComponent.Position * Vector2.UnitY + (float)world.WorldRect.Left * Vector2.UnitX;
-            }
-            if (transformComponent.Position.X + transformComponent.GameObject.ColliderComponent.Size.X > world.WorldRect.Right)//right
-            {
-                // zero x velocity
-                transformComponent.Velocity *= Vector2.UnitY;
-                // set right position to the right limit of the world minus the width. Sprite or collider width?
-                transformComponent.Position = transformComponent.Position * Vector2.UnitY + (Vector2.UnitX * ((float)world.WorldRect.Right - transformComponent.GameObject.ColliderComponent.Size.X));
             }
         }
     }

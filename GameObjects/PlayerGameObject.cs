@@ -45,11 +45,6 @@ namespace uwpKarate.GameObjects
             JumpHandler(userInputs, timeSpan);
         }
 
-        public override void OnAfterUpdate(World world, TimeSpan timeSpan)
-        {
-            //EnforceInsideWorld(world);
-        }
-
         private void JumpHandler(UserInput userInputs, TimeSpan timeSpan)
         {
             _jumpPressedAt -= timeSpan;
@@ -71,11 +66,16 @@ namespace uwpKarate.GameObjects
             if (_jumpPressedAt.TotalMilliseconds <= 0f) return;
 
             //Only jump when grounded
-            if (ColliderComponent.IsColliding == false) return;
+            if (!IsVerticallyStationary()) return;
 
             _jumpPressedAt = TimeSpan.Zero;
 
             Jump();
+        }
+
+        private bool IsVerticallyStationary()
+        {
+            return TransformComponent.Velocity.Y < .1f && TransformComponent.Velocity.Y > -.1f;
         }
 
         private void WalkHandler(UserInput userInputs)
