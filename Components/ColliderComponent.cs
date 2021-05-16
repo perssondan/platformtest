@@ -14,7 +14,6 @@ namespace uwpKarate.Components
         }
 
         public bool IsColliding { get; set; }
-        public bool IsGrounded { get; set; }
 
         public CollisionInfo[] CollisionInfos { get; set; } = Array.Empty<CollisionInfo>();
 
