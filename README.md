@@ -29,3 +29,8 @@ vel += 1/2(acc + new_acc) * dt
 acc = new_acc
 
 ### Runge-Kutta
+
+#TODOs
+- [ ] Investigate QuadTree
+- [ ] Enforce player is inside world by letting the world add colliders around it's boundary
+- [ ] Move game specific functionaliy to Game class

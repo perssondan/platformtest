@@ -155,6 +155,7 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\AnimationFrame.cs" />
+    <Compile Include="Numerics\Ray.cs" />
     <Compile Include="Systems\EventSystem.cs" />
     <Compile Include="Systems\IEventSystem.cs" />
     <Compile Include="Models\Layer.cs" />

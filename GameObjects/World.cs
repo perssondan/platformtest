@@ -1,4 +1,4 @@
-using Microsoft.Graphics.Canvas;
+﻿using Microsoft.Graphics.Canvas;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -82,7 +82,7 @@ namespace uwpKarate.GameObjects
             gameObject.AddComponent(new PlayerComponent(gameObject));
             gameObject.AddComponent(new ColliderComponent(gameObject)
             {
-                Size = new Vector2(_tileWidth, _tileHeight),
+                Size = new Vector2(_tileWidth-1, _tileHeight-1),
                 CollisionType = ColliderComponent.CollisionTypes.Dynamic
             });
             _heroine = gameObject;
@@ -179,23 +179,23 @@ namespace uwpKarate.GameObjects
             }
         }
 
-        public void Update(TimeSpan timeSpan)
+        public void Update(TimeSpan deltaTime)
         {
-            _inputSystem.Update(this, timeSpan);
-            _graphicsSystem.Update(this, timeSpan);
-            _heroine?.Update(this, timeSpan);
-            _physicsSystem.Update(this, timeSpan);
-            _colliderSystem.Update(this, timeSpan);
-            _particleSystem.Update(this, timeSpan);
-            // We might have collisions, resolve them now!
-            // enforce player is inside world
-            _physicsSystem.Resolve(this, timeSpan);
-            _moveSystem.Update(this, timeSpan);
+            _inputSystem.Update(this, deltaTime);
+            _graphicsSystem.Update(this, deltaTime);
+            _heroine?.Update(this, deltaTime);
+            _physicsSystem.Update(this, deltaTime);
+            _particleSystem.Update(this, deltaTime);
+            _colliderSystem.Update(this, deltaTime);
+
+            // If we still have collisions, resolve them now!
+            _colliderSystem.ResolveCollisions(deltaTime);
+            //_physicsSystem.Resolve(this, deltaTime);
+            _moveSystem.Update(this, deltaTime);
         }
 
         public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
         {
-            //GraphicsComponentManager.Instance.Components.ForEach(graphicsComponent => graphicsComponent.Update(canvasDrawingSession, timeSpan));
             _graphicsSystem.Draw(canvasDrawingSession, timeSpan);
         }
 

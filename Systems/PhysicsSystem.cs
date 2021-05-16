@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Numerics;
 using uwpKarate.Components;
 using uwpKarate.GameObjects;
@@ -32,28 +31,6 @@ namespace uwpKarate.Systems
             foreach (var physicsComponent in PhysicsComponentManager.Instance.Components)
             {
                 _integrateFunc?.Invoke(physicsComponent, deltaTime);
-            }
-        }
-
-        public void Resolve(World world, TimeSpan deltaTime)
-        {
-            var fDeltaTime = (float)deltaTime.TotalSeconds;
-            var dynamicPhysicsComponents = PhysicsComponentManager.Instance.Components
-                .Where(physicsComponent => physicsComponent?.GameObject?.ColliderComponent?.IsColliding == true)
-                .Where(physicsComponent => physicsComponent?.GameObject?.ColliderComponent?.CollisionType == ColliderComponent.CollisionTypes.Dynamic)
-                .ToArray();
-
-            var noOfCollidingDynamicPhysicsComponents = dynamicPhysicsComponents.Length;
-            var noOfCollisions = dynamicPhysicsComponents.Sum(x => x.GameObject.ColliderComponent.CollisionInfos.Length);
-            var isMovingHorizontally = dynamicPhysicsComponents.Any(x => x.GameObject.TransformComponent.Velocity.X != 0f);
-            foreach (var physicsComponent in dynamicPhysicsComponents)
-            {
-                foreach (var collisionInfo in physicsComponent.GameObject.ColliderComponent.CollisionInfos)
-                {
-                    ColliderSystem.Instance.TryResolveCollision(physicsComponent.GameObject.ColliderComponent, collisionInfo, fDeltaTime);
-                    //physicsComponent.GameObject.TransformComponent.Velocity += collisionInfo.CollisionNormal * new Vector2(Math.Abs(physicsComponent.GameObject.TransformComponent.Velocity.X), Math.Abs(physicsComponent.GameObject.TransformComponent.Velocity.Y)) * (1f - collisionInfo.CollisionTime);
-                    //physicsComponent.GameObject.TransformComponent.Position = new Vector2(collisionInfo.CollisionPoint.X - (float)physicsComponent.GameObject.ColliderComponent.BoundingBox.Width / 2f, collisionInfo.CollisionPoint.Y - (float)physicsComponent.GameObject.ColliderComponent.BoundingBox.Height / 2f);
-                }
             }
         }
 
@@ -137,15 +114,19 @@ namespace uwpKarate.Systems
                 case IntegrationType.ExplicitEuler:
                     _integrateFunc = ExplicitEulerIntegration;
                     break;
+
                 case IntegrationType.SemiImplicitEuler:
                     _integrateFunc = SemiImplicitEulerIntegration;
                     break;
+
                 case IntegrationType.PositionVerlet:
                     _integrateFunc = PositionVerletIntegration;
                     break;
+
                 case IntegrationType.VelocityVerlet:
                     _integrateFunc = VelocityVerletIntegration;
                     break;
+
                 case IntegrationType.SimplifiedVelocityVerlet:
                     _integrateFunc = SimplifiedVelocityVerletIntegration;
                     break;
