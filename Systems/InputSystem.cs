@@ -30,7 +30,7 @@ namespace uwpKarate.Systems
             }
         }
 
-        public override void Update(World world, TimeSpan deltaTime)
+        public override void Update(TimeSpan deltaTime)
         {
             InputComponentManager.Instance.Components.ForEach(component => component.UserInputs = UserInputs);
         }

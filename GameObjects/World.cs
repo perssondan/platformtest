@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using uwpKarate.Components;
+using uwpKarate.Factories;
 using uwpKarate.Models;
 using uwpKarate.Systems;
 using Windows.Foundation;
@@ -19,7 +20,6 @@ namespace uwpKarate.GameObjects
         private readonly Map _map;
         private readonly TileAtlas[] _tileAtlases;
         private GameObject[] _tiles;
-        private PlayerGameObject _heroine;
 
         private ColliderSystem _colliderSystem = ColliderSystem.Instance;
         private MoveSystem _moveSystem = MoveSystem.Instance;
@@ -27,6 +27,10 @@ namespace uwpKarate.GameObjects
         private InputSystem _inputSystem = InputSystem.Instance;
         private GraphicsSystem _graphicsSystem = GraphicsSystem.Instance;
         private ParticleSystem _particleSystem = ParticleSystem.Instance;
+        private PlayerSystem _playerSystem = PlayerSystem.Instance;
+
+        private HeroFactory _heroFactory = new HeroFactory();
+        private TileFactory _tileFactory = new TileFactory();
 
         private int[] _mapData = new[]
         {
@@ -66,27 +70,7 @@ namespace uwpKarate.GameObjects
 
         private void InitializeHeroine()
         {
-            var gameObject = new PlayerGameObject();
-            var sourceRects = new Rect[]
-            {
-                new Rect(0,32f,32,32),
-                new Rect(32f,32f,32f,32f),
-                new Rect(64f,32f,32f,32f),
-                new Rect(96f,32f,32f,32f),
-            };
-            var animatedGraphicsComponent = new AnimatedGraphicsComponent(gameObject, _canvasBitmaps[0], sourceRects, TimeSpan.FromMilliseconds(150));
-            //gameObject.AddComponent(new GraphicsComponent(gameObject, _canvasBitmaps[0], 0, 96));
-            gameObject.AddComponent(animatedGraphicsComponent);
-            gameObject.AddComponent(new PhysicsComponent(gameObject));
-            gameObject.AddComponent(new InputComponent(gameObject));
-            gameObject.AddComponent(new PlayerComponent(gameObject));
-            gameObject.AddComponent(new ColliderComponent(gameObject)
-            {
-                Size = new Vector2(_tileWidth-1, _tileHeight-1),
-                CollisionType = ColliderComponent.CollisionTypes.Dynamic
-            });
-            _heroine = gameObject;
-            _heroine.TransformComponent.Position = new Vector2(288f, 256f);
+            _heroFactory.CreateHero(_canvasBitmaps[0], new Vector2(288f, 256f), new Vector2(_tileWidth - 1, _tileHeight - 1));
         }
 
         private void InitializeWorldBoundaries()
@@ -146,24 +130,10 @@ namespace uwpKarate.GameObjects
             {
                 if (_mapData[data.offset] == 0) return;
 
-                var gameObject = new GameObject();
-                var transformComponent = new TransformComponent(gameObject)
-                {
-                    Position = new Vector2(data.x * _tileWidth, data.y * _tileHeight)
-                };
-
-                gameObject.AddComponent(transformComponent);
-
-                var graphicsComponent = CreateGraphicsComponent(gameObject, (TileType)_mapData[data.offset], _canvasBitmaps[0]);
-                gameObject.AddComponent(graphicsComponent);
-                // TODO: The currently loaded tiles are all collidables, so when making the sky or what ever we need to fix this
-                gameObject.AddComponent(new ColliderComponent(gameObject)
-                {
-                    Size = new Vector2(_tileWidth, _tileHeight),
-                    CollisionType = ColliderComponent.CollisionTypes.Static
-                });
-
-                _tiles[data.offset] = gameObject;
+                _tiles[data.offset] = _tileFactory.CreateTile(_canvasBitmaps[0],
+                                                              new Vector2(data.x * _tileWidth, data.y * _tileHeight),
+                                                              new Vector2(_tileWidth, _tileHeight),
+                                                              (TileType)_mapData[data.offset]);
             });
         }
 
@@ -181,55 +151,22 @@ namespace uwpKarate.GameObjects
 
         public void Update(TimeSpan deltaTime)
         {
-            _inputSystem.Update(this, deltaTime);
-            _graphicsSystem.Update(this, deltaTime);
-            _heroine?.Update(this, deltaTime);
-            _physicsSystem.Update(this, deltaTime);
-            _particleSystem.Update(this, deltaTime);
-            _colliderSystem.Update(this, deltaTime);
+            _inputSystem.Update(deltaTime);
+            _graphicsSystem.Update(deltaTime);
+            _playerSystem.Update(deltaTime);
+            _physicsSystem.Update(deltaTime);
+            _particleSystem.Update(deltaTime);
+            _colliderSystem.Update(deltaTime);
 
             // If we still have collisions, resolve them now!
             _colliderSystem.ResolveCollisions(deltaTime);
-            //_physicsSystem.Resolve(this, deltaTime);
-            _moveSystem.Update(this, deltaTime);
+            // All done, move game objects
+            _moveSystem.Update(deltaTime);
         }
 
         public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
         {
             _graphicsSystem.Draw(canvasDrawingSession, timeSpan);
         }
-
-        private AnimatedGraphicsComponent CreateGraphicsComponent(GameObject gameObject, TileType tileType, CanvasBitmap canvasBitmap)
-        {
-            switch (tileType)
-            {
-                case TileType.Nothing:
-                    return null;
-
-                case TileType.PlatformLeft:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new Rect(0, 0, 32f, 32f) }, TimeSpan.Zero);
-
-                case TileType.PlatformCenter:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new Rect(32f, 0, 32f, 32f) }, TimeSpan.Zero);
-
-                case TileType.PlatformRight:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new Rect(64f, 0, 32f, 32f) }, TimeSpan.Zero);
-
-                case TileType.Floor:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new Rect(96f, 0, 32f, 32f) }, TimeSpan.Zero);
-
-                default:
-                    return null;
-            }
-        }
-    }
-
-    public enum TileType
-    {
-        Nothing,
-        PlatformLeft,
-        PlatformCenter,
-        PlatformRight,
-        Floor,
     }
 }

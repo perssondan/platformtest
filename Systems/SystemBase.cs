@@ -15,7 +15,7 @@ namespace uwpKarate.Systems
 
         public static T Instance { get; } = new T();
 
-        public abstract void Update(World world, TimeSpan deltaTime);
+        public abstract void Update(TimeSpan deltaTime);
 
         protected virtual void Initialize()
         {

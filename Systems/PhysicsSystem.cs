@@ -26,7 +26,7 @@ namespace uwpKarate.Systems
             Integration = IntegrationType.VelocityVerlet;
         }
 
-        public override void Update(World world, TimeSpan deltaTime)
+        public override void Update(TimeSpan deltaTime)
         {
             foreach (var physicsComponent in PhysicsComponentManager.Instance.Components)
             {

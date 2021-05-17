@@ -13,7 +13,7 @@ namespace uwpKarate.Systems
 {
     public class ColliderSystem : SystemBase<ColliderSystem>
     {
-        public override void Update(World world, TimeSpan deltaTime)
+        public override void Update(TimeSpan deltaTime)
         {
             DetectCollisions(deltaTime);
         }
@@ -36,77 +36,6 @@ namespace uwpKarate.Systems
                     ResolveCollisions(deltaTime);
                     return;
                 }
-            }
-        }
-
-        public void ResolveCollisionsWith2(TimeSpan deltaTime)
-        {
-            var dynamicColliders = ColliderComponentManager.Instance.Components
-                .Where(colliderComponent => colliderComponent.IsColliding == true)
-                .Where(collider => collider.CollisionType == ColliderComponent.CollisionTypes.Dynamic)
-                .ToArray();
-
-            if (!dynamicColliders.Any()) return;
-
-            var ellapsedTime = (float)deltaTime.TotalSeconds;
-            foreach (var dynamicCollider in dynamicColliders)
-            {
-                var maxNumberOfCollisionResolves = 0;
-                while (dynamicCollider.NearestCollisionInfo != CollisionInfo.Zero)
-                {
-                    maxNumberOfCollisionResolves--;
-                    foreach (var collisionInfo in dynamicCollider.CollisionInfos)
-                    {
-                        var transformComponent = dynamicCollider.GameObject.TransformComponent;
-                        if (!IsRectInRect(dynamicCollider.BoundingBox,
-                                          transformComponent.Velocity,
-                                          dynamicCollider.NearestCollisionInfo.ContactRect,
-                                          out var contactPoint,
-                                          out var contactNormal,
-                                          out var contactTime,
-                                          ellapsedTime))
-                            continue;
-
-                        if (contactNormal == Vector2.Zero)
-                            continue;
-
-                        var oldVelocity = transformComponent.Velocity;
-                        var newVelocity = transformComponent.Velocity + (contactNormal * new Vector2(Math.Abs(transformComponent.Velocity.X), Math.Abs(transformComponent.Velocity.Y)) * (1f - contactTime));
-                        transformComponent.Velocity += contactNormal * new Vector2(Math.Abs(transformComponent.Velocity.X), Math.Abs(transformComponent.Velocity.Y)) * (1f - contactTime);
-                    }
-
-                    // Now check if we're still colliding
-                    DetectCollisions(deltaTime);
-                    if (maxNumberOfCollisionResolves < 0) break;
-                }
-            }
-        }
-
-        public bool DetectCollisions(TimeSpan deltaTime)
-        {
-            var dynamicColliders = ColliderComponentManager.Instance.Components
-                            .Where(collider => collider.CollisionType == ColliderComponent.CollisionTypes.Dynamic);
-            if (!dynamicColliders.Any()) return false;
-
-            var isAnyColliding = false;
-            dynamicColliders.ForEach(dynamicCollider =>
-            {
-                dynamicCollider.IsColliding = false;
-
-                var isColliding = IsColliding(dynamicCollider, (float)deltaTime.TotalSeconds);
-                isAnyColliding |= isColliding;
-
-                dynamicCollider.IsColliding = isColliding;
-            });
-
-            return isAnyColliding;
-        }
-
-        private IEnumerable<bool> TryResolveCollisions(ColliderComponent colliderComponent, float fDeltaTime)
-        {
-            foreach (var collisionInfo in colliderComponent.CollisionInfos)
-            {
-                yield return TryResolveCollision(colliderComponent, collisionInfo, fDeltaTime);
             }
         }
 
@@ -154,7 +83,6 @@ namespace uwpKarate.Systems
         public bool IsColliding(ColliderComponent dynamicCollider, float deltaTime)
         {
             dynamicCollider.CollisionInfos = Array.Empty<CollisionInfo>();
-            dynamicCollider.NearestCollisionInfo = CollisionInfo.Zero;
 
             if (dynamicCollider.CollisionType == ColliderComponent.CollisionTypes.Static) return false;
 
@@ -171,10 +99,10 @@ namespace uwpKarate.Systems
             var results = new List<CollisionInfo>();
             foreach (var componentInCollision in componentsInCollision)
             {
-                if (!IsRectInRect(dynamicCollider.BoundingBox, dynamicCollider.GameObject.TransformComponent.Velocity, componentInCollision.BoundingBox, out var cContactPoint, out var cContactNormal, out var cContactTime, deltaTime))
+                if (!IsRectInRect(dynamicCollider.BoundingBox, dynamicCollider.GameObject.TransformComponent.Velocity, componentInCollision.BoundingBox, out var contactPoint, out var contactNormal, out var contactTime, deltaTime))
                     continue;
 
-                var collisionInfo = new CollisionInfo(cContactPoint, cContactNormal, cContactTime)
+                var collisionInfo = new CollisionInfo(contactPoint, contactNormal, contactTime)
                 {
                     ContactRect = componentInCollision.BoundingBox
                 };
@@ -186,11 +114,38 @@ namespace uwpKarate.Systems
             if (results.Any())
             {
                 dynamicCollider.CollisionInfos = results.OrderBy(info => info.CollisionTime).ToArray();
-                dynamicCollider.NearestCollisionInfo = results.First();
                 return true;
             }
 
             return false;
+        }
+
+        private bool DetectCollisions(TimeSpan deltaTime)
+        {
+            var dynamicColliders = ColliderComponentManager.Instance.Components
+                            .Where(collider => collider.CollisionType == ColliderComponent.CollisionTypes.Dynamic);
+            if (!dynamicColliders.Any()) return false;
+
+            var isAnyColliding = false;
+            dynamicColliders.ForEach(dynamicCollider =>
+            {
+                dynamicCollider.IsColliding = false;
+
+                var isColliding = IsColliding(dynamicCollider, (float)deltaTime.TotalSeconds);
+                isAnyColliding |= isColliding;
+
+                dynamicCollider.IsColliding = isColliding;
+            });
+
+            return isAnyColliding;
+        }
+
+        private IEnumerable<bool> TryResolveCollisions(ColliderComponent colliderComponent, float fDeltaTime)
+        {
+            foreach (var collisionInfo in colliderComponent.CollisionInfos)
+            {
+                yield return TryResolveCollision(colliderComponent, collisionInfo, fDeltaTime);
+            }
         }
 
         private IEnumerable<ColliderComponent> GetOverlappingColliders(Rect dynamicRect, ColliderComponent[] collidersToTest)

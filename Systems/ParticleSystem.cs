@@ -10,7 +10,7 @@ namespace uwpKarate.Systems
     public class ParticleSystem : SystemBase<ParticleSystem>
     {
         private readonly TimeSpan _timeStep = TimeSpan.FromMilliseconds(16.6f);
-        public override void Update(World world, TimeSpan deltaTime)
+        public override void Update(TimeSpan deltaTime)
         {
             // Make a copy of the list before thus not to change the list we're iterating
             var particles = ParticleComponentManager.Instance.Components.ToArray();

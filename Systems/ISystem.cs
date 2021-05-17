@@ -1,11 +1,10 @@
 ﻿using System;
-using uwpKarate.GameObjects;
 
 namespace uwpKarate.Systems
 {
     public interface ISystem
     {
-        void Update(World world, TimeSpan deltaTime);
+        void Update(TimeSpan deltaTime);
     }
 
     public interface ISystem<T> : ISystem

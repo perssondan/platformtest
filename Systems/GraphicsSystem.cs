@@ -27,7 +27,7 @@ namespace uwpKarate.Systems
             });
         }
 
-        public override void Update(World world, TimeSpan deltaTime)
+        public override void Update(TimeSpan deltaTime)
         {
         }
 

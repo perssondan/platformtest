@@ -134,6 +134,7 @@
     <Compile Include="Components\PhysicsComponent.cs" />
     <Compile Include="Components\PhysicsComponentManager.cs" />
     <Compile Include="Components\PlayerComponent.cs" />
+    <Compile Include="Components\PlayerComponentManager.cs" />
     <Compile Include="Components\ShapeGraphicsComponent.cs" />
     <Compile Include="Components\ShapeGraphicsComponentManager.cs" />
     <Compile Include="Components\TransformComponent.cs" />
@@ -145,9 +146,12 @@
     <Compile Include="Extensions\RectExtensions.cs" />
     <Compile Include="Extensions\Vector2Extensions.cs" />
     <Compile Include="Factories\DustEntityFactory.cs" />
+    <Compile Include="Factories\HeroFactory.cs" />
+    <Compile Include="Factories\TileFactory.cs" />
+    <Compile Include="GameObjects\Game.cs" />
     <Compile Include="GameObjects\GameObject.cs" />
     <Compile Include="GameObjects\GameObjectManager.cs" />
-    <Compile Include="GameObjects\PlayerGameObject.cs" />
+    <Compile Include="Models\TileType.cs" />
     <Compile Include="GameObjects\World.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -173,6 +177,7 @@
     <Compile Include="Systems\MoveSystem.cs" />
     <Compile Include="Systems\ParticleSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
+    <Compile Include="Systems\PlayerSystem.cs" />
     <Compile Include="Systems\SystemBase.cs" />
     <Compile Include="Systems\UserInput.cs" />
     <Compile Include="Utilities\GameStateManager.cs" />

@@ -7,7 +7,7 @@ namespace uwpKarate.Systems
 {
     public class MoveSystem : SystemBase<MoveSystem>
     {
-        public override void Update(World world, TimeSpan deltaTimeSpan)
+        public override void Update(TimeSpan deltaTimeSpan)
         {
             float deltaTime = (float)deltaTimeSpan.TotalSeconds;
             foreach (var transform in TransformComponentManager.Instance.Components)

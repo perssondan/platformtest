@@ -49,21 +49,6 @@ namespace uwpKarate.GameObjects
             return default;
         }
 
-        public void Update(World world, TimeSpan timeSpan)
-        {
-            OnBeforeUpdate(world, timeSpan);
-
-            OnAfterUpdate(world, timeSpan);
-        }
-
-        public virtual void OnBeforeUpdate(World world, TimeSpan timeSpan)
-        {
-        }
-
-        public virtual void OnAfterUpdate(World world, TimeSpan timeSpan)
-        {
-        }
-
         public void Dispose()
         {
             GameObjectManager.RemoveGameObject(this);
