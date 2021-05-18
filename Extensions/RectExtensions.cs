@@ -1,18 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 using Windows.Foundation;
 
 namespace uwpKarate.Extensions
 {
     public static class RectExtensions
     {
-        public static Vector2 Pos(this Rect rect)
+        public static Vector2 TopLeft(this Rect rect)
         {
-            return new Vector2((float)rect.X, (float)rect.Y);
+            return new Vector2((float)rect.Left, (float)rect.Top);
+        }
+
+        public static Vector2 TopRight(this Rect rect)
+        {
+            return new Vector2((float)rect.Right, (float)rect.Top);
+        }
+
+        public static Vector2 BottomLeft(this Rect rect)
+        {
+            return new Vector2((float)rect.Left, (float)rect.Bottom);
+        }
+
+        public static Vector2 BottomRight(this Rect rect)
+        {
+            return new Vector2((float)rect.Right, (float)rect.Bottom);
         }
 
         public static Vector2 Size(this Rect rect)

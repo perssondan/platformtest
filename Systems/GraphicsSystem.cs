@@ -120,11 +120,11 @@ namespace uwpKarate.Systems
 
             #region Debugging stuff
 
-            DrawPositionHistory(canvasDrawingSession, animatedGraphicsComponent.GameObject);
+            //DrawPositionHistory(canvasDrawingSession, animatedGraphicsComponent.GameObject);
             //DrawRectangleIfColliding(canvasDrawingSession, animatedGraphicsComponent.GameObject);
-            DrawColliderBoundingBox(canvasDrawingSession, animatedGraphicsComponent.GameObject.ColliderComponent);
+            //DrawColliderBoundingBox(canvasDrawingSession, animatedGraphicsComponent.GameObject.ColliderComponent);
             //DrawCollisionPoint(canvasDrawingSession, animatedGraphicsComponent.GameObject.ColliderComponent);
-            DrawVelocityVector(canvasDrawingSession, animatedGraphicsComponent.GameObject);
+            //DrawVelocityVector(canvasDrawingSession, animatedGraphicsComponent.GameObject);
             DrawObjectInfo(canvasDrawingSession, animatedGraphicsComponent.GameObject);
 
             #endregion Debugging stuff
@@ -132,7 +132,15 @@ namespace uwpKarate.Systems
 
         private void DrawObjectInfo(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
         {
-            canvasDrawingSession.DrawText($"{gameObject.TransformComponent.Position}", gameObject.TransformComponent.Position + new Vector2(0f, 10f), Colors.White, new CanvasTextFormat { FontSize = 6 });
+            //canvasDrawingSession.DrawText($"{gameObject.TransformComponent.Position}",
+            //                              gameObject.TransformComponent.Position + new Vector2(0f, 10f),
+            //                              Colors.White,
+            //                              new CanvasTextFormat { FontSize = 6 });
+
+            canvasDrawingSession.DrawText($"{gameObject.Id}",
+                                          gameObject.TransformComponent.Position + new Vector2(5f, 17f),
+                                          Colors.White,
+                                          new CanvasTextFormat { FontSize = 6 });
         }
 
         protected void DrawColliderBoundingBox(CanvasDrawingSession canvasDrawingSession, ColliderComponent colliderComponent)
@@ -141,6 +149,10 @@ namespace uwpKarate.Systems
 
             canvasDrawingSession.DrawRectangle(colliderComponent.BoundingBox, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
             canvasDrawingSession.FillCircle(colliderComponent.Center, 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
+            canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.TopLeft(), 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
+            canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.TopRight(), 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
+            canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.BottomLeft(), 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
+            canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.BottomRight(), 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
             //if (colliderComponent.CollisionType == ColliderComponent.CollisionTypes.Static)
             //{
             //    var expandedStaticRect = colliderComponent.BoundingBox.Add(new Vector2(32f, 32f));

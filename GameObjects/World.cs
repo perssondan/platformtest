@@ -5,29 +5,18 @@ using System.Numerics;
 using uwpKarate.Components;
 using uwpKarate.Factories;
 using uwpKarate.Models;
-using uwpKarate.Systems;
 using Windows.Foundation;
 
 namespace uwpKarate.GameObjects
 {
     public class World
     {
-        private readonly int _mapTileWidth = 14;
-        private readonly int _mapTileHeight = 10;
-        private const int _tileWidth = 32;
-        private const int _tileHeight = 32;
+        private readonly int _horizontalTileCount = 14;
+        private readonly int _verticalTileCount = 10;
         private readonly IReadOnlyList<CanvasBitmap> _canvasBitmaps;
         private readonly Map _map;
         private readonly TileAtlas[] _tileAtlases;
         private GameObject[] _tiles;
-
-        private ColliderSystem _colliderSystem = ColliderSystem.Instance;
-        private MoveSystem _moveSystem = MoveSystem.Instance;
-        private PhysicsSystem _physicsSystem = PhysicsSystem.Instance;
-        private InputSystem _inputSystem = InputSystem.Instance;
-        private GraphicsSystem _graphicsSystem = GraphicsSystem.Instance;
-        private ParticleSystem _particleSystem = ParticleSystem.Instance;
-        private PlayerSystem _playerSystem = PlayerSystem.Instance;
 
         private HeroFactory _heroFactory = new HeroFactory();
         private TileFactory _tileFactory = new TileFactory();
@@ -46,17 +35,16 @@ namespace uwpKarate.GameObjects
             3, 3, 3, 3, 3, 3, 3, 0, 0, 3, 3, 3, 3, 3
         };
 
-        public World(CanvasBitmap[] canvasBitmaps, Map map, TileAtlas[] tileAtlases, Windows.UI.Xaml.Window current)
+        public World(CanvasBitmap[] canvasBitmaps, Map map, TileAtlas[] tileAtlases)
         {
-            _inputSystem.Current = current;
             _canvasBitmaps = canvasBitmaps;
             _map = map;
             _tileAtlases = tileAtlases;
             _mapData = _map.Layers[0].Data;
 
-            _mapTileWidth = _map.Width;
-            _mapTileHeight = _map.Height;
-            _tiles = new GameObject[_mapTileWidth * _mapTileHeight];
+            _horizontalTileCount = _map.Width;
+            _verticalTileCount = _map.Height;
+            _tiles = new GameObject[_horizontalTileCount * _verticalTileCount];
 
             InitializeWorldBoundaries();
             InitializeTileMap();
@@ -70,7 +58,7 @@ namespace uwpKarate.GameObjects
 
         private void InitializeHeroine()
         {
-            _heroFactory.CreateHero(_canvasBitmaps[0], new Vector2(288f, 256f), new Vector2(_tileWidth - 1, _tileHeight - 1));
+            _heroFactory.CreateHero(_canvasBitmaps[0], new Vector2(288f, 256f), new Vector2(_tileAtlases[0].TileWidth - 1, _tileAtlases[0].TileHeight - 1));
         }
 
         private void InitializeWorldBoundaries()
@@ -126,47 +114,29 @@ namespace uwpKarate.GameObjects
 
         private void InitializeTileMap()
         {
+            var tileWidth = _tileAtlases[0].TileWidth;
+            var tileHeight = _tileAtlases[0].TileHeight;
             TileMapIterator((data) =>
             {
                 if (_mapData[data.offset] == 0) return;
 
                 _tiles[data.offset] = _tileFactory.CreateTile(_canvasBitmaps[0],
-                                                              new Vector2(data.x * _tileWidth, data.y * _tileHeight),
-                                                              new Vector2(_tileWidth, _tileHeight),
+                                                              new Vector2(data.x * tileWidth, data.y * tileHeight),
+                                                              new Vector2(tileWidth, tileHeight),
                                                               (TileType)_mapData[data.offset]);
             });
         }
 
         private void TileMapIterator(Action<(int offset, int x, int y)> action)
         {
-            for (var x = 0; x < _mapTileWidth; x++)
+            for (var x = 0; x < _horizontalTileCount; x++)
             {
-                for (var y = 0; y < _mapTileHeight; y++)
+                for (var y = 0; y < _verticalTileCount; y++)
                 {
-                    var offset = y * _mapTileWidth + x;
+                    var offset = y * _horizontalTileCount + x;
                     action?.Invoke((offset, x, y));
                 }
             }
-        }
-
-        public void Update(TimeSpan deltaTime)
-        {
-            _inputSystem.Update(deltaTime);
-            _graphicsSystem.Update(deltaTime);
-            _playerSystem.Update(deltaTime);
-            _physicsSystem.Update(deltaTime);
-            _particleSystem.Update(deltaTime);
-            _colliderSystem.Update(deltaTime);
-
-            // If we still have collisions, resolve them now!
-            _colliderSystem.ResolveCollisions(deltaTime);
-            // All done, move game objects
-            _moveSystem.Update(deltaTime);
-        }
-
-        public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
-        {
-            _graphicsSystem.Draw(canvasDrawingSession, timeSpan);
         }
     }
 }

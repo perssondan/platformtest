@@ -189,7 +189,7 @@ namespace uwpKarate.Systems
             contactNormal = Vector2.Zero;
             contactTime = 0f;
 
-            var targetPos = staticRect.Pos();
+            var targetPos = staticRect.TopLeft();
             var targetSize = staticRect.Size();
 
             // Calculate intersection with rectangle bounding axes
@@ -263,7 +263,7 @@ namespace uwpKarate.Systems
 
             var expandedStaticRect = staticRect.Add(dynamicRect.Size());
 
-            var centerPoint = dynamicRect.Pos() + (dynamicRect.Size() / 2f);
+            var centerPoint = dynamicRect.TopLeft() + (dynamicRect.Size() / 2f);
             var ray = new Ray(centerPoint, sourceVelocity * elapsedTime);
             if (IsRayInRect(ray,
                             expandedStaticRect,

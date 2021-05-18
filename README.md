@@ -32,5 +32,11 @@ acc = new_acc
 
 #TODOs
 - [ ] Investigate QuadTree
-- [ ] Enforce player is inside world by letting the world add colliders around it's boundary
+- [x] Enforce player is inside world by letting the world add colliders around it's boundary
 - [ ] Move game specific functionaliy to Game class
+- [ ] Improve and extend particles
+- [ ] Hud
+- [ ] Enemy
+- [ ] AI
+- [ ] Fight the enemy
+- [ ] Hud part II

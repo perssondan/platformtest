@@ -14,8 +14,9 @@ namespace uwpKarate.GameObjects
         private ParticleSystem _particleSystem = ParticleSystem.Instance;
         private PlayerSystem _playerSystem = PlayerSystem.Instance;
 
-        public Game()
+        public Game(Windows.UI.Xaml.Window current)
         {
+            _inputSystem.Current = current;
         }
 
         public void Update(TimeSpan deltaTime)
@@ -23,8 +24,8 @@ namespace uwpKarate.GameObjects
             _inputSystem.Update(deltaTime);
             _graphicsSystem.Update(deltaTime);
             _playerSystem.Update(deltaTime);
-            _physicsSystem.Update(deltaTime);
             _particleSystem.Update(deltaTime);
+            _physicsSystem.Update(deltaTime);
             _colliderSystem.Update(deltaTime);
 
             // If we still have collisions, resolve them now!

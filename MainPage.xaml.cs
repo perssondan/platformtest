@@ -22,12 +22,15 @@ namespace uwpKarate
         private Scaling _scaling = new Scaling();
         private GameStateManager _gameStateManager = new GameStateManager();
         private World _world;
+        private Game _game;
         private CanvasRenderTarget _offscreen;
 
         public MainPage()
         {
             InitializeComponent();
             Window.Current.SizeChanged += OnWindowSizeChanged;
+
+            _scaling.SetScale();
         }
 
         private void OnWindowSizeChanged(object sender, WindowSizeChangedEventArgs e)
@@ -59,7 +62,7 @@ namespace uwpKarate
         {
             canvasRenderTarget = null;
 
-            if (_world == null) return false;
+            if (_game == null) return false;
 
             EnforceOffScreenCreated(canvasDevice, _world.WorldPixelWidth, _world.WorldPixelHeight);
             if (_offscreen == null) return false;
@@ -67,7 +70,7 @@ namespace uwpKarate
             using (var drawingSession = _offscreen.CreateDrawingSession())
             {
                 drawingSession.Clear(Colors.DarkBlue);
-                _world.Draw(drawingSession, elapsedTime);
+                _game.Draw(drawingSession, elapsedTime);
             }
 
             canvasRenderTarget = _offscreen;
@@ -84,7 +87,6 @@ namespace uwpKarate
 
             _scaling.DesignWidth = width;
             _scaling.DesignHeight = height;
-
         }
 
         private void OnGameCanvasUpdate(ICanvasAnimatedControl sender, CanvasAnimatedUpdateEventArgs args)
@@ -93,7 +95,7 @@ namespace uwpKarate
             _elapsed = args.Timing.ElapsedTime.TotalMilliseconds;
             if (!sender.Paused)
             {
-                _world?.Update(args.Timing.ElapsedTime);
+                _game?.Update(args.Timing.ElapsedTime);
             }
         }
 
@@ -118,11 +120,13 @@ namespace uwpKarate
 
             if (_world == null)
             {
-                _world = new World(bitmaps, map, tileAtlases, Window.Current);
+                _world = new World(bitmaps, map, tileAtlases);
             }
 
-            //CanvasDevice device = CanvasDevice.GetSharedDevice();
-            //_offscreen = new CanvasRenderTarget(device, 320, 448, 96);
+            if (_game is null)
+            {
+                _game = new Game(Window.Current);
+            }
         }
 
         private void OnGameCanvasTapped(object sender, TappedRoutedEventArgs args)
