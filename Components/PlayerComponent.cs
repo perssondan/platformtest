@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Numerics;
-using uwpKarate.Constants;
-using uwpKarate.GameObjects;
+using uwpPlatformer.Constants;
+using uwpPlatformer.GameObjects;
 using Windows.Foundation;
 
-namespace uwpKarate.Components
+namespace uwpPlatformer.Components
 {
     public class PlayerComponent : GameObjectComponent, IComponent
     {

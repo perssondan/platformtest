@@ -1,7 +1,7 @@
 ﻿using System;
-using uwpKarate.GameObjects;
+using uwpPlatformer.GameObjects;
 
-namespace uwpKarate.Systems
+namespace uwpPlatformer.Systems
 {
     public abstract class SystemBase<T> : ISystem<T>
         where T : new()

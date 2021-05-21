@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using uwpKarate.Components;
+using uwpPlatformer.Components;
 
-namespace uwpKarate.GameObjects
+namespace uwpPlatformer.GameObjects
 {
     public class GameObject : IDisposable
     {

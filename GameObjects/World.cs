@@ -2,12 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using uwpKarate.Components;
-using uwpKarate.Factories;
-using uwpKarate.Models;
+using uwpPlatformer.Components;
+using uwpPlatformer.Factories;
+using uwpPlatformer.Models;
 using Windows.Foundation;
 
-namespace uwpKarate.GameObjects
+namespace uwpPlatformer.GameObjects
 {
     public class World
     {

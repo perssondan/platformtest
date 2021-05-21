@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using uwpKarate.Extensions;
+using uwpPlatformer.Extensions;
 
-namespace uwpKarate.Systems
+namespace uwpPlatformer.Systems
 {
     public class EventSystem : IEventSystem
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace uwpKarate.Systems
+namespace uwpPlatformer.Systems
 {
     public interface ISystem
     {

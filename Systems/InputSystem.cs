@@ -1,11 +1,11 @@
 ﻿using System;
-using uwpKarate.Components;
-using uwpKarate.Extensions;
+using uwpPlatformer.Components;
+using uwpPlatformer.Extensions;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 
-namespace uwpKarate.Systems
+namespace uwpPlatformer.Systems
 {
     public class InputSystem : SystemBase<InputSystem>
     {

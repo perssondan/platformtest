@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace uwpKarate.Components
+namespace uwpPlatformer.Components
 {
     public abstract class ComponentManager<T>
     {

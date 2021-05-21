@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using uwpKarate.Components;
-using uwpKarate.Events;
-using uwpKarate.Extensions;
-using uwpKarate.GameObjects;
-using uwpKarate.Numerics;
+using uwpPlatformer.Components;
+using uwpPlatformer.Events;
+using uwpPlatformer.Extensions;
+using uwpPlatformer.GameObjects;
+using uwpPlatformer.Numerics;
 using Windows.Foundation;
 
-namespace uwpKarate.Systems
+namespace uwpPlatformer.Systems
 {
     public class ColliderSystem : SystemBase<ColliderSystem>
     {

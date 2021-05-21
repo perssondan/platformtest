@@ -1,4 +1,4 @@
-﻿namespace uwpKarate.Components
+﻿namespace uwpPlatformer.Components
 {
     internal static class HashCodeHelper
     {

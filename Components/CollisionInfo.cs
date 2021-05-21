@@ -3,7 +3,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using Windows.Foundation;
 
-namespace uwpKarate.Components
+namespace uwpPlatformer.Components
 {
     public struct CollisionInfo : IEquatable<CollisionInfo>, IFormattable
     {

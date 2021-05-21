@@ -1,4 +1,4 @@
-﻿namespace uwpKarate.Constants
+﻿namespace uwpPlatformer.Constants
 {
     public class PlayerConstants
     {

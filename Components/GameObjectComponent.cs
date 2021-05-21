@@ -1,6 +1,6 @@
-﻿using uwpKarate.GameObjects;
+﻿using uwpPlatformer.GameObjects;
 
-namespace uwpKarate.Components
+namespace uwpPlatformer.Components
 {
     public abstract class GameObjectComponent : IComponent
     {

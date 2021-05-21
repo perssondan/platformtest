@@ -1,7 +1,7 @@
-﻿using uwpKarate.Components;
-using uwpKarate.GameObjects;
+﻿using uwpPlatformer.Components;
+using uwpPlatformer.GameObjects;
 
-namespace uwpKarate.Events
+namespace uwpPlatformer.Events
 {
     public class CollisionArgument
     {

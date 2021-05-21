@@ -1,8 +1,8 @@
 ﻿using System.Numerics;
-using uwpKarate.Constants;
-using uwpKarate.GameObjects;
+using uwpPlatformer.Constants;
+using uwpPlatformer.GameObjects;
 
-namespace uwpKarate.Components
+namespace uwpPlatformer.Components
 {
     public class PhysicsComponent : GameObjectComponent, IComponent
     {

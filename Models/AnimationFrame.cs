@@ -1,4 +1,4 @@
-﻿namespace uwpKarate.Models
+﻿namespace uwpPlatformer.Models
 {
     public class AnimationFrame
     {

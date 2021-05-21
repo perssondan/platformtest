@@ -1,7 +1,7 @@
-﻿using uwpKarate.GameObjects;
-using uwpKarate.Systems;
+﻿using uwpPlatformer.GameObjects;
+using uwpPlatformer.Systems;
 
-namespace uwpKarate.Components
+namespace uwpPlatformer.Components
 {
     public class InputComponent : GameObjectComponent, IComponent
     {

@@ -5,12 +5,12 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using uwpKarate.Components;
-using uwpKarate.GameObjects;
-using uwpKarate.Models;
+using uwpPlatformer.Components;
+using uwpPlatformer.GameObjects;
+using uwpPlatformer.Models;
 using Windows.Foundation;
 
-namespace uwpKarate.Factories
+namespace uwpPlatformer.Factories
 {
     public class TileFactory
     {

@@ -6,13 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using uwpKarate.Components;
-using uwpKarate.Events;
-using uwpKarate.Extensions;
-using uwpKarate.GameObjects;
+using uwpPlatformer.Components;
+using uwpPlatformer.Events;
+using uwpPlatformer.Extensions;
+using uwpPlatformer.GameObjects;
 using Windows.UI;
 
-namespace uwpKarate.Systems
+namespace uwpPlatformer.Systems
 {
     public class GraphicsSystem : SystemBase<GraphicsSystem>
     {

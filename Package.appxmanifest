@@ -14,7 +14,7 @@
   <mp:PhoneIdentity PhoneProductId="1a22267d-e849-420e-9509-1be4e18da2a2" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>uwpKarate</DisplayName>
+    <DisplayName>uwpPlatformer</DisplayName>
     <PublisherDisplayName>dan</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -32,10 +32,10 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="uwpKarate.App">
       <uap:VisualElements
-        DisplayName="uwpKarate"
+        DisplayName="uwpPlatformer"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="uwpKarate"
+        Description="uwpPlatformer"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />

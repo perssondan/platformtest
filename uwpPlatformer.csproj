@@ -7,8 +7,8 @@
     <ProjectGuid>{87C81229-AFB2-4583-8793-6FEF96132CA2}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>uwpKarate</RootNamespace>
-    <AssemblyName>uwpKarate</AssemblyName>
+    <RootNamespace>uwpPlatformer</RootNamespace>
+    <AssemblyName>uwpPlatformer</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.19041.0</TargetPlatformVersion>

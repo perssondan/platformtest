@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace uwpKarate.GameObjects
+namespace uwpPlatformer.GameObjects
 {
     public static class GameObjectManager
     {

@@ -1,11 +1,11 @@
 ﻿using Microsoft.Graphics.Canvas;
 using System;
 using System.Numerics;
-using uwpKarate.Components;
-using uwpKarate.GameObjects;
+using uwpPlatformer.Components;
+using uwpPlatformer.GameObjects;
 using Windows.Foundation;
 
-namespace uwpKarate.Factories
+namespace uwpPlatformer.Factories
 {
     public class HeroFactory
     {

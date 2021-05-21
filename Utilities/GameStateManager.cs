@@ -1,4 +1,4 @@
-﻿namespace uwpKarate.Utilities
+﻿namespace uwpPlatformer.Utilities
 {
     public class GameStateManager
     {

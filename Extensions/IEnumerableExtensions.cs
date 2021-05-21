@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace uwpKarate.Extensions
+namespace uwpPlatformer.Extensions
 {
     public static class IEnumerableExtensions
     {

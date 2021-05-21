@@ -3,16 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uwpKarate", "uwpKarate.csproj", "{87C81229-AFB2-4583-8793-6FEF96132CA2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uwpPlatformer", "uwpPlatformer.csproj", "{87C81229-AFB2-4583-8793-6FEF96132CA2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{28E869E3-E06C-4BE6-B942-1AC494BBD513}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GamesLibrary", "GamesLibrary\GamesLibrary.csproj", "{273803E7-8BCF-4760-A434-C9FBA237EFA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GamesLibrary", "GamesLibrary\GamesLibrary.csproj", "{273803E7-8BCF-4760-A434-C9FBA237EFA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GamesLibrary.Test", "..\GamesLibrary.Test\GamesLibrary.Test.csproj", "{AF50F0CD-8F02-424D-A375-723FE024DACD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GamesLibrary.Test", "..\GamesLibrary.Test\GamesLibrary.Test.csproj", "{AF50F0CD-8F02-424D-A375-723FE024DACD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,7 +28,9 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{87C81229-AFB2-4583-8793-6FEF96132CA2}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{87C81229-AFB2-4583-8793-6FEF96132CA2}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{87C81229-AFB2-4583-8793-6FEF96132CA2}.Debug|Any CPU.Build.0 = Debug|x64
+		{87C81229-AFB2-4583-8793-6FEF96132CA2}.Debug|Any CPU.Deploy.0 = Debug|x64
 		{87C81229-AFB2-4583-8793-6FEF96132CA2}.Debug|ARM.ActiveCfg = Debug|ARM
 		{87C81229-AFB2-4583-8793-6FEF96132CA2}.Debug|ARM.Build.0 = Debug|ARM
 		{87C81229-AFB2-4583-8793-6FEF96132CA2}.Debug|ARM.Deploy.0 = Debug|ARM

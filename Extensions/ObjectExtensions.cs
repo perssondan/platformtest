@@ -1,4 +1,4 @@
-﻿namespace uwpKarate.Extensions
+﻿namespace uwpPlatformer.Extensions
 {
     public static class ObjectExtensions
     {

@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using uwpKarate.GameObjects;
+using uwpPlatformer.GameObjects;
 using Windows.Foundation;
 
-namespace uwpKarate.Components
+namespace uwpPlatformer.Components
 {
     public class AnimatedGraphicsComponent : GameObjectComponent, IComponent
     {

@@ -1,7 +1,7 @@
 ﻿using System;
-using uwpKarate.GameObjects;
+using uwpPlatformer.GameObjects;
 
-namespace uwpKarate.Components
+namespace uwpPlatformer.Components
 {
     public interface IComponent : IDisposable
     {

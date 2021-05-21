@@ -1,8 +1,8 @@
 ﻿using System;
-using uwpKarate.GameObjects;
+using uwpPlatformer.GameObjects;
 using Windows.UI;
 
-namespace uwpKarate.Components
+namespace uwpPlatformer.Components
 {
     public class ParticleComponent : GameObjectComponent
     {

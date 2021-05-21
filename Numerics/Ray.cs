@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using uwpKarate.Components;
+using uwpPlatformer.Components;
 
-namespace uwpKarate.Numerics
+namespace uwpPlatformer.Numerics
 {
     public struct Ray : IEquatable<Ray>
     {

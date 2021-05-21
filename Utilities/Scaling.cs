@@ -4,7 +4,7 @@ using System;
 using System.Numerics;
 using Windows.UI.ViewManagement;
 
-namespace uwpKarate.Utilities
+namespace uwpPlatformer.Utilities
 {
     public class Scaling
     {

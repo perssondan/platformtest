@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage;
 
-namespace uwpKarate.Utilities
+namespace uwpPlatformer.Utilities
 {
     public class TiledLoader
     {

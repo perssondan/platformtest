@@ -1,8 +1,8 @@
 ﻿using Microsoft.Graphics.Canvas;
 using System;
-using uwpKarate.Systems;
+using uwpPlatformer.Systems;
 
-namespace uwpKarate.GameObjects
+namespace uwpPlatformer.GameObjects
 {
     public class Game
     {

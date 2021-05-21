@@ -5,17 +5,17 @@ using Microsoft.Graphics.Canvas.UI.Xaml;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using uwpKarate.Entities;
-using uwpKarate.GameObjects;
-using uwpKarate.Models;
-using uwpKarate.Utilities;
+using uwpPlatformer.Entities;
+using uwpPlatformer.GameObjects;
+using uwpPlatformer.Models;
+using uwpPlatformer.Utilities;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 
-namespace uwpKarate
+namespace uwpPlatformer
 {
     public sealed partial class MainPage : Page
     {

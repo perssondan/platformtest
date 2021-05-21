@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using uwpKarate.Components;
-using uwpKarate.GameObjects;
+using uwpPlatformer.Components;
+using uwpPlatformer.GameObjects;
 using Windows.UI;
 
-namespace uwpKarate.Systems
+namespace uwpPlatformer.Systems
 {
     public class ParticleSystem : SystemBase<ParticleSystem>
     {

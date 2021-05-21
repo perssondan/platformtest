@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Numerics;
-using uwpKarate.Components;
-using uwpKarate.GameObjects;
+using uwpPlatformer.Components;
+using uwpPlatformer.GameObjects;
 
-namespace uwpKarate.Systems
+namespace uwpPlatformer.Systems
 {
     public class MoveSystem : SystemBase<MoveSystem>
     {

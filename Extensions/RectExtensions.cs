@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Windows.Foundation;
 
-namespace uwpKarate.Extensions
+namespace uwpPlatformer.Extensions
 {
     public static class RectExtensions
     {

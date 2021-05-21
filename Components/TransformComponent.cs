@@ -1,8 +1,8 @@
 ﻿using System.Numerics;
-using uwpKarate.GameObjects;
-using uwpKarate.Utilities;
+using uwpPlatformer.GameObjects;
+using uwpPlatformer.Utilities;
 
-namespace uwpKarate.Components
+namespace uwpPlatformer.Components
 {
     public class TransformComponent : GameObjectComponent, IComponent
     {

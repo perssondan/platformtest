@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using uwpKarate.GameObjects;
+using uwpPlatformer.GameObjects;
 
-namespace uwpKarate.Commands
+namespace uwpPlatformer.Commands
 {
     public abstract class Command
     {

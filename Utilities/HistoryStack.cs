@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace uwpKarate.Utilities
+namespace uwpPlatformer.Utilities
 {
     public class HistoryStack<T>
     {

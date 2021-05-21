@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using uwpKarate.Components;
-using uwpKarate.GameObjects;
+using uwpPlatformer.Components;
+using uwpPlatformer.GameObjects;
 using Windows.UI;
 
-namespace uwpKarate.Factories
+namespace uwpPlatformer.Factories
 {
     public class DustEntityFactory
     {

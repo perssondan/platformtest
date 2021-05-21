@@ -4,12 +4,12 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using uwpKarate.Components;
-using uwpKarate.Constants;
-using uwpKarate.Extensions;
-using uwpKarate.GameObjects;
+using uwpPlatformer.Components;
+using uwpPlatformer.Constants;
+using uwpPlatformer.Extensions;
+using uwpPlatformer.GameObjects;
 
-namespace uwpKarate.Systems
+namespace uwpPlatformer.Systems
 {
     public class PlayerSystem : SystemBase<PlayerSystem>
     {

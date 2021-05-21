@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace uwpKarate.Models
+namespace uwpPlatformer.Models
 {
     public class Map
     {

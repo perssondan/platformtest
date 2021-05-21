@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using uwpKarate.Components;
+using uwpPlatformer.Components;
 
-namespace uwpKarate.Entities
+namespace uwpPlatformer.Entities
 {
     public struct Entity : IEquatable<Entity>, IFormattable
     {

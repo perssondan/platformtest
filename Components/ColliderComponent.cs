@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Numerics;
-using uwpKarate.GameObjects;
+using uwpPlatformer.GameObjects;
 using Windows.Foundation;
 
-namespace uwpKarate.Components
+namespace uwpPlatformer.Components
 {
     public class ColliderComponent : GameObjectComponent, IComponent
     {
