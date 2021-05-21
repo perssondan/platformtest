@@ -30,10 +30,11 @@ acc = new_acc
 
 ### Runge-Kutta
 
-#TODOs
+# TODOs
 - [ ] Investigate QuadTree
 - [x] Enforce player is inside world by letting the world add colliders around it's boundary
 - [x] Move game specific functionaliy to Game class
+- [ ] Move generic parts of the engine to library and make more parts generic
 - [ ] Improve and extend particles
 - [ ] Hud
 - [ ] Enemy
@@ -41,7 +42,7 @@ acc = new_acc
 - [ ] Fight the enemy
 - [ ] Hud part II
 
-#Licenses
+# Licenses
 ## NUnit
 Copyright (c) 2021 Charlie Poole, Rob Prouse
 
