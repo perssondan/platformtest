@@ -5,6 +5,7 @@ using Microsoft.Graphics.Canvas.UI.Xaml;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using uwpKarate.Entities;
 using uwpKarate.GameObjects;
 using uwpKarate.Models;
 using uwpKarate.Utilities;

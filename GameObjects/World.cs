@@ -54,8 +54,6 @@ namespace uwpKarate.GameObjects
         public int WorldPixelHeight => _map.Height * _map.TileHeight;
         public int WorldPixelWidth => _map.Width * _map.TileWidth;
 
-        public Rect WorldRect => new Rect(0, 0, WorldPixelWidth, WorldPixelHeight);
-
         private void InitializeHeroine()
         {
             _heroFactory.CreateHero(_canvasBitmaps[0], new Vector2(288f, 256f), new Vector2(_tileAtlases[0].TileWidth - 1, _tileAtlases[0].TileHeight - 1));
