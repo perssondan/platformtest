@@ -1,11 +1,9 @@
 ﻿using Microsoft.Graphics.Canvas;
-using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using uwpPlatformer.Entities;
 using uwpPlatformer.GameObjects;
 using uwpPlatformer.Models;
 using uwpPlatformer.Utilities;
@@ -19,9 +17,7 @@ namespace uwpPlatformer
 {
     public sealed partial class MainPage : Page
     {
-        private CanvasBitmap _tileAtlasBitmap;
         private Scaling _scaling = new Scaling();
-        private GameStateManager _gameStateManager = new GameStateManager();
         private World _world;
         private Game _game;
         private CanvasRenderTarget _offscreen;
