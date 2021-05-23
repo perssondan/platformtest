@@ -18,7 +18,9 @@ namespace GamesLibrary.Entities
 
         public void Add(Entity entity)
         {
-            if (!_entities.TryAdd(entity, new Dictionary<Type, IComponent>())) return;
+            if (_entities.ContainsKey(entity)) return;
+
+            _entities.Add(entity, new Dictionary<Type, IComponent>());
 
             _eventSystem?.Send(this, new EntityAdded(entity));
         }
@@ -28,7 +30,9 @@ namespace GamesLibrary.Entities
         {
             Add(entity);
 
-            if (!_entities[entity].TryAdd(typeof(TComponent), component)) return;
+            if (_entities[entity].ContainsKey(typeof(TComponent))) return;
+
+            _entities[entity].Add(typeof(TComponent), component);
 
             _eventSystem?.Send(this, new ComponentAdded(component));
         }

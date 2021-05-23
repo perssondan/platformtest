@@ -15,9 +15,8 @@ namespace GamesLibrary.Systems
         /// <summary>
         /// Unsubscribe from a specific event, <typeparamref name="TArgument"/>
         /// </summary>
-        /// <typeparam name="TArgument"></typeparam>
         /// <param name="observer"></param>
-        void Unsubscribe<TArgument>(object observer, TArgument type = default);
+        void Unsubscribe<TArgument>(object observer);
 
         /// <summary>
         /// Unsubscrive from all events

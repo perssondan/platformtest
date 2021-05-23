@@ -35,7 +35,7 @@ namespace GamesLibrary.Systems
         }
 
         /// <inheritdoc />
-        public void Unsubscribe<TArgument>(object observer, TArgument type = default)
+        public void Unsubscribe<TArgument>(object observer)
         {
             if (!_observers.TryGetValue(typeof(TArgument), out var list)) return;
 
@@ -49,7 +49,13 @@ namespace GamesLibrary.Systems
         /// <inheritdoc />
         public void Unsubscribe(object observer)
         {
-            _observers.Keys.ForEach(key => Unsubscribe(observer, key));
+            _observers.ForEach(key =>
+            {
+                key.Value
+                    .Where(observerInfo => observerInfo.Observer == observer)
+                    .ToArray()
+                    .ForEach(observerInfo => key.Value.Remove(observerInfo));
+            });
         }
 
         protected class ObserverInfo
