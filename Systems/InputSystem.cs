@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GamesLibrary.Systems;
+using System;
 using uwpPlatformer.Components;
 using uwpPlatformer.Extensions;
 using Windows.System;
@@ -11,6 +12,12 @@ namespace uwpPlatformer.Systems
     {
         private Window _window;
         private UserInput _userInputs;
+        private readonly IEventSystem _eventSystem;
+
+        public InputSystem(IEventSystem eventSystem)
+        {
+            _eventSystem = eventSystem;
+        }
 
         public Window Current
         {
@@ -100,6 +107,8 @@ namespace uwpPlatformer.Systems
             {
                 _userInputs &= ~userInput;
             }
+
+            _eventSystem.Send(this, new UserInputInfo(virtualKey, keyDown));
         }
 
         public UserInput UserInputs => _userInputs;

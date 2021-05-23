@@ -11,6 +11,7 @@ using uwpPlatformer.Components;
 using uwpPlatformer.Events;
 using uwpPlatformer.Extensions;
 using uwpPlatformer.GameObjects;
+using Windows.System;
 using Windows.UI;
 
 namespace uwpPlatformer.Systems
@@ -18,19 +19,57 @@ namespace uwpPlatformer.Systems
     public class GraphicsSystem : SystemBase<GraphicsSystem>
     {
         private readonly Dictionary<Color, CanvasSolidColorBrush> _brushes = new Dictionary<Color, CanvasSolidColorBrush>();
-        private readonly List<CollisionInfo> _collisionInfos = new List<CollisionInfo>();
+        private readonly List<CollisionArgument> _collisionArguments = new List<CollisionArgument>();
         private readonly IEventSystem _eventSystem;
+        private Action<CanvasDrawingSession, GameObject> _drawPositionHistory;
+        private Action<CanvasDrawingSession, GameObject> _drawColliderBoundingBox;
+        private Action<CanvasDrawingSession, GameObject> _drawVelocityVector;
+        private Action<CanvasDrawingSession, GameObject> _drawObjectId;
+        private Action<CanvasDrawingSession, GameObject> _drawObjectPositionText;
+        private Action<CanvasDrawingSession, TimeSpan, ShapeGraphicsComponent> _drawShapeComponent;
+        private Action<CanvasDrawingSession, TimeSpan, AnimatedGraphicsComponent> _drawComponent;
+        private Action<CanvasDrawingSession, CollisionArgument[]> _drawCollisionInfos;
 
         public GraphicsSystem(IEventSystem eventSystem)
         {
+            _drawShapeComponent = DrawShapeComponent;
+            _drawComponent = DrawAnimatedComponent;
+
             _eventSystem = eventSystem;
 
             _eventSystem.Subscribe<CollisionArgument>(this, (sender, collision) =>
             {
                 _collisionArguments.Add(collision);
             });
+
+            _eventSystem.Subscribe<UserInputInfo>(this, (sender, userInputInfo) =>
             {
-                _collisionInfos.Add(collision.CollisionInfo);
+                switch (userInputInfo.VirtualKey)
+                {
+                    case VirtualKey.Number1 when userInputInfo.IsPressed:
+                        _drawPositionHistory = _drawPositionHistory == null ? DrawPositionHistory : default(Action<CanvasDrawingSession, GameObject>);
+                        break;
+                    case VirtualKey.Number2 when userInputInfo.IsPressed:
+                        _drawComponent = _drawComponent == null ? DrawAnimatedComponent : default(Action<CanvasDrawingSession, TimeSpan, AnimatedGraphicsComponent>);
+                        _drawShapeComponent = _drawShapeComponent == null ? DrawShapeComponent : default(Action<CanvasDrawingSession, TimeSpan, ShapeGraphicsComponent>);
+                        break;
+                    case VirtualKey.Number3 when userInputInfo.IsPressed:
+                        _drawColliderBoundingBox = _drawColliderBoundingBox == null ? DrawColliderBoundingBox : default(Action<CanvasDrawingSession, GameObject>);
+                        break;
+                    case VirtualKey.Number4 when userInputInfo.IsPressed:
+                        _drawCollisionInfos = _drawCollisionInfos == null ? DrawCollisionArguments : default(Action<CanvasDrawingSession, CollisionArgument[]>);
+                        break;
+                    case VirtualKey.Number5 when userInputInfo.IsPressed:
+                        _drawVelocityVector = _drawVelocityVector == null ? DrawVelocityVector : default(Action<CanvasDrawingSession, GameObject>);
+                        break;
+                    case VirtualKey.Number6 when userInputInfo.IsPressed:
+                        _drawObjectId = _drawObjectId == null ? DrawObjectId : default(Action<CanvasDrawingSession, GameObject>);
+                        break;
+                    case VirtualKey.Number7 when userInputInfo.IsPressed:
+                        _drawObjectPositionText = _drawObjectPositionText == null ? DrawObjectPositionText : default(Action<CanvasDrawingSession, GameObject>);
+                        break;
+                    
+                }
             });
         }
 
@@ -42,12 +81,24 @@ namespace uwpPlatformer.Systems
         {
             GraphicsComponentManager.Instance.Components
                 .OfType<AnimatedGraphicsComponent>()
-                .ForEach(graphicsComponent => DrawComponent(canvasDrawingSession, deltaTime, graphicsComponent));
+                .ForEach(graphicsComponent => _drawComponent?.Invoke(canvasDrawingSession, deltaTime, graphicsComponent));
 
             ShapeGraphicsComponentManager.Instance.Components
-                .ForEach(shapeGraphicsComponent => DrawShapeComponent(canvasDrawingSession, deltaTime, shapeGraphicsComponent));
+                .ForEach(shapeGraphicsComponent => _drawShapeComponent?.Invoke(canvasDrawingSession, deltaTime, shapeGraphicsComponent));
 
-            _collisionInfos.Clear();
+            GameObjectManager.GameObjects
+                .ForEach(gameObject =>
+                {
+                    _drawPositionHistory?.Invoke(canvasDrawingSession, gameObject);
+                    _drawColliderBoundingBox?.Invoke(canvasDrawingSession, gameObject);
+                    _drawVelocityVector?.Invoke(canvasDrawingSession, gameObject);
+                    _drawObjectId?.Invoke(canvasDrawingSession, gameObject);
+                    _drawObjectPositionText?.Invoke(canvasDrawingSession, gameObject);
+                });
+
+            _drawCollisionInfos?.Invoke(canvasDrawingSession, _collisionArguments.ToArray());
+
+            _collisionArguments.Clear();
         }
 
         private void DrawShapeComponent(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime, ShapeGraphicsComponent shapeGraphicsComponent)
@@ -74,13 +125,7 @@ namespace uwpPlatformer.Systems
             }
         }
 
-        private void DrawParticle(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime, ParticleComponent particleComponent)
-        {
-            canvasDrawingSession.FillCircle(particleComponent.GameObject.TransformComponent.Position,
-                                                        1.5f, GetCachedBrush(canvasDrawingSession, Colors.White));
-        }
-
-        private void DrawComponent(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime, AnimatedGraphicsComponent animatedGraphicsComponent)
+        private void DrawAnimatedComponent(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime, AnimatedGraphicsComponent animatedGraphicsComponent)
         {
             var sourceRects = animatedGraphicsComponent.SourceRects;
             var numberOfTiles = sourceRects.Count();
@@ -124,34 +169,27 @@ namespace uwpPlatformer.Systems
                 animatedGraphicsComponent.CurrentTime = TimeSpan.Zero;
                 animatedGraphicsComponent.CurrentTileIndex++;
             }
-
-            #region Debugging stuff
-
-            //DrawPositionHistory(canvasDrawingSession, animatedGraphicsComponent.GameObject);
-            //DrawRectangleIfColliding(canvasDrawingSession, animatedGraphicsComponent.GameObject);
-            //DrawColliderBoundingBox(canvasDrawingSession, animatedGraphicsComponent.GameObject.ColliderComponent);
-            //DrawCollisionPoint(canvasDrawingSession, animatedGraphicsComponent.GameObject.ColliderComponent);
-            //DrawVelocityVector(canvasDrawingSession, animatedGraphicsComponent.GameObject);
-            DrawObjectInfo(canvasDrawingSession, animatedGraphicsComponent.GameObject);
-
-            #endregion Debugging stuff
         }
 
-        private void DrawObjectInfo(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
+        private void DrawObjectId(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
         {
-            //canvasDrawingSession.DrawText($"{gameObject.TransformComponent.Position}",
-            //                              gameObject.TransformComponent.Position + new Vector2(0f, 10f),
-            //                              Colors.White,
-            //                              new CanvasTextFormat { FontSize = 6 });
-
             canvasDrawingSession.DrawText($"{gameObject.Id}",
                                           gameObject.TransformComponent.Position + new Vector2(5f, 17f),
                                           Colors.White,
                                           new CanvasTextFormat { FontSize = 6 });
         }
 
-        protected void DrawColliderBoundingBox(CanvasDrawingSession canvasDrawingSession, ColliderComponent colliderComponent)
+        private void DrawObjectPositionText(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
         {
+            canvasDrawingSession.DrawText($"{gameObject.TransformComponent.Position}",
+                                          gameObject.TransformComponent.Position + new Vector2(0f, 10f),
+                                          Colors.White,
+                                          new CanvasTextFormat { FontSize = 6 });
+        }
+
+        private void DrawColliderBoundingBox(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
+        {
+            var colliderComponent = gameObject?.ColliderComponent;
             if (colliderComponent == null) return;
 
             canvasDrawingSession.DrawRectangle(colliderComponent.BoundingBox, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
@@ -160,63 +198,53 @@ namespace uwpPlatformer.Systems
             canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.TopRight(), 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
             canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.BottomLeft(), 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
             canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.BottomRight(), 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
-            //if (colliderComponent.CollisionType == ColliderComponent.CollisionTypes.Static)
-            //{
-            //    var expandedStaticRect = colliderComponent.BoundingBox.Add(new Vector2(32f, 32f));
-            //    canvasDrawingSession.DrawRectangle(expandedStaticRect, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
-            //}
-
-            DrawCollisionInfos(canvasDrawingSession, _collisionInfos.ToArray());
         }
 
-        protected void DrawVelocityVector(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
+        private void DrawVelocityVector(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
         {
             if (gameObject.TransformComponent.Velocity.LengthSquared() > 0f)
             {
-                canvasDrawingSession.DrawLine(gameObject.ColliderComponent.Center,
-                                              gameObject.ColliderComponent.Center + (gameObject.TransformComponent.Velocity.Normalize() * 20f),
+                var center = gameObject.ColliderComponent?.Center ?? gameObject.TransformComponent.Position;
+                canvasDrawingSession.DrawLine(center,
+                                              center + (gameObject.TransformComponent.Velocity.Normalize() * 15f),
                                               GetCachedBrush(canvasDrawingSession, Colors.Aquamarine));
             }
         }
 
-        protected void DrawCollisionPoint(CanvasDrawingSession canvasDrawingSession, ColliderComponent colliderComponent)
+        private void DrawCollisionArguments(CanvasDrawingSession canvasDrawingSession, CollisionArgument[] collisionArguments)
         {
-            var collisionInfos = colliderComponent?.CollisionInfos;
-            if (collisionInfos == null) return;
-
-            DrawCollisionInfos(canvasDrawingSession, collisionInfos);
-        }
-
-        private void DrawCollisionInfos(CanvasDrawingSession canvasDrawingSession, CollisionInfo[] collisionInfos)
-        {
-            foreach (var collisionInfo in collisionInfos)
+            var collisionColor = Colors.Orange;
+            foreach (var collisionArgument in collisionArguments)
             {
-                canvasDrawingSession.FillCircle(collisionInfo.CollisionPoint,
-                                                        3f, GetCachedBrush(canvasDrawingSession, Colors.Orange));
+                if (collisionArgument.GameObject.ColliderComponent.CollisionType == ColliderComponent.CollisionTypes.Dynamic)
+                {
+                    var startPoint = collisionArgument.CollisionInfo.CollisionPoint - (collisionArgument.CollisionInfo.CollisionNormal * collisionArgument.GameObject.ColliderComponent.Size / 2f);
+                    // draw collision point
+                    canvasDrawingSession.FillCircle(startPoint,
+                                                    2f,
+                                                    GetCachedBrush(canvasDrawingSession, collisionColor));
 
-                canvasDrawingSession.DrawRectangle(collisionInfo.ContactRect, GetCachedBrush(canvasDrawingSession, Colors.Orange));
+                    // draw collision normal
+                    
+                    canvasDrawingSession.DrawLine(startPoint,
+                                                  startPoint + (collisionArgument.CollisionInfo.CollisionNormal * 16f),
+                                                  GetCachedBrush(canvasDrawingSession, collisionColor));
+                }
+                
 
-                var startPoint = collisionInfo.CollisionPoint - (collisionInfo.CollisionNormal * 32f);
-                canvasDrawingSession.DrawLine(startPoint,
-                                              startPoint - (collisionInfo.CollisionNormal * 15f),
-                                              GetCachedBrush(canvasDrawingSession, Colors.Orange));
+                // draw collision rectangle
+                canvasDrawingSession.DrawRectangle(collisionArgument.CollisionInfo.ContactRect, GetCachedBrush(canvasDrawingSession, collisionColor));
             }
         }
 
-        protected void DrawRectangleIfColliding(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
-        {
-            if (gameObject?.ColliderComponent?.IsColliding != true) return;
-
-            canvasDrawingSession.DrawRectangle(gameObject.ColliderComponent.BoundingBox, GetCachedBrush(canvasDrawingSession, gameObject.InputComponent != null ? Colors.Yellow : Colors.Blue));
-        }
-
-        protected void DrawPositionHistory(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
+        private void DrawPositionHistory(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
         {
             if (gameObject.TransformComponent.PositionHistory.Length < 5) return;
 
             var canvasPathBuilder = new CanvasPathBuilder(canvasDrawingSession);
 
-            var offset = gameObject.ColliderComponent.Center - gameObject.TransformComponent.Position;
+            var center = gameObject.ColliderComponent?.Center ?? gameObject.TransformComponent.Position;
+            var offset = center - gameObject.TransformComponent.Position;
 
             canvasPathBuilder.BeginFigure(gameObject.TransformComponent.PositionHistory.First() + offset);
             gameObject.TransformComponent.PositionHistory.Skip(1).All(vector =>
