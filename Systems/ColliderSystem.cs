@@ -1,11 +1,11 @@
-﻿using System;
+﻿using GamesLibrary.Systems;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using uwpPlatformer.Components;
 using uwpPlatformer.Events;
 using uwpPlatformer.Extensions;
-using uwpPlatformer.GameObjects;
 using uwpPlatformer.Numerics;
 using Windows.Foundation;
 
@@ -13,6 +13,14 @@ namespace uwpPlatformer.Systems
 {
     public class ColliderSystem : SystemBase<ColliderSystem>
     {
+        private readonly IEventSystem _eventSystem;
+
+        public ColliderSystem(IEventSystem eventSystem)
+            : base()
+        {
+            _eventSystem = eventSystem;
+        }
+
         public override void Update(TimeSpan deltaTime)
         {
             DetectCollisions(deltaTime);
@@ -108,7 +116,7 @@ namespace uwpPlatformer.Systems
                 };
                 results.Add(collisionInfo);
                 componentInCollision.IsColliding = true;
-                EventSystem.Instance.Send(new CollisionArgument { GameObject = dynamicCollider.GameObject, IsCollidingWith = componentInCollision.GameObject, CollisionInfo = collisionInfo });
+                _eventSystem.Send(this, new CollisionArgument { GameObject = dynamicCollider.GameObject, IsCollidingWith = componentInCollision.GameObject, CollisionInfo = collisionInfo });
             }
 
             if (results.Any())

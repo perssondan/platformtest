@@ -162,8 +162,6 @@
     </Compile>
     <Compile Include="Models\AnimationFrame.cs" />
     <Compile Include="Numerics\Ray.cs" />
-    <Compile Include="Systems\EventSystem.cs" />
-    <Compile Include="Systems\IEventSystem.cs" />
     <Compile Include="Models\Layer.cs" />
     <Compile Include="Models\Map.cs" />
     <Compile Include="Models\Tile.cs" />
@@ -229,7 +227,12 @@
     <Content Include="Assets\GameAssets\images\mytilemap.json" />
     <Content Include="Assets\GameAssets\images\mytiles.json" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="GamesLibrary\GamesLibrary.csproj">
+      <Project>{273803e7-8bcf-4760-a434-c9fba237efa0}</Project>
+      <Name>GamesLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

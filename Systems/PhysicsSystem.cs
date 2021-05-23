@@ -1,7 +1,7 @@
-﻿using System;
+﻿using GamesLibrary.Systems;
+using System;
 using System.Numerics;
 using uwpPlatformer.Components;
-using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Systems
 {
@@ -9,6 +9,13 @@ namespace uwpPlatformer.Systems
     {
         private Action<PhysicsComponent, TimeSpan> _integrateFunc;
         private IntegrationType _integration;
+        private readonly IEventSystem _eventSystem;
+
+        public PhysicsSystem(IEventSystem eventSystem)
+        {
+            _eventSystem = eventSystem;
+            Integration = IntegrationType.VelocityVerlet;
+        }
 
         public IntegrationType Integration
         {
@@ -19,11 +26,6 @@ namespace uwpPlatformer.Systems
                 _integration = value;
                 ChangeIntegration(_integration);
             }
-        }
-
-        protected override void Initialize()
-        {
-            Integration = IntegrationType.VelocityVerlet;
         }
 
         public override void Update(TimeSpan deltaTime)

@@ -15,7 +15,7 @@
 
   <Properties>
     <DisplayName>uwpPlatformer</DisplayName>
-    <PublisherDisplayName>dan</PublisherDisplayName>
+    <PublisherDisplayName>Dan Persson</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 

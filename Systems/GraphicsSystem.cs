@@ -1,4 +1,5 @@
-﻿using Microsoft.Graphics.Canvas;
+﻿using GamesLibrary.Systems;
+using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
@@ -18,10 +19,16 @@ namespace uwpPlatformer.Systems
     {
         private readonly Dictionary<Color, CanvasSolidColorBrush> _brushes = new Dictionary<Color, CanvasSolidColorBrush>();
         private readonly List<CollisionInfo> _collisionInfos = new List<CollisionInfo>();
+        private readonly IEventSystem _eventSystem;
 
-        protected override void Initialize()
+        public GraphicsSystem(IEventSystem eventSystem)
         {
-            EventSystem.Instance.Register<CollisionArgument>(this, collision =>
+            _eventSystem = eventSystem;
+
+            _eventSystem.Subscribe<CollisionArgument>(this, (sender, collision) =>
+            {
+                _collisionArguments.Add(collision);
+            });
             {
                 _collisionInfos.Add(collision.CollisionInfo);
             });
