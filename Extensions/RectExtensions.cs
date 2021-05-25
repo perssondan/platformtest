@@ -25,6 +25,16 @@ namespace uwpPlatformer.Extensions
             return new Vector2((float)rect.Right, (float)rect.Bottom);
         }
 
+        public static Vector2 BottomCenter(this Rect rect)
+        {
+            return new Vector2((float)rect.Right - (float)(rect.Width / 2f), (float)rect.Bottom);
+        }
+
+        public static Vector2 BottomCenterOffset(this Rect rect)
+        {
+            return new Vector2((float)rect.Width/2f, (float)rect.Height);
+        }
+
         public static Vector2 Size(this Rect rect)
         {
             return new Vector2((float)rect.Width, (float)rect.Height);

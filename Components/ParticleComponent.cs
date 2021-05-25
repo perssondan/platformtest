@@ -7,25 +7,27 @@ namespace uwpPlatformer.Components
     public class ParticleComponent : GameObjectComponent
     {
         public ParticleComponent(GameObject gameObject,
-                                 TimeSpan initialTimeToLive,
+                                 TimeSpan timeToLive,
                                  Color startColor,
                                  Color endColor,
-                                 ChangeColorBehavior changeColorBehavior)
+                                 ChangeColorBehavior changeColorBehavior,
+                                 TimeSpan createdAt)
             : base(gameObject)
         {
-            InitialTimeToLive = initialTimeToLive;
             StartColor = startColor;
             EndColor = endColor;
             ChangeColorBehavior = changeColorBehavior;
-            TimeToLive = initialTimeToLive;
+            TimeToLive = timeToLive;
+            CreatedAt = createdAt;
             ParticleComponentManager.Instance.AddComponent(this);
         }
 
         public TimeSpan TimeToLive { get; set; }
-        public TimeSpan InitialTimeToLive { get; }
         public Color StartColor { get; set; }
         public Color EndColor { get; set; }
         public ChangeColorBehavior ChangeColorBehavior { get; set; }
+        public TimeSpan CreatedAt { get; }
+        public TimeSpan EndOfLife => CreatedAt + TimeToLive;
 
         protected override void OnDispose()
         {

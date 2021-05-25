@@ -1,4 +1,5 @@
 ﻿using GamesLibrary.Models;
+using GamesLibrary.Systems;
 using Microsoft.Graphics.Canvas;
 using System;
 using uwpPlatformer.Systems;
@@ -14,6 +15,7 @@ namespace uwpPlatformer.GameObjects
         private readonly GraphicsSystem _graphicsSystem;
         private readonly ParticleSystem _particleSystem;
         private readonly PlayerSystem _playerSystem;
+        private readonly DustParticleEmitterSystem _dustParticleEmitterSystem;
         private readonly IEventSystem _eventSystem = new EventSystem();
 
         public Game(Windows.UI.Xaml.Window current)
@@ -24,7 +26,9 @@ namespace uwpPlatformer.GameObjects
             _inputSystem = new InputSystem(_eventSystem);
             _graphicsSystem = new GraphicsSystem(_eventSystem);
             _particleSystem = new ParticleSystem();
-            _playerSystem = new PlayerSystem();
+            _playerSystem = new PlayerSystem(_eventSystem);
+            _dustParticleEmitterSystem = new DustParticleEmitterSystem(_eventSystem);
+
 
             _inputSystem.Current = current;
         }
@@ -37,6 +41,7 @@ namespace uwpPlatformer.GameObjects
             _particleSystem.Update(timingInfo);
             _physicsSystem.Update(timingInfo);
             _colliderSystem.Update(timingInfo);
+            _dustParticleEmitterSystem.Update(timingInfo);
 
             // If we still have collisions, resolve them now!
             _colliderSystem.ResolveCollisions(timingInfo);

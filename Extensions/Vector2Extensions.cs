@@ -34,8 +34,7 @@ namespace uwpPlatformer.Extensions
 
         public static Vector2 Normalize(this Vector2 source)
         {
-            var reverseLenght = 1f / source.Length();
-            return reverseLenght * source;
+            return Vector2.Normalize(source);
         }
     }
 }

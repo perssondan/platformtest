@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Threading.Tasks;
 using uwpPlatformer.Components;
 using uwpPlatformer.GameObjects;
 using Windows.UI;
@@ -16,18 +15,21 @@ namespace uwpPlatformer.Factories
         public void CreateDustParticleEntitesAndUnwrap(Vector2 position,
                                                        int numberOfParticles,
                                                        TimeSpan timeToLive,
+                                                       TimeSpan createdAt,
                                                        float initialVelocityFactor = 75f)
         {
             CreateDustParticleEntites(position,
                                       numberOfParticles,
                                       timeToLive,
+                                      createdAt,
                                       initialVelocityFactor)
                 .ToArray();
         }
 
-            public IEnumerable<GameObject> CreateDustParticleEntites(Vector2 position,
+        public IEnumerable<GameObject> CreateDustParticleEntites(Vector2 position,
                                                                  int numberOfParticles,
                                                                  TimeSpan timeToLive,
+                                                                 TimeSpan createdAt,
                                                                  float initialVelocityFactor = 75f)
         {
             for (var particleIndex = 0; particleIndex < numberOfParticles; particleIndex++)
@@ -40,8 +42,8 @@ namespace uwpPlatformer.Factories
                 gameObject.TransformComponent.Velocity = (float)_random.NextDouble() * initialVelocityFactor * velocity;
 
                 // TODO: Where's a good place to have the color shading stuff?
-                gameObject.AddComponent(new ParticleComponent(gameObject, timeToLive, Colors.White, Colors.WhiteSmoke, ChangeColorBehavior.OverTime));
-                gameObject.AddComponent(new ShapeGraphicsComponent(gameObject, ShapeType.Rectangle, Colors.White, new Vector2(1f, 1f)));
+                gameObject.AddComponent(new ParticleComponent(gameObject, timeToLive, Colors.White, Colors.WhiteSmoke, ChangeColorBehavior.OverTime, createdAt));
+                gameObject.AddComponent(new ShapeGraphicsComponent(gameObject, ShapeType.Rectangle, Colors.White, new Vector2(2f, 2f)));
 
                 yield return gameObject;
             }
@@ -56,16 +58,6 @@ namespace uwpPlatformer.Factories
             var y = Math.Sin(randValue * phi);
             var velocity = new Vector2((float)x, (float)y);
             return velocity;
-        }
-
-        public IEnumerable<GameObject> CreateDustParticleEntites(Vector2 position,
-                                                                 int numberOfParticles,
-                                                                 float initialVelocityFactor = 75f)
-        {
-            return CreateDustParticleEntites(position,
-                                             numberOfParticles,
-                                             TimeSpan.FromMilliseconds(150),
-                                             initialVelocityFactor);
         }
     }
 }

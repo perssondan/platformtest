@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using GamesLibrary.Models;
+using GamesLibrary.Systems;
+using System;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using uwpPlatformer.Components;
 using uwpPlatformer.Constants;
+using uwpPlatformer.EventArguments;
 using uwpPlatformer.Extensions;
 using uwpPlatformer.GameObjects;
 
@@ -13,7 +13,13 @@ namespace uwpPlatformer.Systems
 {
     public class PlayerSystem : SystemBase<PlayerSystem>
     {
-        public override void Update(TimeSpan deltaTime)
+        private readonly IEventSystem _eventSystem;
+
+        public PlayerSystem(IEventSystem eventSystem)
+        {
+            _eventSystem = eventSystem;
+        }
+
         public override void Update(TimingInfo timingInfo)
         {
             var playerGameObjects = PlayerComponentManager.Instance.Components.Select(c => c.GameObject);
@@ -83,13 +89,7 @@ namespace uwpPlatformer.Systems
         private void Jump(GameObject gameObject)
         {
             gameObject.TransformComponent.Velocity += gameObject.GetComponent<PlayerComponent>().InitialJumpVelocity;
-            CreateDustParticles(gameObject);
-        }
-
-        private void CreateDustParticles(GameObject gameObject)
-        {
-            var position = new Vector2(gameObject.ColliderComponent.Center.X, (float)gameObject.ColliderComponent.BoundingBox.Bottom);
-            //_dustEntityFactory.CreateDustParticleEntitesAndUnwrap(position, 50, TimeSpan.FromMilliseconds(150), 50f);
+            _eventSystem.Send(this, new ActivateDustParticles(gameObject));
         }
 
         private void Walk(GameObject gameObject, float orientation)

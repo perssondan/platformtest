@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using GamesLibrary.Models;
+using System;
 using System.Linq;
 using uwpPlatformer.Components;
-using uwpPlatformer.GameObjects;
-using Windows.UI;
 using uwpPlatformer.Extensions;
 
 namespace uwpPlatformer.Systems
@@ -15,42 +13,32 @@ namespace uwpPlatformer.Systems
             // Make a copy of the list before thus not to change the list we're iterating
             var particles = ParticleComponentManager.Instance.Components.ToArray();
 
+            var now = timingInfo.TotalTime;
             foreach (var particle in particles)
             {
-                UpdateParticleColor(particle);
-                particle.TimeToLive -= deltaTime;
-                if (particle.TimeToLive > TimeSpan.Zero)
+                var elapsedTime = now - particle.CreatedAt;
+
+                if (elapsedTime < particle.TimeToLive)
                 {
+                    UpdateParticleColor(particle, elapsedTime);
                     continue;
                 }
 
                 particle.GameObject.Dispose();
+                //_entityManager.Remove(entity);
             }
         }
 
-        private void UpdateParticleColor(ParticleComponent particle)
+        private void UpdateParticleColor(ParticleComponent particle, TimeSpan elapsedTime)
         {
             var graphicsComponent = particle.GameObject.GetComponent<ShapeGraphicsComponent>();
             if (graphicsComponent is null) return;
 
-            var startColorPercentage = (particle.TimeToLive.TotalMilliseconds / particle.InitialTimeToLive.TotalMilliseconds);
+            var ticksDifference = Math.Clamp(particle.TimeToLive.Ticks - elapsedTime.Ticks, 0f, particle.TimeToLive.Ticks);
+            var startColorPercentage = ticksDifference / particle.TimeToLive.Ticks;
             var endColorPercentage = 1f - startColorPercentage;
-            graphicsComponent.Color = GetNextColor(particle.StartColor, particle.EndColor, (float)endColorPercentage);
-        }
-
-        private Color GetNextColor(Color startColor, Color endColor, float percentage)
-        {
-            var alpha = Lerp(startColor.A, endColor.A, percentage);
-            var red = Lerp(startColor.R, endColor.R, percentage);
-            var green = Lerp(startColor.G, endColor.G, percentage);
-            var blue = Lerp(startColor.B, endColor.B, percentage);
-
-            return Color.FromArgb((byte)alpha, (byte)red, (byte)green, (byte)blue);
-        }
-
-        private float Lerp(float startValue, float endValue, float lerpValue)
-        {
-            return startValue * (1 - lerpValue) + endValue * lerpValue;
+            var nextColor = particle.StartColor.Lerp(particle.EndColor, endColorPercentage);
+            graphicsComponent.Color = nextColor;
         }
     }
 }

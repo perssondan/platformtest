@@ -129,8 +129,8 @@
     <Compile Include="Components\InputComponentManager.cs" />
     <Compile Include="Components\ParticleComponent.cs" />
     <Compile Include="Components\ParticleComponentManager.cs" />
-    <Compile Include="Components\ParticleEmitterComponent.cs" />
-    <Compile Include="Components\ParticleEmitterComponentManager.cs" />
+    <Compile Include="Components\DustParticleEmitterComponent.cs" />
+    <Compile Include="Components\DustParticleEmitterComponentManager.cs" />
     <Compile Include="Components\PhysicsComponent.cs" />
     <Compile Include="Components\PhysicsComponentManager.cs" />
     <Compile Include="Components\PlayerComponent.cs" />
@@ -141,6 +141,7 @@
     <Compile Include="Components\TransformComponentManager.cs" />
     <Compile Include="Constants\PlayerConstants.cs" />
     <Compile Include="EventArguments\CollisionArgument.cs" />
+    <Compile Include="EventArguments\ActivateDustParticles.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
@@ -174,6 +175,7 @@
     <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\ISystem.cs" />
     <Compile Include="Systems\MoveSystem.cs" />
+    <Compile Include="Systems\DustParticleEmitterSystem.cs" />
     <Compile Include="Systems\ParticleSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\PlayerSystem.cs" />
