@@ -1,4 +1,5 @@
-﻿using GamesLibrary.Systems;
+﻿using GamesLibrary.Models;
+using GamesLibrary.Systems;
 using System;
 using System.Numerics;
 using uwpPlatformer.Components;
@@ -28,11 +29,11 @@ namespace uwpPlatformer.Systems
             }
         }
 
-        public override void Update(TimeSpan deltaTime)
+        public override void Update(TimingInfo timingInfo)
         {
             foreach (var physicsComponent in PhysicsComponentManager.Instance.Components)
             {
-                _integrateFunc?.Invoke(physicsComponent, deltaTime);
+                _integrateFunc?.Invoke(physicsComponent, timingInfo.ElapsedTime);
             }
         }
 

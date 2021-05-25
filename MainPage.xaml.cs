@@ -1,4 +1,5 @@
-﻿using Microsoft.Graphics.Canvas;
+﻿using GamesLibrary.Models;
+using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using System;
@@ -92,7 +93,7 @@ namespace uwpPlatformer
             _elapsed = args.Timing.ElapsedTime.TotalMilliseconds;
             if (!sender.Paused)
             {
-                _game?.Update(args.Timing.ElapsedTime);
+                _game?.Update(new TimingInfo(args.Timing.ElapsedTime, args.Timing.TotalTime));
             }
         }
 

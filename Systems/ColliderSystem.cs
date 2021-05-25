@@ -1,4 +1,5 @@
-﻿using GamesLibrary.Systems;
+﻿using GamesLibrary.Models;
+using GamesLibrary.Systems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,14 +22,14 @@ namespace uwpPlatformer.Systems
             _eventSystem = eventSystem;
         }
 
-        public override void Update(TimeSpan deltaTime)
+        public override void Update(TimingInfo timingInfo)
         {
-            DetectCollisions(deltaTime);
+            DetectCollisions(timingInfo.ElapsedTime);
         }
 
-        public void ResolveCollisions(TimeSpan deltaTime)
+        public void ResolveCollisions(TimingInfo timingInfo)
         {
-            var fDeltaTime = (float)deltaTime.TotalSeconds;
+            var fDeltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
             var dynamicColliderComponents = ColliderComponentManager.Instance.Components
                 .Where(colliderComponent => colliderComponent.IsColliding == true)
                 .Where(colliderComponent => colliderComponent.CollisionType == ColliderComponent.CollisionTypes.Dynamic)
@@ -40,8 +41,8 @@ namespace uwpPlatformer.Systems
                     .Any(value => value == true);
                 if (dynamicColliderWasMoved)
                 {
-                    DetectCollisions(deltaTime);
-                    ResolveCollisions(deltaTime);
+                    DetectCollisions(timingInfo.ElapsedTime);
+                    ResolveCollisions(timingInfo);
                     return;
                 }
             }

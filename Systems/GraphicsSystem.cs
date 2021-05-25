@@ -1,4 +1,5 @@
-﻿using GamesLibrary.Systems;
+﻿using GamesLibrary.Models;
+using GamesLibrary.Systems;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Geometry;
@@ -49,31 +50,36 @@ namespace uwpPlatformer.Systems
                     case VirtualKey.Number1 when userInputInfo.IsPressed:
                         _drawPositionHistory = _drawPositionHistory == null ? DrawPositionHistory : default(Action<CanvasDrawingSession, GameObject>);
                         break;
+
                     case VirtualKey.Number2 when userInputInfo.IsPressed:
                         _drawComponent = _drawComponent == null ? DrawAnimatedComponent : default(Action<CanvasDrawingSession, TimeSpan, AnimatedGraphicsComponent>);
                         _drawShapeComponent = _drawShapeComponent == null ? DrawShapeComponent : default(Action<CanvasDrawingSession, TimeSpan, ShapeGraphicsComponent>);
                         break;
+
                     case VirtualKey.Number3 when userInputInfo.IsPressed:
                         _drawColliderBoundingBox = _drawColliderBoundingBox == null ? DrawColliderBoundingBox : default(Action<CanvasDrawingSession, GameObject>);
                         break;
+
                     case VirtualKey.Number4 when userInputInfo.IsPressed:
                         _drawCollisionInfos = _drawCollisionInfos == null ? DrawCollisionArguments : default(Action<CanvasDrawingSession, CollisionArgument[]>);
                         break;
+
                     case VirtualKey.Number5 when userInputInfo.IsPressed:
                         _drawVelocityVector = _drawVelocityVector == null ? DrawVelocityVector : default(Action<CanvasDrawingSession, GameObject>);
                         break;
+
                     case VirtualKey.Number6 when userInputInfo.IsPressed:
                         _drawObjectId = _drawObjectId == null ? DrawObjectId : default(Action<CanvasDrawingSession, GameObject>);
                         break;
+
                     case VirtualKey.Number7 when userInputInfo.IsPressed:
                         _drawObjectPositionText = _drawObjectPositionText == null ? DrawObjectPositionText : default(Action<CanvasDrawingSession, GameObject>);
                         break;
-                    
                 }
             });
         }
 
-        public override void Update(TimeSpan deltaTime)
+        public override void Update(TimingInfo timingInfo)
         {
         }
 
@@ -108,16 +114,20 @@ namespace uwpPlatformer.Systems
             {
                 case ShapeType.None:
                     break;
+
                 case ShapeType.Rectangle:
                     canvasDrawingSession.FillRectangle(position.X, position.Y, shapeGraphicsComponent.Size.X, shapeGraphicsComponent.Size.Y, GetCachedBrush(canvasDrawingSession, shapeGraphicsComponent.Color));
                     break;
+
                 case ShapeType.Ellipse:
                     canvasDrawingSession.FillEllipse(position, shapeGraphicsComponent.Size.X / 2f, shapeGraphicsComponent.Size.Y / 2f, GetCachedBrush(canvasDrawingSession, shapeGraphicsComponent.Color));
                     break;
+
                 case ShapeType.Square:
                     var size = Math.Max(shapeGraphicsComponent.Size.X, shapeGraphicsComponent.Size.Y);
                     canvasDrawingSession.FillRectangle(position.X, position.Y, size, size, GetCachedBrush(canvasDrawingSession, shapeGraphicsComponent.Color));
                     break;
+
                 case ShapeType.Circle:
                     var radius = Math.Max(shapeGraphicsComponent.Size.X, shapeGraphicsComponent.Size.Y) / 2f;
                     canvasDrawingSession.FillCircle(position, radius, GetCachedBrush(canvasDrawingSession, shapeGraphicsComponent.Color));
@@ -225,12 +235,11 @@ namespace uwpPlatformer.Systems
                                                     GetCachedBrush(canvasDrawingSession, collisionColor));
 
                     // draw collision normal
-                    
+
                     canvasDrawingSession.DrawLine(startPoint,
                                                   startPoint + (collisionArgument.CollisionInfo.CollisionNormal * 16f),
                                                   GetCachedBrush(canvasDrawingSession, collisionColor));
                 }
-                
 
                 // draw collision rectangle
                 canvasDrawingSession.DrawRectangle(collisionArgument.CollisionInfo.ContactRect, GetCachedBrush(canvasDrawingSession, collisionColor));

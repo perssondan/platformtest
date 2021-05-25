@@ -1,10 +1,10 @@
-﻿using System;
+﻿using GamesLibrary.Models;
 
 namespace uwpPlatformer.Systems
 {
     public interface ISystem
     {
-        void Update(TimeSpan deltaTime);
+        void Update(TimingInfo timingInfo);
     }
 
     public interface ISystem<T> : ISystem

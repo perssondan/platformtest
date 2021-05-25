@@ -14,11 +14,12 @@ namespace uwpPlatformer.Systems
     public class PlayerSystem : SystemBase<PlayerSystem>
     {
         public override void Update(TimeSpan deltaTime)
+        public override void Update(TimingInfo timingInfo)
         {
             var playerGameObjects = PlayerComponentManager.Instance.Components.Select(c => c.GameObject);
             playerGameObjects.ForEach(playerGameObject =>
             {
-                UpdatePlayerGameObject(playerGameObject, deltaTime);
+                UpdatePlayerGameObject(playerGameObject, timingInfo.ElapsedTime);
             });
         }
 

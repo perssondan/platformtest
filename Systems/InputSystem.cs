@@ -1,5 +1,5 @@
-﻿using GamesLibrary.Systems;
-using System;
+﻿using GamesLibrary.Models;
+using GamesLibrary.Systems;
 using uwpPlatformer.Components;
 using uwpPlatformer.Extensions;
 using Windows.System;
@@ -32,7 +32,7 @@ namespace uwpPlatformer.Systems
             }
         }
 
-        public override void Update(TimeSpan deltaTime)
+        public override void Update(TimingInfo timingInfo)
         {
             InputComponentManager.Instance.Components.ForEach(component => component.UserInputs = UserInputs);
         }

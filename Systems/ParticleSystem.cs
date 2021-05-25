@@ -4,13 +4,13 @@ using System.Linq;
 using uwpPlatformer.Components;
 using uwpPlatformer.GameObjects;
 using Windows.UI;
+using uwpPlatformer.Extensions;
 
 namespace uwpPlatformer.Systems
 {
     public class ParticleSystem : SystemBase<ParticleSystem>
     {
-        private readonly TimeSpan _timeStep = TimeSpan.FromMilliseconds(16.6f);
-        public override void Update(TimeSpan deltaTime)
+        public override void Update(TimingInfo timingInfo)
         {
             // Make a copy of the list before thus not to change the list we're iterating
             var particles = ParticleComponentManager.Instance.Components.ToArray();

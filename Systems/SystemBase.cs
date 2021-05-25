@@ -1,4 +1,4 @@
-﻿using System;
+﻿using GamesLibrary.Models;
 
 namespace uwpPlatformer.Systems
 {
@@ -10,6 +10,6 @@ namespace uwpPlatformer.Systems
 
         public string Name => typeof(T).Name;
 
-        public abstract void Update(TimeSpan deltaTime);
+        public abstract void Update(TimingInfo timingInfo);
     }
 }

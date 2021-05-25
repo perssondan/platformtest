@@ -1,15 +1,14 @@
-﻿using System;
+﻿using GamesLibrary.Models;
 using System.Numerics;
 using uwpPlatformer.Components;
-using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Systems
 {
     public class MoveSystem : SystemBase<MoveSystem>
     {
-        public override void Update(TimeSpan deltaTimeSpan)
+        public override void Update(TimingInfo timingInfo)
         {
-            float deltaTime = (float)deltaTimeSpan.TotalSeconds;
+            float deltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
             foreach (var transform in TransformComponentManager.Instance.Components)
             {
                 if (transform.Velocity.LengthSquared() == 0f) continue;
