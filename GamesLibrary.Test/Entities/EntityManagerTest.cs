@@ -7,49 +7,46 @@ using NUnit.Framework;
 
 namespace GamesLibrary.Test.Entities
 {
-    public class GameEntitiesTest
+    public class EntityManagerTest
     {
-        private IEntities _entities;
+        private IEntityManager _componentManager;
         private IEventSystem _eventSystem;
 
         [SetUp]
         public void Setup()
         {
             _eventSystem = A.Fake<IEventSystem>();
-            _entities = new GameEntities(_eventSystem);
+            _componentManager = new EntityManager(_eventSystem);
         }
 
         [Test]
         public void AddEntity()
         {
-            var entity = Entity.CreateEntity();
-            _entities.Add(entity);
+            var entity = _componentManager.CreateEntity();
 
-            A.CallTo(() => _eventSystem.Send<EntityAdded>(A<object>._, A<EntityAdded>._))
+            A.CallTo(() => _eventSystem.Send(A<object>._, A<EntityAdded>._))
                 .MustHaveHappenedOnceExactly();
 
-            Assert.That(_entities.GetEntity(entity.Id), Is.EqualTo(entity));
+            Assert.That(_componentManager.GetEntity(entity.Id), Is.EqualTo(entity));
         }
 
         [Test]
         public void RemoveEntity()
         {
-            var entity = Entity.CreateEntity();
-            _entities.Add(entity);
+            var entity = _componentManager.CreateEntity();
 
-            _entities.Remove(entity);
+            _componentManager.Remove(entity);
 
-            A.CallTo(() => _eventSystem.Send<EntityRemoved>(A<object>._, A<EntityRemoved>._))
+            A.CallTo(() => _eventSystem.Send(A<object>._, A<EntityRemoved>._))
                 .MustHaveHappenedOnceExactly();
 
-            Assert.That(_entities.GetEntity(entity.Id), Is.Not.EqualTo(entity));
+            Assert.That(_componentManager.GetEntity(entity.Id), Is.Not.EqualTo(entity));
         }
 
         [Test]
         public void AddComponent()
         {
-            var entity = Entity.CreateEntity();
-            _entities.Add(entity);
+            var entity = _componentManager.CreateEntity();
 
             var component = A.Fake<IComponent>();
             A.CallTo(() => component.Entity).Returns(entity);
@@ -57,17 +54,16 @@ namespace GamesLibrary.Test.Entities
             // TODO: Possibly simplify add component, since component should contain the id of the entity
             // TODO: Need to resolve if we force the entity id of the component to match the entity
             // TODO: Protection against adding the same component twice to two different entities?
-            _entities.AddComponent(entity, component);
+            _componentManager.AddComponent(entity, component);
 
-            A.CallTo(() => _eventSystem.Send<ComponentAdded>(A<object>._, A<ComponentAdded>._))
+            A.CallTo(() => _eventSystem.Send(A<object>._, A<ComponentAdded>._))
                 .MustHaveHappenedOnceExactly();
         }
 
         [Test]
         public void AddSameComponentTypeTwiceTriggerEventOnce()
         {
-            var entity = Entity.CreateEntity();
-            _entities.Add(entity);
+            var entity = _componentManager.CreateEntity();
 
             var componentOne = A.Fake<IComponent>();
             A.CallTo(() => componentOne.Entity).Returns(entity);
@@ -76,28 +72,40 @@ namespace GamesLibrary.Test.Entities
             A.CallTo(() => componentTwo.Entity).Returns(entity);
 
             // TODO: Should we replace the component if it's the same type?
-            _entities.AddComponent(entity, componentOne);
-            _entities.AddComponent(entity, componentTwo);
+            _componentManager.AddComponent(entity, componentOne);
+            _componentManager.AddComponent(entity, componentTwo);
 
-            A.CallTo(() => _eventSystem.Send<ComponentAdded>(A<object>._, A<ComponentAdded>._))
+            A.CallTo(() => _eventSystem.Send(A<object>._, A<ComponentAdded>._))
                 .MustHaveHappenedOnceExactly();
         }
 
         [Test]
         public void RemoveComponent()
         {
-            var entity = Entity.CreateEntity();
-            _entities.Add(entity);
+            var entity = _componentManager.CreateEntity();
 
             var component = A.Fake<IComponent>();
             A.CallTo(() => component.Entity).Returns(entity);
 
-            _entities.AddComponent(entity, component);
+            _componentManager.AddComponent(entity, component);
 
-            _entities.RemoveComponent(entity, component);
+            _componentManager.RemoveComponent(entity, component);
 
-            A.CallTo(() => _eventSystem.Send<ComponentRemoved>(A<object>._, A<ComponentRemoved>._))
+            A.CallTo(() => _eventSystem.Send(A<object>._, A<ComponentRemoved>._))
                 .MustHaveHappenedOnceExactly();
+        }
+
+        [Test]
+        public void EntitesAddedWithTagIsReturned()
+        {
+            var tag = "42";
+            var firstEntity = _componentManager.CreateEntity(tag);
+            var secondEntity = _componentManager.CreateEntity(tag);
+
+            var taggedEntities = _componentManager.GetEntities(tag);
+
+            Assert.That(taggedEntities, Contains.Item(firstEntity).And.Contains(secondEntity));
+
         }
     }
 }
