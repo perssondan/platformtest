@@ -141,6 +141,7 @@
     <Compile Include="Components\TransformComponentManager.cs" />
     <Compile Include="Constants\PlayerConstants.cs" />
     <Compile Include="EventArguments\CollisionArgument.cs" />
+    <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\RectExtensions.cs" />
