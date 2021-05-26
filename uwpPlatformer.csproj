@@ -140,7 +140,7 @@
     <Compile Include="Components\TransformComponent.cs" />
     <Compile Include="Components\TransformComponentManager.cs" />
     <Compile Include="Constants\PlayerConstants.cs" />
-    <Compile Include="EventArguments\ActivateDustParticles.cs" />
+    <Compile Include="EventArguments\CollisionEvent.cs" />
     <Compile Include="EventArguments\JumpEvent.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />

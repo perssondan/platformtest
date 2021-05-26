@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Components
@@ -32,5 +33,25 @@ namespace uwpPlatformer.Components
         {
             DustParticleEmitterComponentManager.Instance.RemoveComponent(this);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator ==(DustParticleEmitterComponent left, DustParticleEmitterComponent right)
+        {
+            return left.Equals(right);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator !=(DustParticleEmitterComponent left, DustParticleEmitterComponent right)
+        {
+            return !(left == right);
+        }
+    }
+
+    public enum ParticleEmitterType
+    {
+        None,
+        OneTime,
+        Loop,
+        Burst,
     }
 }

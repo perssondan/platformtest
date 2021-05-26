@@ -41,8 +41,8 @@ namespace uwpPlatformer.Factories
                 // set a initial speed with some randomness
                 gameObject.TransformComponent.Velocity = (float)_random.NextDouble() * initialVelocityFactor * velocity;
 
-                // TODO: Where's a good place to have the color shading stuff?
-                gameObject.AddComponent(new ParticleComponent(gameObject, timeToLive, Colors.White, Colors.WhiteSmoke, ChangeColorBehavior.OverTime, createdAt));
+                // TODO: Where's a good place to have the color shading stuff, separate component?
+                gameObject.AddComponent(new ParticleComponent(gameObject, timeToLive, Colors.White, Colors.SandyBrown, TransitionBehavior.OverTime, createdAt));
                 gameObject.AddComponent(new ShapeGraphicsComponent(gameObject, ShapeType.Rectangle, Colors.White, new Vector2(2f, 2f)));
 
                 yield return gameObject;
@@ -53,9 +53,9 @@ namespace uwpPlatformer.Factories
         {
             const double phi = 2f * Math.PI;
 
-            var randValue = _random.NextDouble();
-            var x = Math.Cos(randValue * phi);
-            var y = Math.Sin(randValue * phi);
+            var randomValue = _random.NextDouble();
+            var x = Math.Cos(randomValue * phi);
+            var y = Math.Sin(randomValue * phi);
             var velocity = new Vector2((float)x, (float)y);
             return velocity;
         }

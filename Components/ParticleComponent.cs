@@ -10,13 +10,13 @@ namespace uwpPlatformer.Components
                                  TimeSpan timeToLive,
                                  Color startColor,
                                  Color endColor,
-                                 ChangeColorBehavior changeColorBehavior,
+                                 TransitionBehavior changeColorBehavior,
                                  TimeSpan createdAt)
             : base(gameObject)
         {
             StartColor = startColor;
             EndColor = endColor;
-            ChangeColorBehavior = changeColorBehavior;
+            TransitionBehavior = changeColorBehavior;
             TimeToLive = timeToLive;
             CreatedAt = createdAt;
             ParticleComponentManager.Instance.AddComponent(this);
@@ -25,7 +25,9 @@ namespace uwpPlatformer.Components
         public TimeSpan TimeToLive { get; set; }
         public Color StartColor { get; set; }
         public Color EndColor { get; set; }
-        public ChangeColorBehavior ChangeColorBehavior { get; set; }
+        public TransitionBehavior TransitionBehavior { get; set; }
+        public FadeBehavior FadeBehavior { get; set; }
+        public ParticleSizeBehavior ParticleSizeBehavior { get; set; }
         public TimeSpan CreatedAt { get; }
         public TimeSpan EndOfLife => CreatedAt + TimeToLive;
 
@@ -35,10 +37,35 @@ namespace uwpPlatformer.Components
         }
     }
 
-    public enum ChangeColorBehavior
+    // 1 bit
+    public enum ColorBehavior
     {
-        OverTime,
-        OverLength,
-        OverVelocity
+        None = 0,
+        Lerp = 1,
+    }
+
+    // 3 bit
+    public enum TransitionBehavior
+    {
+        None = 0,
+        OverTime = 1,
+        OverLength = 2,
+        OverVelocity = 3
+    }
+
+    // 2 bit
+    public enum FadeBehavior
+    {
+        None = 0,
+        FadeIn = 1,
+        FadeOut = 2
+    }
+
+    // 2 bit
+    public enum ParticleSizeBehavior
+    {
+        None = 0,
+        Grow = 1,
+        Shrink = 2
     }
 }

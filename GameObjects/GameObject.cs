@@ -37,13 +37,41 @@ namespace uwpPlatformer.GameObjects
             return default;
         }
 
-        public (T, U) GetComponent<T, U>()
+        public void RemoveComponent<T>()
+            where T : IComponent
+        {
+            if (_components.TryGetValue(typeof(T), out var component))
+            {
+                _components.Remove(typeof(T));
+                component.Dispose();
+            }
+        }
+
+        public (T, U) GetComponents<T, U>()
             where T : IComponent
             where U : IComponent
         {
-            if (_components.TryGetValue(typeof(T), out var componentT) && _components.TryGetValue(typeof(U), out var componentU))
+            if (_components.TryGetValue(typeof(T), out var componentT)
+                && _components.TryGetValue(typeof(U), out var componentU))
             {
                 return ((T)componentT, (U)componentU);
+            }
+
+            return default;
+        }
+
+        public bool TryGetComponents<T, U>(out T componentT, out U componentU)
+            where T : IComponent
+            where U : IComponent
+        {
+            componentT = default;
+            componentU = default;
+            if (_components.TryGetValue(typeof(T), out var compT)
+                && _components.TryGetValue(typeof(U), out var compU))
+            {
+                componentT = (T)compT;
+                componentU = (U)compU;
+                return true;
             }
 
             return default;

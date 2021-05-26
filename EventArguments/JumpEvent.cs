@@ -2,9 +2,9 @@
 
 namespace uwpPlatformer.EventArguments
 {
-    public struct ActivateDustParticles
+    public struct JumpEvent
     {
-        public ActivateDustParticles(GameObject gameObject)
+        public JumpEvent(GameObject gameObject)
         {
             GameObject = gameObject;
         }

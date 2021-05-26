@@ -1,9 +1,8 @@
 ﻿using GamesLibrary.Models;
 using GamesLibrary.Systems;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using uwpPlatformer.Components;
-using uwpPlatformer.EventArguments;
 using uwpPlatformer.Extensions;
 using uwpPlatformer.Factories;
 using uwpPlatformer.GameObjects;
@@ -14,35 +13,33 @@ namespace uwpPlatformer.Systems
     {
         private readonly IEventSystem _eventSystem;
         private readonly DustEntityFactory _dustEntityFactory;
-        private readonly HashSet<GameObject> _activeEmitters = new HashSet<GameObject>();
 
-        public DustParticleEmitterSystem(IEventSystem eventSystem)
+        public DustParticleEmitterSystem(IEventSystem eventSystem, DustEntityFactory dustEntityFactory)
         {
-            _dustEntityFactory = new DustEntityFactory();
+            _dustEntityFactory = dustEntityFactory;
             _eventSystem = eventSystem;
-
-            _eventSystem.Subscribe<ActivateDustParticles>(this, (sender, activateEmitter) =>
-            {
-                // Should we keep this here, or is it a setting on the emitter?
-                _activeEmitters.Add(activateEmitter.GameObject);
-            });
         }
 
         public override void Update(TimingInfo timingInfo)
         {
-            // TODO: In case of bursts or continious we need to track when it's time
-            // to create new particles
-            _activeEmitters.ForEach(gameObject => CreateParticles(gameObject, timingInfo.TotalTime));
-
-            _activeEmitters.Clear();
+            GameObjectManager.GameObjects
+                .Select(gameObject => gameObject.GetComponents<DustParticleEmitterComponent, TransformComponent>())
+                .Where(result => result != default)
+                .ToArray() // clone
+                .ForEach(result =>
+                {
+                    CreateParticles(result.Item1, result.Item2, timingInfo.TotalTime);
+                    result.Item1.GameObject.RemoveComponent<DustParticleEmitterComponent>();
+                });
         }
 
-        private void CreateParticles(GameObject gameObject, TimeSpan createdAt)
+        private void CreateParticles(DustParticleEmitterComponent particleEmitterComponent,
+                                     TransformComponent transformComponent,
+                                     TimeSpan createdAt)
         {
-            var particleEmitterComponent = gameObject.GetComponent<DustParticleEmitterComponent>();
             if (particleEmitterComponent.NumberOfParticles > 0)
             {
-                var position = gameObject.TransformComponent.Position + particleEmitterComponent.ParticleOffset;
+                var position = transformComponent.Position + particleEmitterComponent.ParticleOffset;
                 _dustEntityFactory.CreateDustParticleEntitesAndUnwrap(position,
                                                                       particleEmitterComponent.NumberOfParticles,
                                                                       particleEmitterComponent.TimeToLive,

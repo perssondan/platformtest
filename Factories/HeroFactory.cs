@@ -2,10 +2,8 @@
 using System;
 using System.Numerics;
 using uwpPlatformer.Components;
-using uwpPlatformer.Extensions;
 using uwpPlatformer.GameObjects;
 using Windows.Foundation;
-using Windows.UI;
 
 namespace uwpPlatformer.Factories
 {
@@ -36,12 +34,6 @@ namespace uwpPlatformer.Factories
                 CollisionType = ColliderComponent.CollisionTypes.Dynamic
             };
             gameObject.AddComponent(collider);
-
-            gameObject.AddComponent(new DustParticleEmitterComponent(TimeSpan.FromSeconds(.3),
-                                                                     gameObject,
-                                                                     collider.BoundingBox.BottomCenterOffset(),
-                                                                     10,
-                                                                     50f));
 
             return gameObject;
         }

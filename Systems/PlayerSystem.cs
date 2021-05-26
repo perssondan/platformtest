@@ -7,6 +7,7 @@ using uwpPlatformer.Components;
 using uwpPlatformer.Constants;
 using uwpPlatformer.EventArguments;
 using uwpPlatformer.Extensions;
+using uwpPlatformer.Factories;
 using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Systems
@@ -89,7 +90,17 @@ namespace uwpPlatformer.Systems
         private void Jump(GameObject gameObject)
         {
             gameObject.TransformComponent.Velocity += gameObject.GetComponent<PlayerComponent>().InitialJumpVelocity;
+            AddDustEmitter(gameObject);
             _eventSystem.Send(this, new JumpEvent(gameObject));
+        }
+
+        private static void AddDustEmitter(GameObject gameObject)
+        {
+            gameObject.AddComponent(new DustParticleEmitterComponent(TimeSpan.FromSeconds(.3),
+                                                                                 gameObject,
+                                                                                 gameObject.ColliderComponent.BoundingBox.BottomCenterOffset(),
+                                                                                 10,
+                                                                                 50f));
         }
 
         private void Walk(GameObject gameObject, float orientation)

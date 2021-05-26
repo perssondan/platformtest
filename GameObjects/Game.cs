@@ -2,12 +2,14 @@
 using GamesLibrary.Systems;
 using Microsoft.Graphics.Canvas;
 using System;
+using uwpPlatformer.Factories;
 using uwpPlatformer.Systems;
 
 namespace uwpPlatformer.GameObjects
 {
     public class Game
     {
+        // TODO: DI time...
         private readonly ColliderSystem _colliderSystem;
         private readonly MoveSystem _moveSystem;
         private readonly PhysicsSystem _physicsSystem;
@@ -17,6 +19,7 @@ namespace uwpPlatformer.GameObjects
         private readonly PlayerSystem _playerSystem;
         private readonly DustParticleEmitterSystem _dustParticleEmitterSystem;
         private readonly IEventSystem _eventSystem = new EventSystem();
+        private readonly DustEntityFactory _dustEntityFactory = new DustEntityFactory();
 
         public Game(Windows.UI.Xaml.Window current)
         {
@@ -27,8 +30,7 @@ namespace uwpPlatformer.GameObjects
             _graphicsSystem = new GraphicsSystem(_eventSystem);
             _particleSystem = new ParticleSystem();
             _playerSystem = new PlayerSystem(_eventSystem);
-            _dustParticleEmitterSystem = new DustParticleEmitterSystem(_eventSystem);
-
+            _dustParticleEmitterSystem = new DustParticleEmitterSystem(_eventSystem, _dustEntityFactory);
 
             _inputSystem.Current = current;
         }
