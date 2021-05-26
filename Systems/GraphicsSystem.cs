@@ -20,7 +20,7 @@ namespace uwpPlatformer.Systems
     public class GraphicsSystem : SystemBase<GraphicsSystem>
     {
         private readonly Dictionary<Color, CanvasSolidColorBrush> _brushes = new Dictionary<Color, CanvasSolidColorBrush>();
-        private readonly List<CollisionArgument> _collisionArguments = new List<CollisionArgument>();
+        private readonly List<CollisionEvent> _collisionArguments = new List<CollisionEvent>();
         private readonly IEventSystem _eventSystem;
         private Action<CanvasDrawingSession, GameObject> _drawPositionHistory;
         private Action<CanvasDrawingSession, GameObject> _drawColliderBoundingBox;
@@ -29,7 +29,7 @@ namespace uwpPlatformer.Systems
         private Action<CanvasDrawingSession, GameObject> _drawObjectPositionText;
         private Action<CanvasDrawingSession, TimeSpan, ShapeGraphicsComponent> _drawShapeComponent;
         private Action<CanvasDrawingSession, TimeSpan, AnimatedGraphicsComponent> _drawComponent;
-        private Action<CanvasDrawingSession, CollisionArgument[]> _drawCollisionInfos;
+        private Action<CanvasDrawingSession, CollisionEvent[]> _drawCollisionInfos;
 
         public GraphicsSystem(IEventSystem eventSystem)
         {
@@ -38,7 +38,7 @@ namespace uwpPlatformer.Systems
 
             _eventSystem = eventSystem;
 
-            _eventSystem.Subscribe<CollisionArgument>(this, (sender, collision) =>
+            _eventSystem.Subscribe<CollisionEvent>(this, (sender, collision) =>
             {
                 _collisionArguments.Add(collision);
             });
@@ -61,7 +61,7 @@ namespace uwpPlatformer.Systems
                         break;
 
                     case VirtualKey.Number4 when userInputInfo.IsPressed:
-                        _drawCollisionInfos = _drawCollisionInfos == null ? DrawCollisionArguments : default(Action<CanvasDrawingSession, CollisionArgument[]>);
+                        _drawCollisionInfos = _drawCollisionInfos == null ? DrawCollisionArguments : default(Action<CanvasDrawingSession, CollisionEvent[]>);
                         break;
 
                     case VirtualKey.Number5 when userInputInfo.IsPressed:
@@ -221,7 +221,7 @@ namespace uwpPlatformer.Systems
             }
         }
 
-        private void DrawCollisionArguments(CanvasDrawingSession canvasDrawingSession, CollisionArgument[] collisionArguments)
+        private void DrawCollisionArguments(CanvasDrawingSession canvasDrawingSession, CollisionEvent[] collisionArguments)
         {
             var collisionColor = Colors.Orange;
             foreach (var collisionArgument in collisionArguments)

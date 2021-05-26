@@ -117,7 +117,7 @@ namespace uwpPlatformer.Systems
                 };
                 results.Add(collisionInfo);
                 componentInCollision.IsColliding = true;
-                _eventSystem.Send(this, new CollisionArgument { GameObject = dynamicCollider.GameObject, IsCollidingWith = componentInCollision.GameObject, CollisionInfo = collisionInfo });
+                _eventSystem.Send(this, new CollisionEvent(dynamicCollider.GameObject, componentInCollision.GameObject, collisionInfo));
             }
 
             if (results.Any())

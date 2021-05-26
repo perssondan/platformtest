@@ -89,7 +89,7 @@ namespace uwpPlatformer.Systems
         private void Jump(GameObject gameObject)
         {
             gameObject.TransformComponent.Velocity += gameObject.GetComponent<PlayerComponent>().InitialJumpVelocity;
-            _eventSystem.Send(this, new ActivateDustParticles(gameObject));
+            _eventSystem.Send(this, new JumpEvent(gameObject));
         }
 
         private void Walk(GameObject gameObject, float orientation)
