@@ -23,6 +23,8 @@ namespace uwpPlatformer.GameObjects
         {
             if (gameObjectComponent == null) return;
 
+            //if (_components.TryGetValue(typeof(T), out var _)) return;
+
             _components[typeof(T)] = gameObjectComponent;
         }
 
@@ -35,6 +37,20 @@ namespace uwpPlatformer.GameObjects
             }
 
             return default;
+        }
+
+        public bool Has<T>()
+            where T : IComponent
+        {
+            return _components.TryGetValue(typeof(T), out var _);
+        }
+
+        public bool Has<T, U>()
+            where T : IComponent
+            where U : IComponent
+        {
+            return _components.TryGetValue(typeof(T), out var _) &&
+                   _components.TryGetValue(typeof(U), out var _);
         }
 
         public void RemoveComponent<T>()
