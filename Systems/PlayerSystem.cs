@@ -4,10 +4,10 @@ using System;
 using System.Linq;
 using System.Numerics;
 using uwpPlatformer.Components;
+using uwpPlatformer.Components.Particles;
 using uwpPlatformer.Constants;
 using uwpPlatformer.EventArguments;
 using uwpPlatformer.Extensions;
-using uwpPlatformer.Factories;
 using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Systems
@@ -96,11 +96,21 @@ namespace uwpPlatformer.Systems
 
         private static void AddDustEmitter(GameObject gameObject)
         {
-            gameObject.AddComponent(new DustParticleEmitterComponent(TimeSpan.FromSeconds(.3),
-                                                                                 gameObject,
-                                                                                 gameObject.ColliderComponent.BoundingBox.BottomCenterOffset(),
-                                                                                 10,
-                                                                                 50f));
+            //if (gameObject.Has<DustParticleEmitterComponent>()) return;
+
+            //gameObject.AddComponent(new DustParticleEmitterComponent(TimeSpan.FromSeconds(.3),
+            //                                                         gameObject,
+            //                                                         gameObject.ColliderComponent.BoundingBox.BottomCenterOffset(),
+            //                                                         10,
+            //                                                         50f,
+            //                                                         ParticleEmitterType.Burst));
+
+            if (gameObject.Has<ParticleEmitterComponent>()) return;
+
+            gameObject.AddComponent(new ParticleEmitterComponent(
+                gameObject,
+                ParticleTemplateType.Dust,
+                gameObject.ColliderComponent.BoundingBox.BottomCenterOffset()));
         }
 
         private void Walk(GameObject gameObject, float orientation)

@@ -1,13 +1,19 @@
 ﻿using GamesLibrary.Models;
 using System;
+using System.Collections;
 using System.Linq;
 using uwpPlatformer.Components;
+using uwpPlatformer.Components.Particles;
 using uwpPlatformer.Extensions;
 
 namespace uwpPlatformer.Systems
 {
     public class ParticleSystem : SystemBase<ParticleSystem>
     {
+        public ParticleSystem()
+        {
+        }
+
         public override void Update(TimingInfo timingInfo)
         {
             // Make a copy of the list before thus not to change the list we're iterating

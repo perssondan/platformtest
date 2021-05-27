@@ -1,5 +1,4 @@
 ﻿using GamesLibrary.Models;
-using GamesLibrary.Systems;
 using System;
 using System.Linq;
 using uwpPlatformer.Components;
@@ -10,21 +9,19 @@ using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Systems
 {
-    public class DustParticleEmitterSystem : SystemBase<DustParticleEmitterSystem>
+    public class ParticleEmitterSystem : SystemBase<ParticleEmitterSystem>
     {
-        private readonly IEventSystem _eventSystem;
-        private readonly DustEntityFactory _dustEntityFactory;
+        private DustEntityFactory _dustEntityFactory;
 
-        public DustParticleEmitterSystem(IEventSystem eventSystem, DustEntityFactory dustEntityFactory)
+        public ParticleEmitterSystem(DustEntityFactory dustEntityFactory)
         {
             _dustEntityFactory = dustEntityFactory;
-            _eventSystem = eventSystem;
         }
 
         public override void Update(TimingInfo timingInfo)
         {
             GameObjectManager.GameObjects
-                .Select(gameObject => gameObject.GetComponents<DustParticleEmitterComponent, TransformComponent>())
+                .Select(gameObject => gameObject.GetComponents<ParticleEmitterComponent, TransformComponent>())
                 .Where(result => result != default)
                 .ToArray() // clone
                 .ForEach(result =>
@@ -32,24 +29,21 @@ namespace uwpPlatformer.Systems
                     CreateParticles(result.Item1, result.Item2, timingInfo.TotalTime);
                     if (result.Item1.ParticleEmitterType == ParticleEmitterType.Burst)
                     {
-                        result.Item1.GameObject.RemoveComponent<DustParticleEmitterComponent>();
+                        result.Item1.GameObject.RemoveComponent<ParticleEmitterComponent>();
                     }
                 });
         }
 
-        private void CreateParticles(DustParticleEmitterComponent particleEmitterComponent,
+        private void CreateParticles(ParticleEmitterComponent particleEmitterComponent,
                                      TransformComponent transformComponent,
                                      TimeSpan createdAt)
         {
-            if (particleEmitterComponent.NumberOfParticles > 0 &&
+            if (particleEmitterComponent.ParticleTemplateType == ParticleTemplateType.Dust &&
                 particleEmitterComponent.ParticleEmitterType != ParticleEmitterType.None)
             {
                 var position = transformComponent.Position + particleEmitterComponent.ParticleOffset;
                 _dustEntityFactory.CreateDustParticleEntitesAndUnwrap(position,
-                                                                      createdAt,
-                                                                      particleEmitterComponent.NumberOfParticles,
-                                                                      particleEmitterComponent.TimeToLive,
-                                                                      particleEmitterComponent.InitialVelocityFactor);
+                                                                      createdAt);
             }
         }
     }

@@ -2,7 +2,7 @@
 using uwpPlatformer.GameObjects;
 using Windows.UI;
 
-namespace uwpPlatformer.Components
+namespace uwpPlatformer.Components.Particles
 {
     public class ParticleComponent : GameObjectComponent
     {
@@ -35,37 +35,5 @@ namespace uwpPlatformer.Components
         {
             ParticleComponentManager.Instance.RemoveComponent(this);
         }
-    }
-
-    // 1 bit
-    public enum ColorBehavior
-    {
-        None = 0,
-        Lerp = 1,
-    }
-
-    // 3 bit
-    public enum TransitionBehavior
-    {
-        None = 0,
-        OverTime = 1,
-        OverLength = 2,
-        OverVelocity = 3
-    }
-
-    // 2 bit
-    public enum FadeBehavior
-    {
-        None = 0,
-        FadeIn = 1,
-        FadeOut = 2
-    }
-
-    // 2 bit
-    public enum ParticleSizeBehavior
-    {
-        None = 0,
-        Grow = 1,
-        Shrink = 2
     }
 }

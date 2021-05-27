@@ -1,4 +1,4 @@
-﻿namespace uwpPlatformer.Components
+﻿namespace uwpPlatformer.Components.Particles
 {
     public class DustParticleEmitterComponentManager : ComponentManager<DustParticleEmitterComponent>
     {

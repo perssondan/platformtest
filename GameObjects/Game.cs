@@ -18,6 +18,7 @@ namespace uwpPlatformer.GameObjects
         private readonly ParticleSystem _particleSystem;
         private readonly PlayerSystem _playerSystem;
         private readonly DustParticleEmitterSystem _dustParticleEmitterSystem;
+        private readonly ParticleEmitterSystem _particleEmitterSystem;
         private readonly IEventSystem _eventSystem = new EventSystem();
         private readonly DustEntityFactory _dustEntityFactory = new DustEntityFactory();
 
@@ -31,6 +32,7 @@ namespace uwpPlatformer.GameObjects
             _particleSystem = new ParticleSystem();
             _playerSystem = new PlayerSystem(_eventSystem);
             _dustParticleEmitterSystem = new DustParticleEmitterSystem(_eventSystem, _dustEntityFactory);
+            _particleEmitterSystem = new ParticleEmitterSystem(_dustEntityFactory);
 
             _inputSystem.Current = current;
         }
@@ -44,6 +46,7 @@ namespace uwpPlatformer.GameObjects
             _physicsSystem.Update(timingInfo);
             _colliderSystem.Update(timingInfo);
             _dustParticleEmitterSystem.Update(timingInfo);
+            _particleEmitterSystem.Update(timingInfo);
 
             // If we still have collisions, resolve them now!
             _colliderSystem.ResolveCollisions(timingInfo);

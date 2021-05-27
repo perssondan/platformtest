@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using uwpPlatformer.Components;
+using uwpPlatformer.Components.Particles;
 using uwpPlatformer.GameObjects;
 using Windows.UI;
 
@@ -13,14 +14,14 @@ namespace uwpPlatformer.Factories
         private static readonly Random _random = new Random((int)DateTime.Now.Ticks);
 
         public void CreateDustParticleEntitesAndUnwrap(Vector2 position,
-                                                       int numberOfParticles,
-                                                       TimeSpan timeToLive,
                                                        TimeSpan createdAt,
-                                                       float initialVelocityFactor = 75f)
+                                                       int numberOfParticles = 10,
+                                                       TimeSpan? timeToLive = null,
+                                                       float initialVelocityFactor = 50f)
         {
             CreateDustParticleEntites(position,
                                       numberOfParticles,
-                                      timeToLive,
+                                      timeToLive ?? TimeSpan.FromSeconds(.3),
                                       createdAt,
                                       initialVelocityFactor)
                 .ToArray();
