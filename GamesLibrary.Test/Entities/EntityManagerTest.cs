@@ -49,7 +49,6 @@ namespace GamesLibrary.Test.Entities
             var entity = _componentManager.CreateEntity();
 
             var component = A.Fake<IComponent>();
-            A.CallTo(() => component.Entity).Returns(entity);
 
             // TODO: Possibly simplify add component, since component should contain the id of the entity
             // TODO: Need to resolve if we force the entity id of the component to match the entity
@@ -66,10 +65,8 @@ namespace GamesLibrary.Test.Entities
             var entity = _componentManager.CreateEntity();
 
             var componentOne = A.Fake<IComponent>();
-            A.CallTo(() => componentOne.Entity).Returns(entity);
 
             var componentTwo = A.Fake<IComponent>();
-            A.CallTo(() => componentTwo.Entity).Returns(entity);
 
             // TODO: Should we replace the component if it's the same type?
             _componentManager.AddComponent(entity, componentOne);
@@ -85,7 +82,6 @@ namespace GamesLibrary.Test.Entities
             var entity = _componentManager.CreateEntity();
 
             var component = A.Fake<IComponent>();
-            A.CallTo(() => component.Entity).Returns(entity);
 
             _componentManager.AddComponent(entity, component);
 

@@ -114,6 +114,27 @@ namespace GamesLibrary.Entities
             return (firstComponent, secondComponent);
         }
 
+        public IEnumerable<(Entity, T)> ForEach<T>()
+        {
+            return _entities
+                .Where(entity => entity.Value.ContainsKey(typeof(T)))
+                .Select(entity => (entity.Key, (T)entity.Value[typeof(T)]));
+        }
+
+        public IEnumerable<(Entity, T, U)> ForEach<T, U>()
+        {
+            return _entities
+                .Where(entity => entity.Value.ContainsKey(typeof(T)) && entity.Value.ContainsKey(typeof(U)))
+                .Select(entity => (entity.Key, (T)entity.Value[typeof(T)], (U)entity.Value[typeof(U)]));
+        }
+
+        public IEnumerable<(Entity, T, U, V)> ForEach<T, U, V>()
+        {
+            return _entities
+                .Where(entity => entity.Value.ContainsKey(typeof(T)) && entity.Value.ContainsKey(typeof(U)) && entity.Value.ContainsKey(typeof(V)))
+                .Select(entity => (entity.Key, (T)entity.Value[typeof(T)], (U)entity.Value[typeof(U)], (V)entity.Value[typeof(V)]));
+        }
+
         private void AddEntityToGroupedEntities(Entity entity, string tag)
         {
             tag = tag ?? string.Empty;
