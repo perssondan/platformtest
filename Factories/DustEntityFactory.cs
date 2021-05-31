@@ -43,7 +43,7 @@ namespace uwpPlatformer.Factories
                 gameObject.TransformComponent.Velocity = (float)_random.NextDouble() * initialVelocityFactor * velocity;
 
                 // TODO: Where's a good place to have the color shading stuff, separate component?
-                gameObject.AddComponent(new ParticleComponent(gameObject, timeToLive, Colors.White, Colors.SandyBrown, TransitionBehavior.OverTime, createdAt));
+                gameObject.AddComponent(new ParticleComponent(gameObject, timeToLive, Colors.White, Colors.SandyBrown, TransitionBehavior.OverTime, createdAt) { FadeBehavior = FadeBehavior.FadeOut });
                 gameObject.AddComponent(new ShapeGraphicsComponent(gameObject, ShapeType.Rectangle, Colors.White, new Vector2(2f, 2f)));
 
                 yield return gameObject;

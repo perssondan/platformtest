@@ -21,10 +21,9 @@ namespace uwpPlatformer.Components
             get => _position;
             set
             {
-                if (Velocity.LengthSquared() > 0f)
-                {
-                    _historyStack.Push(value);
-                }
+                if (_position == value) return;
+
+                _historyStack.Push(value);
 
                 _position = value;
             }
