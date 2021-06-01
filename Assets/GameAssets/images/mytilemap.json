@@ -24,6 +24,10 @@
         {
          "firstgid":1,
          "source":"mytiles.json"
+        }, 
+        {
+         "firstgid":17,
+         "source":"wasp_sprites.json"
         }],
  "tilewidth":32,
  "type":"map",

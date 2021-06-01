@@ -135,6 +135,8 @@
     <Compile Include="Components\Particles\DustParticleEmitterComponentManager.cs" />
     <Compile Include="Components\Particles\ParticleEmitterComponent.cs" />
     <Compile Include="Components\Particles\ParticleEmitterComponentManager.cs" />
+    <Compile Include="Components\PerlinMovementComponent.cs" />
+    <Compile Include="Factories\EnemyFactory.cs" />
     <Compile Include="Systems\ParticleEmitterSystem.cs" />
     <Compile Include="Components\Particles\ParticleEmitterType.cs" />
     <Compile Include="Components\Particles\ParticleSizeBehavior.cs" />
@@ -203,9 +205,8 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\GameAssets\images\ikplusbakdrop.gif" />
-    <Content Include="Assets\GameAssets\images\ikplusbakdrop.png" />
     <Content Include="Assets\GameAssets\images\tiles.png" />
+    <Content Include="Assets\GameAssets\images\wasp_sprites.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -245,6 +246,9 @@
       <Project>{273803e7-8bcf-4760-a434-c9fba237efa0}</Project>
       <Name>GamesLibrary</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\GameAssets\images\wasp_sprites.json" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

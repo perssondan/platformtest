@@ -20,6 +20,7 @@ namespace uwpPlatformer.GameObjects
 
         private HeroFactory _heroFactory = new HeroFactory();
         private TileFactory _tileFactory = new TileFactory();
+        private EnemyFactory _enemyFactory = new EnemyFactory();
 
         private int[] _mapData = new[]
         {
@@ -49,10 +50,16 @@ namespace uwpPlatformer.GameObjects
             InitializeWorldBoundaries();
             InitializeTileMap();
             InitializeHeroine();
+            CreateFlyingEnemy();
         }
 
         public int WorldPixelHeight => _map.Height * _map.TileHeight;
         public int WorldPixelWidth => _map.Width * _map.TileWidth;
+
+        private void CreateFlyingEnemy()
+        {
+            _enemyFactory.CreateFlyingEnemy(_canvasBitmaps[1], new Vector2(100f, 100f), new Vector2(_tileAtlases[1].TileWidth - 1, _tileAtlases[1].TileHeight - 1), new Rect(0, 0, WorldPixelWidth, WorldPixelHeight));
+        }
 
         private void InitializeHeroine()
         {
