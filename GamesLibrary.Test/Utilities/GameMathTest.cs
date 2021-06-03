@@ -10,6 +10,9 @@ namespace GamesLibrary.Test.Utilities
         [TestCase(1f, 0f, 1f, 0f, 480f, 480f)]
         [TestCase(0f, 0f, 1f, 0f, 480f, 0f)]
         [TestCase(.25f, 0f, 1f, 0f, 100f, 25f)]
+        [TestCase(-1f, -1f, 1f, 0f, 100f, 0f)]
+        [TestCase(10f, 10f, 50f, 0f, 100f, 0f)]
+        [TestCase(50f, 10f, 50f, 0f, 100f, 100f)]
         public void Map(float value, float inMin, float inMax, float outMin, float outMax, float expected)
         {
             Assert.That(GameMath.Map(value, inMin, inMax, outMin, outMax), Is.EqualTo(expected));

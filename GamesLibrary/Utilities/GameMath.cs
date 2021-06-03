@@ -10,7 +10,8 @@
         public static float Map(float value, float inMin, float inMax, float outMin, float outMax)
         {
             var k = (outMax - outMin) / (inMax - inMin);
-            return value * k;
+            var m = outMin - k * inMin;
+            return (value * k) + m;
         }
     }
 }
