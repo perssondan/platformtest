@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using Windows.Foundation;
 
 namespace uwpPlatformer.Extensions
@@ -35,6 +36,11 @@ namespace uwpPlatformer.Extensions
         public static Vector2 Normalize(this Vector2 source)
         {
             return Vector2.Normalize(source);
+        }
+
+        public static Vector2 FromAngle(this float angle)
+        {
+            return new Vector2(MathF.Cos(angle), MathF.Sin(angle));
         }
     }
 }

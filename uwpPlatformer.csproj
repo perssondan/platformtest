@@ -137,6 +137,9 @@
     <Compile Include="Components\Particles\ParticleEmitterComponentManager.cs" />
     <Compile Include="Components\PerlinMovementComponent.cs" />
     <Compile Include="Factories\EnemyFactory.cs" />
+    <Compile Include="Systems\PositionVerletSystem.cs" />
+    <Compile Include="Systems\SemiImplicitEulerPhysicsSystem.cs" />
+    <Compile Include="Systems\ExplicitEulerPhysicsSystem.cs" />
     <Compile Include="Systems\ParticleEmitterSystem.cs" />
     <Compile Include="Components\Particles\ParticleEmitterType.cs" />
     <Compile Include="Components\Particles\ParticleSizeBehavior.cs" />
@@ -193,6 +196,7 @@
     <Compile Include="Systems\SystemBase.cs" />
     <Compile Include="Systems\UserInput.cs" />
     <Compile Include="Systems\UserInputInfo.cs" />
+    <Compile Include="Systems\VelocityVerletPhysicsSystem.cs" />
     <Compile Include="Utilities\GameStateManager.cs" />
     <Compile Include="Utilities\HistoryStack.cs" />
     <Compile Include="Utilities\TiledLoader.cs" />

@@ -25,7 +25,6 @@ namespace uwpPlatformer.Components
         public Vector2 Size { get; set; } = Vector2.Zero;
         public Rect BoundingBox => new Rect(Position.ToPoint(), Size.ToSize());
         public Vector2 Center => new Vector2(Position.X + Size.X / 2f, Position.Y + Size.Y / 2f);
-        public Vector2 LastValidPosition { get; set; } = Vector2.Zero;
 
         protected override void OnDispose()
         {

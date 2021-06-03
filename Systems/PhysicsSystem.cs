@@ -39,68 +39,65 @@ namespace uwpPlatformer.Systems
 
         private Vector2 ApplyForces(PhysicsComponent physicsComponent)
         {
-            var gravityForce = physicsComponent.Gravity;
-            var dragForce = 0.5f * physicsComponent.Drag * (physicsComponent.GameObject.TransformComponent.Velocity.Length() * physicsComponent.GameObject.TransformComponent.Velocity);
-            return gravityForce - dragForce;
+            // should we make the drag force negative? Possibly we should make it inverted
+            // with respect to the other forces...
+            return physicsComponent.Gravity;
         }
 
-        private void ExplicitEulerIntegration(PhysicsComponent physicsComponent, TimeSpan timeSpan)
-        {
-            var acceleration = ApplyForces(physicsComponent);
-            var deltaTime = (float)timeSpan.TotalSeconds;
-            physicsComponent.OldPosition = physicsComponent.GameObject.TransformComponent.Position;
-            //GameObject.TransformComponent.Position += (deltaTime * GameObject.TransformComponent.Velocity);
-            physicsComponent.OldVelocity = physicsComponent.GameObject.TransformComponent.Velocity;
-            physicsComponent.GameObject.TransformComponent.Velocity += (deltaTime * acceleration);
-            physicsComponent.Acceleration = acceleration;
-        }
+        //private void ExplicitEulerIntegration(PhysicsComponent physicsComponent, TimeSpan timeSpan)
+        //{
+        //    var acceleration = ApplyForces(physicsComponent);
+        //    var deltaTime = (float)timeSpan.TotalSeconds;
+        //    physicsComponent.OldPosition = physicsComponent.GameObject.TransformComponent.Position;
+        //    //GameObject.TransformComponent.Position += (deltaTime * GameObject.TransformComponent.Velocity);
+        //    physicsComponent.OldVelocity = physicsComponent.GameObject.TransformComponent.Velocity;
+        //    physicsComponent.GameObject.TransformComponent.Velocity += (deltaTime * acceleration);
+        //    physicsComponent.Acceleration = acceleration;
+        //}
 
-        private void SemiImplicitEulerIntegration(PhysicsComponent physicsComponent, TimeSpan timeSpan)
-        {
-            var acceleration = ApplyForces(physicsComponent);
-            var deltaTime = (float)timeSpan.TotalSeconds;
-            physicsComponent.OldVelocity = physicsComponent.GameObject.TransformComponent.Velocity;
-            physicsComponent.GameObject.TransformComponent.Velocity += (deltaTime * acceleration);
-            physicsComponent.OldPosition = physicsComponent.GameObject.TransformComponent.Position;
-            //GameObject.TransformComponent.Position += (deltaTime * GameObject.TransformComponent.Velocity);
-            physicsComponent.Acceleration = acceleration;
-        }
+        //private void SemiImplicitEulerIntegration(PhysicsComponent physicsComponent, TimeSpan timeSpan)
+        //{
+        //    var acceleration = ApplyForces(physicsComponent);
+        //    var deltaTime = (float)timeSpan.TotalSeconds;
+        //    physicsComponent.OldVelocity = physicsComponent.GameObject.TransformComponent.Velocity;
+        //    physicsComponent.GameObject.TransformComponent.Velocity += (deltaTime * acceleration);
+        //    physicsComponent.OldPosition = physicsComponent.GameObject.TransformComponent.Position;
+        //    //GameObject.TransformComponent.Position += (deltaTime * GameObject.TransformComponent.Velocity);
+        //    physicsComponent.Acceleration = acceleration;
+        //}
 
-        private void SimplifiedVelocityVerletIntegration(PhysicsComponent physicsComponent, TimeSpan timeSpan)
-        {
-            var acceleration = ApplyForces(physicsComponent);
-            var deltaTime = (float)timeSpan.TotalSeconds;
-            // Apply acceleration
-            var newVelocity = physicsComponent.GameObject.TransformComponent.Velocity + (deltaTime * acceleration);
-            // TODO: Limit velocity
-            physicsComponent.GameObject.TransformComponent.Velocity = newVelocity;
+        //private void SimplifiedVelocityVerletIntegration(PhysicsComponent physicsComponent, TimeSpan timeSpan)
+        //{
+        //    var acceleration = ApplyForces(physicsComponent);
+        //    var deltaTime = (float)timeSpan.TotalSeconds;
+        //    // Apply acceleration
+        //    var newVelocity = physicsComponent.GameObject.TransformComponent.Velocity + (deltaTime * acceleration);
+        //    // TODO: Limit velocity
+        //    physicsComponent.GameObject.TransformComponent.Velocity = newVelocity;
 
-            physicsComponent.OldPosition = physicsComponent.GameObject.TransformComponent.Position;
-            //GameObject.TransformComponent.Position += (0.5f * (newVelocity + OldVelocity) * deltaTime);
+        //    physicsComponent.OldPosition = physicsComponent.GameObject.TransformComponent.Position;
+        //    //GameObject.TransformComponent.Position += (0.5f * (newVelocity + OldVelocity) * deltaTime);
 
-            physicsComponent.OldVelocity = physicsComponent.GameObject.TransformComponent.Velocity;
-            physicsComponent.Acceleration = acceleration;
-        }
+        //    physicsComponent.OldVelocity = physicsComponent.GameObject.TransformComponent.Velocity;
+        //    physicsComponent.Acceleration = acceleration;
+        //}
 
-        private void PositionVerletIntegration(PhysicsComponent physicsComponent, TimeSpan timeSpan)
-        {
-            //var deltaTime = (float)timeSpan.TotalSeconds;
-            //var currentPosition = physicsComponent.GameObject.TransformComponent.Position;
-            //var acceleration = ApplyForces(physicsComponent);
-            //physicsComponent.GameObject.TransformComponent.Position += (physicsComponent.GameObject.TransformComponent.Position - physicsComponent.OldPosition) + (acceleration * deltaTime * deltaTime);
-            //physicsComponent.OldPosition = currentPosition;
-            //physicsComponent.Acceleration = acceleration;
-        }
+        //private void PositionVerletIntegration(PhysicsComponent physicsComponent, TimeSpan timeSpan)
+        //{
+        //    //var deltaTime = (float)timeSpan.TotalSeconds;
+        //    //var currentPosition = physicsComponent.GameObject.TransformComponent.Position;
+        //    //var acceleration = ApplyForces(physicsComponent);
+        //    //physicsComponent.GameObject.TransformComponent.Position += (physicsComponent.GameObject.TransformComponent.Position - physicsComponent.OldPosition) + (acceleration * deltaTime * deltaTime);
+        //    //physicsComponent.OldPosition = currentPosition;
+        //    //physicsComponent.Acceleration = acceleration;
+        //}
 
         private void VelocityVerletIntegration(PhysicsComponent physicsComponent, TimeSpan timeSpan)
         {
             var deltaTime = (float)timeSpan.TotalSeconds;
-            //var oldPosition = physicsComponent.GameObject.TransformComponent.Position;
-            //var newPosition = oldPosition + (physicsComponent.GameObject.TransformComponent.Velocity * deltaTime) + (physicsComponent.Acceleration * deltaTime * deltaTime * 0.5f);
             var acceleration = ApplyForces(physicsComponent);
             var newVelocity = physicsComponent.GameObject.TransformComponent.Velocity + ((physicsComponent.Acceleration + acceleration) * (deltaTime * 0.5f));
-            //var pos = oldPosition + (newVelocity * deltaTime);
-
+            
             if (Math.Abs(newVelocity.X) < 5f)
             {
                 newVelocity.X = 0f;
@@ -115,15 +112,15 @@ namespace uwpPlatformer.Systems
             switch (integration)
             {
                 case IntegrationType.ExplicitEuler:
-                    _integrateFunc = ExplicitEulerIntegration;
+                    //_integrateFunc = ExplicitEulerIntegration;
                     break;
 
                 case IntegrationType.SemiImplicitEuler:
-                    _integrateFunc = SemiImplicitEulerIntegration;
+                    //_integrateFunc = SemiImplicitEulerIntegration;
                     break;
 
                 case IntegrationType.PositionVerlet:
-                    _integrateFunc = PositionVerletIntegration;
+                    //_integrateFunc = PositionVerletIntegration;
                     break;
 
                 case IntegrationType.VelocityVerlet:
@@ -131,7 +128,7 @@ namespace uwpPlatformer.Systems
                     break;
 
                 case IntegrationType.SimplifiedVelocityVerlet:
-                    _integrateFunc = SimplifiedVelocityVerletIntegration;
+                    //_integrateFunc = SimplifiedVelocityVerletIntegration;
                     break;
             }
         }
