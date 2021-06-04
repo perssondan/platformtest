@@ -25,9 +25,12 @@ namespace uwpPlatformer.Components
 
                 _historyStack.Push(value);
 
+                PreviousPosition = _position;
                 _position = value;
             }
         }
+
+        public Vector2 PreviousPosition { get; private set; }
 
         public Vector2[] PositionHistory => _historyStack.Items.ToArray();
 
