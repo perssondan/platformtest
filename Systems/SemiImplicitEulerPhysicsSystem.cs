@@ -1,58 +1,53 @@
 ﻿using GamesLibrary.Models;
-using GamesLibrary.Systems;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using uwpPlatformer.Components;
 using uwpPlatformer.Extensions;
 using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Systems
 {
+    /// <summary>
+    /// For reference, Semi-implicit Euler integration
+    /// </summary>
     public class SemiImplicitEulerPhysicsSystem : SystemBase<SemiImplicitEulerPhysicsSystem>
     {
-        private readonly IEventSystem _eventSystem;
-
-        public SemiImplicitEulerPhysicsSystem(IEventSystem eventSystem)
-        {
-            _eventSystem = eventSystem;
-        }
-
         public override void Update(TimingInfo timingInfo)
         {
+            var deltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
             GameObjectManager.GameObjects
-                .Select(gameObject => (gameObject, gameObject.GetComponents<PhysicsComponent, TransformComponent>()))
-                .Where(result => result != default && result.Item2 != default)
+                .Select(gameObject => (gameObject, components: gameObject.GetComponents<PhysicsComponent, TransformComponent>()))
+                .Where(result => result != default && result.components != default)
                 .ToArray() // clone
                 .ForEach(result =>
                 {
-                    Integrate(result.Item2.Item1, result.Item2.Item2, timingInfo.ElapsedTime);
+                    Integrate(result.components.Item1, result.components.Item2, deltaTime);
                 });
         }
 
         private void Integrate(PhysicsComponent physicsComponent,
-                                              TransformComponent transform,
-                                              TimeSpan timeSpan)
+                               TransformComponent transform,
+                               float deltaTime)
         {
-            physicsComponent.OldPosition = transform.Position;
-            physicsComponent.OldVelocity = transform.Velocity;
-            physicsComponent.OldAcceleration = physicsComponent.Acceleration;
+            var newAcceleration = ApplyForces(physicsComponent);
 
-            var acceleration = ApplyForces(physicsComponent);
+            var currentPosition = transform.Position;
+            var currentVelocity = transform.Velocity;
+            var previousAcceleration = physicsComponent.OldAcceleration;
 
-            var deltaTime = (float)timeSpan.TotalSeconds;
-            transform.Velocity += (deltaTime * acceleration);
-            transform.Position += (deltaTime * transform.Velocity);
+            var newVelocity = currentVelocity + (deltaTime * previousAcceleration);
+            var newPosition = currentPosition + (deltaTime * newVelocity);
 
-            physicsComponent.Acceleration = Vector2.Zero;
+            transform.Position = newPosition;
+            transform.Velocity = newVelocity;
+            physicsComponent.OldAcceleration = newAcceleration;
+
+            physicsComponent.ImpulseForce = Vector2.Zero;
         }
 
         private Vector2 ApplyForces(PhysicsComponent physicsComponent)
         {
-            return physicsComponent.Gravity;
+            return (physicsComponent.Gravity + physicsComponent.ImpulseForce) * physicsComponent.MassInverted;
         }
     }
 }

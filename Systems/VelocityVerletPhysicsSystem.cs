@@ -21,7 +21,7 @@ namespace uwpPlatformer.Systems
 
             GameObjectManager.GameObjects
                 .Select(gameObject => (gameObject, components: gameObject.GetComponents<PhysicsComponent, TransformComponent>()))
-                .Where(result => result != default && result.Item2 != default)
+                .Where(result => result != default && result.components != default)
                 .ToArray() // clone
                 .ForEach(result =>
                 {
