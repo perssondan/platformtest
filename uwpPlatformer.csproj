@@ -137,6 +137,7 @@
     <Compile Include="Components\Particles\ParticleEmitterComponentManager.cs" />
     <Compile Include="Components\PerlinMovementComponent.cs" />
     <Compile Include="Factories\EnemyFactory.cs" />
+    <Compile Include="Systems\ImprovedEulerPhysicsSystem.cs" />
     <Compile Include="Systems\PositionVerletPhysicsSystem.cs" />
     <Compile Include="Systems\SemiImplicitEulerPhysicsSystem.cs" />
     <Compile Include="Systems\ExplicitEulerPhysicsSystem.cs" />
@@ -193,6 +194,7 @@
     <Compile Include="Systems\ParticleSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\PlayerSystem.cs" />
+    <Compile Include="Systems\SimplifiedVelocityVerletPhysicsSystem.cs" />
     <Compile Include="Systems\SystemBase.cs" />
     <Compile Include="Systems\UserInput.cs" />
     <Compile Include="Systems\UserInputInfo.cs" />
