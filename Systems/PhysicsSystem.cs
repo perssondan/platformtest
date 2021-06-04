@@ -1,136 +1,44 @@
 ﻿using GamesLibrary.Models;
 using GamesLibrary.Systems;
 using System;
+using System.Linq;
 using System.Numerics;
 using uwpPlatformer.Components;
+using uwpPlatformer.Extensions;
+using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Systems
 {
     public class PhysicsSystem : SystemBase<PhysicsSystem>
     {
-        private Action<PhysicsComponent, TimeSpan> _integrateFunc;
-        private IntegrationType _integration;
-        private readonly IEventSystem _eventSystem;
-
-        public PhysicsSystem(IEventSystem eventSystem)
-        {
-            _eventSystem = eventSystem;
-            Integration = IntegrationType.VelocityVerlet;
-        }
-
-        public IntegrationType Integration
-        {
-            get => _integration;
-            set
-            {
-                if (_integration == value) return;
-                _integration = value;
-                ChangeIntegration(_integration);
-            }
-        }
-
         public override void Update(TimingInfo timingInfo)
         {
-            foreach (var physicsComponent in PhysicsComponentManager.Instance.Components)
-            {
-                _integrateFunc?.Invoke(physicsComponent, timingInfo.ElapsedTime);
-            }
+            var deltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
+
+            GameObjectManager.GameObjects
+                .Select(gameObject => (gameObject, gameObject.GetComponents<PhysicsComponent, TransformComponent>()))
+                .Where(result => result != default && result.Item2 != default)
+                .ToArray() // clone
+                .ForEach(result =>
+                {
+                    Integrate(result.Item2.Item1, result.Item2.Item2, deltaTime);
+                });
         }
 
         private Vector2 ApplyForces(PhysicsComponent physicsComponent)
         {
-            // should we make the drag force negative? Possibly we should make it inverted
-            // with respect to the other forces...
-            return physicsComponent.Gravity;
+            // acc = F/m (F*1/m)
+            return (physicsComponent.Gravity + physicsComponent.ImpulseForce) * physicsComponent.MassInverted;
         }
 
-        //private void ExplicitEulerIntegration(PhysicsComponent physicsComponent, TimeSpan timeSpan)
-        //{
-        //    var acceleration = ApplyForces(physicsComponent);
-        //    var deltaTime = (float)timeSpan.TotalSeconds;
-        //    physicsComponent.OldPosition = physicsComponent.GameObject.TransformComponent.Position;
-        //    //GameObject.TransformComponent.Position += (deltaTime * GameObject.TransformComponent.Velocity);
-        //    physicsComponent.OldVelocity = physicsComponent.GameObject.TransformComponent.Velocity;
-        //    physicsComponent.GameObject.TransformComponent.Velocity += (deltaTime * acceleration);
-        //    physicsComponent.Acceleration = acceleration;
-        //}
-
-        //private void SemiImplicitEulerIntegration(PhysicsComponent physicsComponent, TimeSpan timeSpan)
-        //{
-        //    var acceleration = ApplyForces(physicsComponent);
-        //    var deltaTime = (float)timeSpan.TotalSeconds;
-        //    physicsComponent.OldVelocity = physicsComponent.GameObject.TransformComponent.Velocity;
-        //    physicsComponent.GameObject.TransformComponent.Velocity += (deltaTime * acceleration);
-        //    physicsComponent.OldPosition = physicsComponent.GameObject.TransformComponent.Position;
-        //    //GameObject.TransformComponent.Position += (deltaTime * GameObject.TransformComponent.Velocity);
-        //    physicsComponent.Acceleration = acceleration;
-        //}
-
-        //private void SimplifiedVelocityVerletIntegration(PhysicsComponent physicsComponent, TimeSpan timeSpan)
-        //{
-        //    var acceleration = ApplyForces(physicsComponent);
-        //    var deltaTime = (float)timeSpan.TotalSeconds;
-        //    // Apply acceleration
-        //    var newVelocity = physicsComponent.GameObject.TransformComponent.Velocity + (deltaTime * acceleration);
-        //    // TODO: Limit velocity
-        //    physicsComponent.GameObject.TransformComponent.Velocity = newVelocity;
-
-        //    physicsComponent.OldPosition = physicsComponent.GameObject.TransformComponent.Position;
-        //    //GameObject.TransformComponent.Position += (0.5f * (newVelocity + OldVelocity) * deltaTime);
-
-        //    physicsComponent.OldVelocity = physicsComponent.GameObject.TransformComponent.Velocity;
-        //    physicsComponent.Acceleration = acceleration;
-        //}
-
-        //private void PositionVerletIntegration(PhysicsComponent physicsComponent, TimeSpan timeSpan)
-        //{
-        //    //var deltaTime = (float)timeSpan.TotalSeconds;
-        //    //var currentPosition = physicsComponent.GameObject.TransformComponent.Position;
-        //    //var acceleration = ApplyForces(physicsComponent);
-        //    //physicsComponent.GameObject.TransformComponent.Position += (physicsComponent.GameObject.TransformComponent.Position - physicsComponent.OldPosition) + (acceleration * deltaTime * deltaTime);
-        //    //physicsComponent.OldPosition = currentPosition;
-        //    //physicsComponent.Acceleration = acceleration;
-        //}
-
-        private void VelocityVerletIntegration(PhysicsComponent physicsComponent, TimeSpan timeSpan)
+        private void Integrate(PhysicsComponent physicsComponent, TransformComponent transformComponent, float deltaTime)
         {
-            var deltaTime = (float)timeSpan.TotalSeconds;
-            var acceleration = ApplyForces(physicsComponent);
-            var newVelocity = physicsComponent.GameObject.TransformComponent.Velocity + ((physicsComponent.Acceleration + acceleration) * (deltaTime * 0.5f));
-            
-            if (Math.Abs(newVelocity.X) < 5f)
-            {
-                newVelocity.X = 0f;
-            }
+            var newAcceleration = ApplyForces(physicsComponent);
+            var newVelocity = transformComponent.Velocity + ((physicsComponent.OldAcceleration + newAcceleration) * (deltaTime * 0.5f));
 
-            physicsComponent.Acceleration = acceleration;
-            physicsComponent.GameObject.TransformComponent.Velocity = newVelocity;
-        }
-
-        private void ChangeIntegration(IntegrationType integration)
-        {
-            switch (integration)
-            {
-                case IntegrationType.ExplicitEuler:
-                    //_integrateFunc = ExplicitEulerIntegration;
-                    break;
-
-                case IntegrationType.SemiImplicitEuler:
-                    //_integrateFunc = SemiImplicitEulerIntegration;
-                    break;
-
-                case IntegrationType.PositionVerlet:
-                    //_integrateFunc = PositionVerletIntegration;
-                    break;
-
-                case IntegrationType.VelocityVerlet:
-                    _integrateFunc = VelocityVerletIntegration;
-                    break;
-
-                case IntegrationType.SimplifiedVelocityVerlet:
-                    //_integrateFunc = SimplifiedVelocityVerletIntegration;
-                    break;
-            }
+            physicsComponent.OldAcceleration = newAcceleration;
+            transformComponent.Velocity = newVelocity;
+            physicsComponent.ImpulseForce = Vector2.Zero;
         }
 
         public enum IntegrationType

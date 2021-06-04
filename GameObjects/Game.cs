@@ -26,7 +26,7 @@ namespace uwpPlatformer.GameObjects
         {
             _colliderSystem = new ColliderSystem(_eventSystem);
             _moveSystem = new MoveSystem();
-            _physicsSystem = new PhysicsSystem(_eventSystem);
+            _physicsSystem = new PhysicsSystem();
             _inputSystem = new InputSystem(_eventSystem);
             _graphicsSystem = new GraphicsSystem(_eventSystem);
             _particleSystem = new ParticleSystem();

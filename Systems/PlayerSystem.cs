@@ -96,18 +96,9 @@ namespace uwpPlatformer.Systems
 
         private static void AddDustEmitter(GameObject gameObject)
         {
-            //if (gameObject.Has<DustParticleEmitterComponent>()) return;
-
-            //gameObject.AddComponent(new DustParticleEmitterComponent(TimeSpan.FromSeconds(.3),
-            //                                                         gameObject,
-            //                                                         gameObject.ColliderComponent.BoundingBox.BottomCenterOffset(),
-            //                                                         10,
-            //                                                         50f,
-            //                                                         ParticleEmitterType.Burst));
-
             if (gameObject.Has<ParticleEmitterComponent>()) return;
 
-            gameObject.AddComponent(new ParticleEmitterComponent(
+            gameObject.AddOrUpdateComponent(new ParticleEmitterComponent(
                 gameObject,
                 ParticleTemplateType.Dust,
                 gameObject.ColliderComponent.BoundingBox.BottomCenterOffset()));

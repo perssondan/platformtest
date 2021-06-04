@@ -1,7 +1,9 @@
 ﻿using GamesLibrary.Models;
 using GamesLibrary.Systems;
+using System.Linq;
 using uwpPlatformer.Components;
 using uwpPlatformer.Extensions;
+using uwpPlatformer.GameObjects;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -34,7 +36,11 @@ namespace uwpPlatformer.Systems
 
         public override void Update(TimingInfo timingInfo)
         {
-            InputComponentManager.Instance.Components.ForEach(component => component.UserInputs = UserInputs);
+            GameObjectManager.GameObjects
+                .Select(gameObject => (gameObject, inputComponent: gameObject.GetComponent<InputComponent>()))
+                .Where(result => result != default && result.inputComponent != default)
+                .ToArray() // clone
+                .ForEach(result => result.inputComponent.UserInputs = UserInputs);
         }
 
         private void HookdownKeyListener(Window current)

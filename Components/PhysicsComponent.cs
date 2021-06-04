@@ -22,14 +22,12 @@ namespace uwpPlatformer.Components
 
         public float Drag { get; set; }
 
-        public Vector2 Acceleration { get; set; }
-
         public Vector2 Gravity { get; set; } = new Vector2(0f, PlayerConstants.Gravity);
 
         public float Mass { get; set; } = 1f;
 
         public float MassInverted => 1f / Mass;
 
-        public Vector2 AdditionalForce { get; set; }
+        public Vector2 ImpulseForce { get; set; }
     }
 }
