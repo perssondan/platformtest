@@ -22,12 +22,12 @@ namespace uwpPlatformer.Factories
                 Position = position
             };
 
-            gameObject.AddComponent(transformComponent);
+            gameObject.AddOrUpdateComponent(transformComponent);
 
             var graphicsComponent = CreateGraphicsComponent(gameObject, tileType, canvasBitmap);
-            gameObject.AddComponent(graphicsComponent);
+            gameObject.AddOrUpdateComponent(graphicsComponent);
             // TODO: The currently loaded tiles are all collidables, so when making the sky or what ever we need to fix this
-            gameObject.AddComponent(new ColliderComponent(gameObject)
+            gameObject.AddOrUpdateComponent(new ColliderComponent(gameObject)
             {
                 Size = size,
                 CollisionType = ColliderComponent.CollisionTypes.Static

@@ -70,11 +70,11 @@ namespace uwpPlatformer.GameObjects
         {
             var leftBoundary = new GameObject();
 
-            leftBoundary.AddComponent(new TransformComponent(leftBoundary)
+            leftBoundary.AddOrUpdateComponent(new TransformComponent(leftBoundary)
             {
                 Position = new Vector2(-32f, -32f)
             });
-            leftBoundary.AddComponent(new ColliderComponent(leftBoundary)
+            leftBoundary.AddOrUpdateComponent(new ColliderComponent(leftBoundary)
             {
                 CollisionType = ColliderComponent.CollisionTypes.Static,
                 Size = new Vector2(32f, WorldPixelHeight + 32f + 32f)
@@ -82,11 +82,11 @@ namespace uwpPlatformer.GameObjects
 
             var rightBoundary = new GameObject();
 
-            rightBoundary.AddComponent(new TransformComponent(rightBoundary)
+            rightBoundary.AddOrUpdateComponent(new TransformComponent(rightBoundary)
             {
                 Position = new Vector2(WorldPixelWidth, -32f)
             });
-            rightBoundary.AddComponent(new ColliderComponent(rightBoundary)
+            rightBoundary.AddOrUpdateComponent(new ColliderComponent(rightBoundary)
             {
                 CollisionType = ColliderComponent.CollisionTypes.Static,
                 Size = new Vector2(32f, WorldPixelHeight + 32f + 32f)
@@ -94,11 +94,11 @@ namespace uwpPlatformer.GameObjects
 
             var topBoundary = new GameObject();
 
-            topBoundary.AddComponent(new TransformComponent(topBoundary)
+            topBoundary.AddOrUpdateComponent(new TransformComponent(topBoundary)
             {
                 Position = new Vector2(-32f, -32f)
             });
-            topBoundary.AddComponent(new ColliderComponent(topBoundary)
+            topBoundary.AddOrUpdateComponent(new ColliderComponent(topBoundary)
             {
                 CollisionType = ColliderComponent.CollisionTypes.Static,
                 Size = new Vector2(WorldPixelWidth + 32f + 32f, 32f)
@@ -106,11 +106,11 @@ namespace uwpPlatformer.GameObjects
 
             var bottomBoundary = new GameObject();
 
-            bottomBoundary.AddComponent(new TransformComponent(bottomBoundary)
+            bottomBoundary.AddOrUpdateComponent(new TransformComponent(bottomBoundary)
             {
                 Position = new Vector2(-32f, WorldPixelHeight)
             });
-            bottomBoundary.AddComponent(new ColliderComponent(bottomBoundary)
+            bottomBoundary.AddOrUpdateComponent(new ColliderComponent(bottomBoundary)
             {
                 CollisionType = ColliderComponent.CollisionTypes.Static,
                 Size = new Vector2(WorldPixelWidth + 32f + 32f, 32f)

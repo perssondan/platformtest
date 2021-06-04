@@ -13,17 +13,15 @@ namespace uwpPlatformer.GameObjects
         {
             Id = GenerateId();
             GameObjectManager.AddGameObject(this);
-            AddComponent(new TransformComponent(this));
+            AddOrUpdateComponent(new TransformComponent(this));
         }
 
         public int Id { get; }
 
-        public void AddComponent<T>(T gameObjectComponent)
+        public void AddOrUpdateComponent<T>(T gameObjectComponent)
             where T : IComponent
         {
             if (gameObjectComponent == null) return;
-
-            //if (_components.TryGetValue(typeof(T), out var _)) return;
 
             _components[typeof(T)] = gameObjectComponent;
         }

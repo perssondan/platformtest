@@ -12,7 +12,7 @@ namespace uwpPlatformer.Factories
         public GameObject CreateHero(CanvasBitmap canvasBitmap, Vector2 position, Vector2 size)
         {
             var gameObject = new GameObject();
-            gameObject.AddComponent(new TransformComponent(gameObject)
+            gameObject.AddOrUpdateComponent(new TransformComponent(gameObject)
             {
                 Position = position
             });
@@ -24,16 +24,16 @@ namespace uwpPlatformer.Factories
                 new Rect(96f,32f,32f,32f),
             };
             var animatedGraphicsComponent = new AnimatedGraphicsComponent(gameObject, canvasBitmap, sourceRects, TimeSpan.FromMilliseconds(150));
-            gameObject.AddComponent(animatedGraphicsComponent);
-            gameObject.AddComponent(new PhysicsComponent(gameObject));
-            gameObject.AddComponent(new InputComponent(gameObject));
-            gameObject.AddComponent(new PlayerComponent(gameObject));
+            gameObject.AddOrUpdateComponent(animatedGraphicsComponent);
+            gameObject.AddOrUpdateComponent(new PhysicsComponent(gameObject));
+            gameObject.AddOrUpdateComponent(new InputComponent(gameObject));
+            gameObject.AddOrUpdateComponent(new PlayerComponent(gameObject));
             var collider = new ColliderComponent(gameObject)
             {
                 Size = size,
                 CollisionType = ColliderComponent.CollisionTypes.Dynamic
             };
-            gameObject.AddComponent(collider);
+            gameObject.AddOrUpdateComponent(collider);
 
             return gameObject;
         }
