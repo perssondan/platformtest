@@ -32,7 +32,7 @@ namespace uwpPlatformer.Systems
             var fDeltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
             var dynamicColliderComponents = ColliderComponentManager.Instance.Components
                 .Where(colliderComponent => colliderComponent.IsColliding == true)
-                .Where(colliderComponent => colliderComponent.CollisionType == ColliderComponent.CollisionTypes.Dynamic)
+                .Where(colliderComponent => (colliderComponent.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) > 0)
                 .ToArray();
 
             foreach (var colliderComponent in dynamicColliderComponents)
@@ -93,10 +93,10 @@ namespace uwpPlatformer.Systems
         {
             dynamicCollider.CollisionInfos = Array.Empty<CollisionInfo>();
 
-            if (dynamicCollider.CollisionType == ColliderComponent.CollisionTypes.Static) return false;
+            if ((dynamicCollider.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) == 0) return false;
 
             var colliderComponents = ColliderComponentManager.Instance.Components
-                .Where(collider => collider.CollisionType == ColliderComponent.CollisionTypes.Static)
+                .Where(collider => (collider.CollisionType & ColliderComponent.CollisionTypes.IsStaticMask) > 0)
                 .ToArray();
 
             // reset collision flag
@@ -132,7 +132,7 @@ namespace uwpPlatformer.Systems
         private bool DetectCollisions(TimeSpan deltaTime)
         {
             var dynamicColliders = ColliderComponentManager.Instance.Components
-                            .Where(collider => collider.CollisionType == ColliderComponent.CollisionTypes.Dynamic);
+                            .Where(collider => (collider.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) > 0);
             if (!dynamicColliders.Any()) return false;
 
             var isAnyColliding = false;

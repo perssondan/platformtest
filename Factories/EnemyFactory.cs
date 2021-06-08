@@ -17,7 +17,9 @@ namespace uwpPlatformer.Factories
 
             //gameObject.AddComponent(new ShapeGraphicsComponent(gameObject, ShapeType.Rectangle, Colors.Pink, size));
             gameObject.AddOrUpdateComponent(new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new Rect(new Point(0, 0), size.ToSize()) }, TimeSpan.Zero));
-            gameObject.AddOrUpdateComponent(new PerlinMovementComponent(gameObject, bounds, 0f, 1000f));
+            gameObject.AddOrUpdateComponent(new PerlinMovementComponent(gameObject, bounds, 0f, 10000f));
+            gameObject.AddOrUpdateComponent(new PhysicsComponent(gameObject) { Gravity = Vector2.Zero });
+            gameObject.AddOrUpdateComponent(new ColliderComponent(gameObject) { Size = size, CollisionType = ColliderComponent.CollisionTypes.DynamicWorld });
 
             return gameObject;
         }

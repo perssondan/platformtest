@@ -18,9 +18,9 @@ namespace uwpPlatformer.Components
         public CollisionInfo[] CollisionInfos { get; set; } = Array.Empty<CollisionInfo>();
 
         /// <summary>
-        /// Get or set <see cref="CollisionTypes"/>. Default value is <see cref="CollisionTypes.Static"/>
+        /// Get or set <see cref="CollisionTypes"/>. Default value is <see cref="CollisionTypes.StaticPlatform"/>
         /// </summary>
-        public CollisionTypes CollisionType { get; set; } = CollisionTypes.Static;
+        public CollisionTypes CollisionType { get; set; } = CollisionTypes.StaticPlatform;
 
         public Vector2 Size { get; set; } = Vector2.Zero;
         public Rect BoundingBox => new Rect(Position.ToPoint(), Size.ToSize());
@@ -33,17 +33,50 @@ namespace uwpPlatformer.Components
 
         protected Vector2 Position => GameObject.TransformComponent.Position;
 
+        [Flags]
         public enum CollisionTypes
         {
             /// <summary>
+            /// No collision
+            /// </summary>
+            None = 0x00,
+
+            /// <summary>
             /// Value if the <see cref="GameObject"/> is static, cannot move
             /// </summary>
-            Static,
+            StaticPlatform = 0b000001,
+
+            /// <summary>
+            /// Part of the world boundary
+            /// </summary>
+            StaticWorld = 0b000010,
+
+            IsStaticMask = 0b000011,
 
             /// <summary>
             /// Value if the <see cref="GameObject"/> is dynamic, can move
             /// </summary>
-            Dynamic
+            Dynamic = 0b001000,
+
+            /// <summary>
+            /// This together with another type that yields > 0 should be collision evaluated
+            /// </summary>
+            DynamicMask = Dynamic | DynamicWorld | StaticWorld | StaticPlatform,
+
+            /// <summary>
+            /// Only interacts with static world and dynamic
+            /// </summary>
+            DynamicWorld = 0b010000,
+
+            /// <summary>
+            /// This together with another type that yields > 0 should be collision evaluated
+            /// </summary>
+            DynamicWorldMask = Dynamic | DynamicWorld | StaticWorld,
+
+            /// <summary>
+            /// This together with another type that yields > 0 is dynamic
+            /// </summary>
+            IsDynamicMask = Dynamic | DynamicWorld,
         }
     }
 }

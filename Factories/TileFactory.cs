@@ -30,7 +30,7 @@ namespace uwpPlatformer.Factories
             gameObject.AddOrUpdateComponent(new ColliderComponent(gameObject)
             {
                 Size = size,
-                CollisionType = ColliderComponent.CollisionTypes.Static
+                CollisionType = ColliderComponent.CollisionTypes.StaticPlatform
             });
 
             return gameObject;

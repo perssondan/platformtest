@@ -38,7 +38,7 @@ namespace uwpPlatformer.Extensions
             return Vector2.Normalize(source);
         }
 
-        public static Vector2 FromAngle(this float angle)
+        public static Vector2 VectorFromAngle(this float angle)
         {
             return new Vector2(MathF.Cos(angle), MathF.Sin(angle));
         }

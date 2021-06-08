@@ -76,7 +76,7 @@ namespace uwpPlatformer.GameObjects
             });
             leftBoundary.AddOrUpdateComponent(new ColliderComponent(leftBoundary)
             {
-                CollisionType = ColliderComponent.CollisionTypes.Static,
+                CollisionType = ColliderComponent.CollisionTypes.StaticWorld,
                 Size = new Vector2(32f, WorldPixelHeight + 32f + 32f)
             });
 
@@ -88,7 +88,7 @@ namespace uwpPlatformer.GameObjects
             });
             rightBoundary.AddOrUpdateComponent(new ColliderComponent(rightBoundary)
             {
-                CollisionType = ColliderComponent.CollisionTypes.Static,
+                CollisionType = ColliderComponent.CollisionTypes.StaticWorld,
                 Size = new Vector2(32f, WorldPixelHeight + 32f + 32f)
             });
 
@@ -100,7 +100,7 @@ namespace uwpPlatformer.GameObjects
             });
             topBoundary.AddOrUpdateComponent(new ColliderComponent(topBoundary)
             {
-                CollisionType = ColliderComponent.CollisionTypes.Static,
+                CollisionType = ColliderComponent.CollisionTypes.StaticWorld,
                 Size = new Vector2(WorldPixelWidth + 32f + 32f, 32f)
             });
 
@@ -112,7 +112,7 @@ namespace uwpPlatformer.GameObjects
             });
             bottomBoundary.AddOrUpdateComponent(new ColliderComponent(bottomBoundary)
             {
-                CollisionType = ColliderComponent.CollisionTypes.Static,
+                CollisionType = ColliderComponent.CollisionTypes.StaticWorld,
                 Size = new Vector2(WorldPixelWidth + 32f + 32f, 32f)
             });
         }

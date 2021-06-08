@@ -226,7 +226,7 @@ namespace uwpPlatformer.Systems
             var collisionColor = Colors.Orange;
             foreach (var collisionArgument in collisionArguments)
             {
-                if (collisionArgument.GameObject.ColliderComponent.CollisionType == ColliderComponent.CollisionTypes.Dynamic)
+                if ((collisionArgument.GameObject.ColliderComponent.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) > 0)
                 {
                     var startPoint = collisionArgument.CollisionInfo.CollisionPoint - (collisionArgument.CollisionInfo.CollisionNormal * collisionArgument.GameObject.ColliderComponent.Size / 2f);
                     // draw collision point
