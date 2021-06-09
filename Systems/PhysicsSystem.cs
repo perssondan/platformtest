@@ -11,11 +11,18 @@ namespace uwpPlatformer.Systems
 {
     public class PhysicsSystem : SystemBase<PhysicsSystem>
     {
+        private readonly IGameObjectManager _gameObjectManager;
+
+        public PhysicsSystem(IGameObjectManager gameObjectManager)
+        {
+            _gameObjectManager = gameObjectManager;
+        }
+
         public override void Update(TimingInfo timingInfo)
         {
             var deltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
 
-            GameObjectManager.GameObjects
+            _gameObjectManager.GameObjects
                 .Select(gameObject => (gameObject, gameObject.GetComponents<PhysicsComponent, TransformComponent>()))
                 .Where(result => result != default && result.Item2 != default)
                 .ToArray() // clone

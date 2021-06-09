@@ -9,9 +9,16 @@ namespace uwpPlatformer.Factories
 {
     public class HeroFactory
     {
+        private readonly IGameObjectManager _gameObjectManager;
+
+        public HeroFactory(IGameObjectManager gameObjectManager)
+        {
+            _gameObjectManager = gameObjectManager;
+        }
+
         public GameObject CreateHero(CanvasBitmap canvasBitmap, Vector2 position, Vector2 size)
         {
-            var gameObject = new GameObject();
+            var gameObject = _gameObjectManager.CreateGameObject();
             gameObject.AddOrUpdateComponent(new TransformComponent(gameObject)
             {
                 Position = position

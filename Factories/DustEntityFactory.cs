@@ -12,6 +12,12 @@ namespace uwpPlatformer.Factories
     public class DustEntityFactory
     {
         private static readonly Random _random = new Random((int)DateTime.Now.Ticks);
+        private readonly IGameObjectManager _gameObjectManager;
+
+        public DustEntityFactory(IGameObjectManager gameObjectManager)
+        {
+            _gameObjectManager = gameObjectManager;
+        }
 
         public void CreateDustParticleEntitesAndUnwrap(Vector2 position,
                                                        TimeSpan createdAt,
@@ -35,7 +41,7 @@ namespace uwpPlatformer.Factories
         {
             for (var particleIndex = 0; particleIndex < numberOfParticles; particleIndex++)
             {
-                var gameObject = new GameObject();
+                var gameObject = _gameObjectManager.CreateGameObject();
                 gameObject.TransformComponent.Position = position;
                 var velocity = CreateRandomVelocityVector();
 

@@ -10,9 +10,16 @@ namespace uwpPlatformer.Factories
 {
     public class EnemyFactory
     {
+        private readonly IGameObjectManager _gameObjectManager;
+
+        public EnemyFactory(IGameObjectManager gameObjectManager)
+        {
+            _gameObjectManager = gameObjectManager;
+        }
+
         public GameObject CreateFlyingEnemy(CanvasBitmap canvasBitmap, Vector2 position, Vector2 size, Rect bounds)
         {
-            var gameObject = new GameObject();
+            var gameObject = _gameObjectManager.CreateGameObject();
             gameObject.TransformComponent.Position = position;
 
             //gameObject.AddComponent(new ShapeGraphicsComponent(gameObject, ShapeType.Rectangle, Colors.Pink, size));

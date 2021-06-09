@@ -15,11 +15,18 @@ namespace uwpPlatformer.Systems
     /// </remarks>
     public class VelocityVerletPhysicsSystem : SystemBase<VelocityVerletPhysicsSystem>
     {
+        private readonly IGameObjectManager _gameObjectManager;
+
+        public VelocityVerletPhysicsSystem(IGameObjectManager gameObjectManager)
+        {
+            _gameObjectManager = gameObjectManager;
+        }
+
         public override void Update(TimingInfo timingInfo)
         {
             var deltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
 
-            GameObjectManager.GameObjects
+            _gameObjectManager.GameObjects
                 .Select(gameObject => (gameObject, components: gameObject.GetComponents<PhysicsComponent, TransformComponent>()))
                 .Where(result => result != default && result.components != default)
                 .ToArray() // clone

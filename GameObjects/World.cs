@@ -16,11 +16,12 @@ namespace uwpPlatformer.GameObjects
         private readonly IReadOnlyList<CanvasBitmap> _canvasBitmaps;
         private readonly Map _map;
         private readonly TileAtlas[] _tileAtlases;
+        private readonly IGameObjectManager _gameObjectManager;
         private GameObject[] _tiles;
 
-        private HeroFactory _heroFactory = new HeroFactory();
-        private TileFactory _tileFactory = new TileFactory();
-        private EnemyFactory _enemyFactory = new EnemyFactory();
+        private HeroFactory _heroFactory;
+        private TileFactory _tileFactory;
+        private EnemyFactory _enemyFactory;
 
         private int[] _mapData = new[]
         {
@@ -36,11 +37,18 @@ namespace uwpPlatformer.GameObjects
             3, 3, 3, 3, 3, 3, 3, 0, 0, 3, 3, 3, 3, 3
         };
 
-        public World(CanvasBitmap[] canvasBitmaps, Map map, TileAtlas[] tileAtlases)
+        public World(CanvasBitmap[] canvasBitmaps, Map map, TileAtlas[] tileAtlases, IGameObjectManager gameObjectManager)
         {
+            _gameObjectManager = gameObjectManager;
+
+            _heroFactory = new HeroFactory(_gameObjectManager);
+            _tileFactory = new TileFactory(_gameObjectManager);
+            _enemyFactory = new EnemyFactory(_gameObjectManager);
+
             _canvasBitmaps = canvasBitmaps;
             _map = map;
             _tileAtlases = tileAtlases;
+
             _mapData = _map.Layers[0].Data;
 
             _horizontalTileCount = _map.Width;
@@ -68,7 +76,7 @@ namespace uwpPlatformer.GameObjects
 
         private void InitializeWorldBoundaries()
         {
-            var leftBoundary = new GameObject();
+            var leftBoundary = _gameObjectManager.CreateGameObject();
 
             leftBoundary.AddOrUpdateComponent(new TransformComponent(leftBoundary)
             {
@@ -80,7 +88,7 @@ namespace uwpPlatformer.GameObjects
                 Size = new Vector2(32f, WorldPixelHeight + 32f + 32f)
             });
 
-            var rightBoundary = new GameObject();
+            var rightBoundary = _gameObjectManager.CreateGameObject();
 
             rightBoundary.AddOrUpdateComponent(new TransformComponent(rightBoundary)
             {
@@ -92,7 +100,7 @@ namespace uwpPlatformer.GameObjects
                 Size = new Vector2(32f, WorldPixelHeight + 32f + 32f)
             });
 
-            var topBoundary = new GameObject();
+            var topBoundary = _gameObjectManager.CreateGameObject();
 
             topBoundary.AddOrUpdateComponent(new TransformComponent(topBoundary)
             {
@@ -104,7 +112,7 @@ namespace uwpPlatformer.GameObjects
                 Size = new Vector2(WorldPixelWidth + 32f + 32f, 32f)
             });
 
-            var bottomBoundary = new GameObject();
+            var bottomBoundary = _gameObjectManager.CreateGameObject();
 
             bottomBoundary.AddOrUpdateComponent(new TransformComponent(bottomBoundary)
             {

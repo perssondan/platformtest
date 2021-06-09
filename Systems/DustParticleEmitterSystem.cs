@@ -14,16 +14,20 @@ namespace uwpPlatformer.Systems
     {
         private readonly IEventSystem _eventSystem;
         private readonly DustEntityFactory _dustEntityFactory;
+        private readonly IGameObjectManager _gameObjectManager;
 
-        public DustParticleEmitterSystem(IEventSystem eventSystem, DustEntityFactory dustEntityFactory)
+        public DustParticleEmitterSystem(IEventSystem eventSystem,
+                                         DustEntityFactory dustEntityFactory,
+                                         IGameObjectManager gameObjectManager)
         {
             _dustEntityFactory = dustEntityFactory;
+            _gameObjectManager = gameObjectManager;
             _eventSystem = eventSystem;
         }
 
         public override void Update(TimingInfo timingInfo)
         {
-            GameObjectManager.GameObjects
+            _gameObjectManager.GameObjects
                 .Select(gameObject => gameObject.GetComponents<DustParticleEmitterComponent, TransformComponent>())
                 .Where(result => result != default)
                 .ToArray() // clone

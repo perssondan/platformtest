@@ -5,14 +5,18 @@ using System.Linq;
 using uwpPlatformer.Components;
 using uwpPlatformer.Components.Particles;
 using uwpPlatformer.Extensions;
+using uwpPlatformer.GameObjects;
 using Windows.UI;
 
 namespace uwpPlatformer.Systems
 {
     public class ParticleSystem : SystemBase<ParticleSystem>
     {
-        public ParticleSystem()
+        private readonly IGameObjectManager _gameObjectManager;
+
+        public ParticleSystem(IGameObjectManager gameObjectManager)
         {
+            _gameObjectManager = gameObjectManager;
         }
 
         public override void Update(TimingInfo timingInfo)
@@ -33,8 +37,7 @@ namespace uwpPlatformer.Systems
                     continue;
                 }
 
-                particle.GameObject.Dispose();
-                //_entityManager.Remove(entity);
+                _gameObjectManager.DestroyGameObject(particle.GameObject);
             }
         }
 

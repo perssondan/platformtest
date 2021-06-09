@@ -137,6 +137,9 @@
     <Compile Include="Components\Particles\ParticleEmitterComponentManager.cs" />
     <Compile Include="Components\PerlinMovementComponent.cs" />
     <Compile Include="Factories\EnemyFactory.cs" />
+    <Compile Include="GameObjects\IGameObjectManager.cs" />
+    <Compile Include="GameObjects\IScene.cs" />
+    <Compile Include="GameObjects\PlatformScene.cs" />
     <Compile Include="Systems\ImprovedEulerPhysicsSystem.cs" />
     <Compile Include="Systems\PositionVerletPhysicsSystem.cs" />
     <Compile Include="Systems\SemiImplicitEulerPhysicsSystem.cs" />

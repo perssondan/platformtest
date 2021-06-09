@@ -2,21 +2,29 @@
 
 namespace uwpPlatformer.GameObjects
 {
-    public static class GameObjectManager
+    public class GameObjectManager : IGameObjectManager
     {
-        private static List<GameObject> _gameObjects = new List<GameObject>();
+        private List<GameObject> _gameObjects = new List<GameObject>();
 
-        public static void AddGameObject(GameObject gameObject)
+        public GameObject CreateGameObject()
         {
+            var gameObject = new GameObject();
             _gameObjects.Add(gameObject);
+            return gameObject;
         }
 
-        public static void RemoveGameObject(GameObject gameObject)
+        public void RemoveGameObject(GameObject gameObject)
         {
             // TODO: remove components
             _gameObjects.Remove(gameObject);
         }
 
-        public static IReadOnlyList<GameObject> GameObjects => _gameObjects.AsReadOnly();
+        public void DestroyGameObject(GameObject gameObject)
+        {
+            _gameObjects.Remove(gameObject);
+            gameObject.Dispose();
+        }
+
+        public IReadOnlyList<GameObject> GameObjects => _gameObjects.AsReadOnly();
     }
 }

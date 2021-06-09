@@ -7,12 +7,16 @@ using System.Linq;
 using uwpPlatformer.Components;
 using uwpPlatformer.Events;
 using uwpPlatformer.Factories;
+using uwpPlatformer.Models;
 using uwpPlatformer.Systems;
 
 namespace uwpPlatformer.GameObjects
 {
     public class Game
     {
+        private IDictionary<string, IScene> _scenes = new Dictionary<string, IScene>();
+
+        private IGameObjectManager _gameObjectManager = new GameObjectManager();
         private bool _hasCollisions = false;
         // TODO: DI time...
         private readonly ColliderSystem _colliderSystem;
@@ -25,20 +29,23 @@ namespace uwpPlatformer.GameObjects
         private readonly DustParticleEmitterSystem _dustParticleEmitterSystem;
         private readonly ParticleEmitterSystem _particleEmitterSystem;
         private readonly IEventSystem _eventSystem = new EventSystem();
-        private readonly DustEntityFactory _dustEntityFactory = new DustEntityFactory();
         private readonly PerlinSystem _perlinSystem = new PerlinSystem();
+        private readonly DustEntityFactory _dustEntityFactory;
+        private readonly World _world;
 
-        public Game(Windows.UI.Xaml.Window current)
+        public Game(Windows.UI.Xaml.Window current, CanvasBitmap[] canvasBitmaps, Map map, TileAtlas[] tileAtlases)
         {
             _colliderSystem = new ColliderSystem(_eventSystem);
-            _moveSystem = new MoveSystem();
-            _physicsSystem = new PhysicsSystem();
-            _inputSystem = new InputSystem(_eventSystem);
-            _graphicsSystem = new GraphicsSystem(_eventSystem);
-            _particleSystem = new ParticleSystem();
+            _moveSystem = new MoveSystem(_gameObjectManager);
+            _physicsSystem = new PhysicsSystem(_gameObjectManager);
+            _inputSystem = new InputSystem(_eventSystem, _gameObjectManager);
+            _graphicsSystem = new GraphicsSystem(_eventSystem, _gameObjectManager);
+            _particleSystem = new ParticleSystem(_gameObjectManager);
+            _world = new World(canvasBitmaps, map, tileAtlases, _gameObjectManager);
+            _dustEntityFactory = new DustEntityFactory(_gameObjectManager);
             _playerSystem = new PlayerSystem(_eventSystem);
-            _dustParticleEmitterSystem = new DustParticleEmitterSystem(_eventSystem, _dustEntityFactory);
-            _particleEmitterSystem = new ParticleEmitterSystem(_dustEntityFactory);
+            _dustParticleEmitterSystem = new DustParticleEmitterSystem(_eventSystem, _dustEntityFactory, _gameObjectManager);
+            _particleEmitterSystem = new ParticleEmitterSystem(_dustEntityFactory, _gameObjectManager);
 
             _inputSystem.Current = current;
 
@@ -48,6 +55,7 @@ namespace uwpPlatformer.GameObjects
             });
         }
 
+        public World World => _world;
         public void Update(TimingInfo timingInfo)
         {
             _hasCollisions = false;

@@ -22,6 +22,7 @@ namespace uwpPlatformer.Systems
         private readonly Dictionary<Color, CanvasSolidColorBrush> _brushes = new Dictionary<Color, CanvasSolidColorBrush>();
         private readonly List<CollisionEvent> _collisionArguments = new List<CollisionEvent>();
         private readonly IEventSystem _eventSystem;
+        private readonly IGameObjectManager _gameObjectManager;
         private Action<CanvasDrawingSession, GameObject> _drawPositionHistory;
         private Action<CanvasDrawingSession, GameObject> _drawColliderBoundingBox;
         private Action<CanvasDrawingSession, GameObject> _drawVelocityVector;
@@ -31,13 +32,13 @@ namespace uwpPlatformer.Systems
         private Action<CanvasDrawingSession, TimeSpan, AnimatedGraphicsComponent> _drawComponent;
         private Action<CanvasDrawingSession, CollisionEvent[]> _drawCollisionInfos;
 
-        public GraphicsSystem(IEventSystem eventSystem)
+        public GraphicsSystem(IEventSystem eventSystem, IGameObjectManager gameObjectManager)
         {
             _drawShapeComponent = DrawShapeComponent;
             _drawComponent = DrawAnimatedComponent;
 
             _eventSystem = eventSystem;
-
+            _gameObjectManager = gameObjectManager;
             _eventSystem.Subscribe<CollisionEvent>(this, (sender, collision) =>
             {
                 _collisionArguments.Add(collision);
@@ -92,7 +93,7 @@ namespace uwpPlatformer.Systems
             ShapeGraphicsComponentManager.Instance.Components
                 .ForEach(shapeGraphicsComponent => _drawShapeComponent?.Invoke(canvasDrawingSession, deltaTime, shapeGraphicsComponent));
 
-            GameObjectManager.GameObjects
+            _gameObjectManager.GameObjects
                 .ForEach(gameObject =>
                 {
                     _drawPositionHistory?.Invoke(canvasDrawingSession, gameObject);

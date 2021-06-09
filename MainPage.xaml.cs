@@ -19,7 +19,6 @@ namespace uwpPlatformer
     public sealed partial class MainPage : Page
     {
         private Scaling _scaling = new Scaling();
-        private World _world;
         private Game _game;
         private CanvasRenderTarget _offscreen;
 
@@ -62,7 +61,7 @@ namespace uwpPlatformer
 
             if (_game == null) return false;
 
-            EnforceOffScreenCreated(canvasDevice, _world.WorldPixelWidth, _world.WorldPixelHeight);
+            EnforceOffScreenCreated(canvasDevice, _game.World.WorldPixelWidth, _game.World.WorldPixelHeight);
             if (_offscreen == null) return false;
 
             using (var drawingSession = _offscreen.CreateDrawingSession())
@@ -116,14 +115,9 @@ namespace uwpPlatformer
             var bitmaps = await Task.WhenAll(tileAtlases
                 .Select(tileAtlas => CanvasBitmap.LoadAsync(canvasControl, new Uri($"ms-appx:///Assets/GameAssets/images/{tileAtlas.ImageSource}")).AsTask()));
 
-            if (_world == null)
-            {
-                _world = new World(bitmaps, map, tileAtlases);
-            }
-
             if (_game is null)
             {
-                _game = new Game(Window.Current);
+                _game = new Game(Window.Current, bitmaps, map, tileAtlases);
             }
         }
 

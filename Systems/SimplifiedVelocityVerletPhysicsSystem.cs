@@ -13,13 +13,20 @@ namespace uwpPlatformer.Systems
 {
     public class SimplifiedVelocityVerletPhysicsSystem : SystemBase<SimplifiedVelocityVerletPhysicsSystem>
     {
+        private readonly IGameObjectManager _gameObjectManager;
+
+        public SimplifiedVelocityVerletPhysicsSystem(IGameObjectManager gameObjectManager)
+        {
+            _gameObjectManager = gameObjectManager;
+        }
+
         /// <summary>
         /// For reference, Simplified Velocity Verlet integration
         /// </summary>
         /// <param name="timingInfo"></param>
         public override void Update(TimingInfo timingInfo)
         {
-            GameObjectManager.GameObjects
+            _gameObjectManager.GameObjects
                 .Select(gameObject => (gameObject, components: gameObject.GetComponents<PhysicsComponent, TransformComponent>()))
                 .Where(result => result != default && result.components != default)
                 .ToArray() // clone

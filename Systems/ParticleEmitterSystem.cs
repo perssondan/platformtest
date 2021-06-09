@@ -12,15 +12,17 @@ namespace uwpPlatformer.Systems
     public class ParticleEmitterSystem : SystemBase<ParticleEmitterSystem>
     {
         private DustEntityFactory _dustEntityFactory;
+        private readonly IGameObjectManager _gameObjectManager;
 
-        public ParticleEmitterSystem(DustEntityFactory dustEntityFactory)
+        public ParticleEmitterSystem(DustEntityFactory dustEntityFactory, IGameObjectManager gameObjectManager)
         {
             _dustEntityFactory = dustEntityFactory;
+            _gameObjectManager = gameObjectManager;
         }
 
         public override void Update(TimingInfo timingInfo)
         {
-            GameObjectManager.GameObjects
+            _gameObjectManager.GameObjects
                 .Select(gameObject => gameObject.GetComponents<ParticleEmitterComponent, TransformComponent>())
                 .Where(result => result != default)
                 .ToArray() // clone

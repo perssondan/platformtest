@@ -19,9 +19,16 @@ namespace uwpPlatformer.Systems
     /// </remarks>
     public class PositionVerletPhysicsSystem : SystemBase<PositionVerletPhysicsSystem>
     {
+        private readonly IGameObjectManager _gameObjectManager;
+
+        public PositionVerletPhysicsSystem(IGameObjectManager gameObjectManager)
+        {
+            _gameObjectManager = gameObjectManager;
+        }
+
         public override void Update(TimingInfo timingInfo)
         {
-            GameObjectManager.GameObjects
+            _gameObjectManager.GameObjects
                 .Select(gameObject => (gameObject, gameObject.GetComponents<PhysicsComponent, TransformComponent>()))
                 .Where(result => result != default && result.Item2 != default)
                 .ToArray() // clone

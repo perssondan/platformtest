@@ -15,10 +15,12 @@ namespace uwpPlatformer.Systems
         private Window _window;
         private UserInput _userInputs;
         private readonly IEventSystem _eventSystem;
+        private readonly IGameObjectManager _gameObjectManager;
 
-        public InputSystem(IEventSystem eventSystem)
+        public InputSystem(IEventSystem eventSystem, IGameObjectManager gameObjectManager)
         {
             _eventSystem = eventSystem;
+            _gameObjectManager = gameObjectManager;
         }
 
         public Window Current
@@ -36,7 +38,7 @@ namespace uwpPlatformer.Systems
 
         public override void Update(TimingInfo timingInfo)
         {
-            GameObjectManager.GameObjects
+            _gameObjectManager.GameObjects
                 .Select(gameObject => (gameObject, inputComponent: gameObject.GetComponent<InputComponent>()))
                 .Where(result => result != default && result.inputComponent != default)
                 .ToArray() // clone

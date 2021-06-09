@@ -14,9 +14,16 @@ namespace uwpPlatformer.Factories
 {
     public class TileFactory
     {
+        private readonly IGameObjectManager _gameObjectManager;
+
+        public TileFactory(IGameObjectManager gameObjectManager)
+        {
+            _gameObjectManager = gameObjectManager;
+        }
+
         public GameObject CreateTile(CanvasBitmap canvasBitmap, Vector2 position, Vector2 size, TileType tileType)
         {
-            var gameObject = new GameObject();
+            var gameObject = _gameObjectManager.CreateGameObject();
             var transformComponent = new TransformComponent(gameObject)
             {
                 Position = position

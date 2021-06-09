@@ -12,7 +12,6 @@ namespace uwpPlatformer.GameObjects
         public GameObject()
         {
             Id = GenerateId();
-            GameObjectManager.AddGameObject(this);
             AddOrUpdateComponent(new TransformComponent(this));
         }
 
@@ -108,7 +107,6 @@ namespace uwpPlatformer.GameObjects
 
         public void Dispose()
         {
-            GameObjectManager.RemoveGameObject(this);
             foreach (var component in _components.Values)
             {
                 component.Dispose();
