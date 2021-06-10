@@ -4,16 +4,10 @@ using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Components
 {
-    public class PhysicsComponent : GameObjectComponent, IComponent
+    public class PhysicsComponent : ComponentBase, IComponent
     {
         public PhysicsComponent(GameObject gameObject) : base(gameObject)
         {
-            PhysicsComponentManager.Instance.AddComponent(this);
-        }
-
-        protected override void OnDispose()
-        {
-            PhysicsComponentManager.Instance.RemoveComponent(this);
         }
 
         public Vector2 OldVelocity { get; set; }

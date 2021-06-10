@@ -2,9 +2,9 @@
 
 namespace uwpPlatformer.Components
 {
-    public abstract class GameObjectComponent : IComponent
+    public abstract class ComponentBase : IComponent
     {
-        public GameObjectComponent(GameObject gameObject)
+        public ComponentBase(GameObject gameObject)
         {
             GameObject = gameObject;
         }
@@ -14,14 +14,8 @@ namespace uwpPlatformer.Components
 
         public void Dispose()
         {
-            OnDispose();
             GameObject = null;
             IsDisposed = true;
-        }
-
-        protected virtual void OnDispose()
-        {
-
         }
     }
 }

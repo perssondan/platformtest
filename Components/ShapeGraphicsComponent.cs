@@ -4,7 +4,7 @@ using Windows.UI;
 
 namespace uwpPlatformer.Components
 {
-    public class ShapeGraphicsComponent : GameObjectComponent, IComponent
+    public class ShapeGraphicsComponent : ComponentBase, IComponent
     {
         public ShapeGraphicsComponent(GameObject gameObject, ShapeType shapeType = ShapeType.Circle)
             : this(gameObject, shapeType, Colors.White, new Vector2(3f, 3f))
@@ -17,17 +17,11 @@ namespace uwpPlatformer.Components
             ShapeType = shapeType;
             Color = color;
             Size = size;
-            ShapeGraphicsComponentManager.Instance.AddComponent(this);
         }
 
         public ShapeType ShapeType { get; set; }
         public Color Color { get; set; }
         public Vector2 Size { get; set; }
-
-        protected override void OnDispose()
-        {
-            ShapeGraphicsComponentManager.Instance.RemoveComponent(this);
-        }
     }
 
     public enum ShapeType

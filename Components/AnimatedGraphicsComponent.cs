@@ -7,7 +7,7 @@ using Windows.Foundation;
 
 namespace uwpPlatformer.Components
 {
-    public class AnimatedGraphicsComponent : GameObjectComponent, IComponent
+    public class AnimatedGraphicsComponent : ComponentBase, IComponent
     {
         public AnimatedGraphicsComponent(GameObject gameObject,
                                  CanvasBitmap canvasBitmap,
@@ -15,7 +15,6 @@ namespace uwpPlatformer.Components
                                  TimeSpan animationInterval)
             : base(gameObject)
         {
-            GraphicsComponentManager.Instance.AddComponent(this);
             CanvasBitmap = canvasBitmap;
             SourceRects = sourceRects;
             AnimationInterval = animationInterval;
@@ -32,10 +31,5 @@ namespace uwpPlatformer.Components
         public CanvasBitmap CanvasBitmap { get; private set; }
 
         public TimeSpan CurrentTime { get; set; }
-
-        protected override void OnDispose()
-        {
-            GraphicsComponentManager.Instance.RemoveComponent(this);
-        }
     }
 }

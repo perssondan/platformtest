@@ -35,7 +35,7 @@ namespace uwpPlatformer.GameObjects
 
         public Game(Windows.UI.Xaml.Window current, CanvasBitmap[] canvasBitmaps, Map map, TileAtlas[] tileAtlases)
         {
-            _colliderSystem = new ColliderSystem(_eventSystem);
+            _colliderSystem = new ColliderSystem(_eventSystem, _gameObjectManager);
             _moveSystem = new MoveSystem(_gameObjectManager);
             // _perlinSystem = new PerlinSystem(_gameObjectManager);
             _physicsSystem = new PhysicsSystem(_gameObjectManager);
@@ -44,7 +44,7 @@ namespace uwpPlatformer.GameObjects
             _particleSystem = new ParticleSystem(_gameObjectManager);
             _world = new World(canvasBitmaps, map, tileAtlases, _gameObjectManager);
             _dustEntityFactory = new DustEntityFactory(_gameObjectManager);
-            _playerSystem = new PlayerSystem(_eventSystem);
+            _playerSystem = new PlayerSystem(_eventSystem, _gameObjectManager);
             _dustParticleEmitterSystem = new DustParticleEmitterSystem(_eventSystem, _dustEntityFactory, _gameObjectManager);
             _particleEmitterSystem = new ParticleEmitterSystem(_dustEntityFactory, _gameObjectManager);
 

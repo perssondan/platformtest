@@ -86,12 +86,21 @@ namespace uwpPlatformer.Systems
 
         public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime)
         {
-            GraphicsComponentManager.Instance.Components
-                .OfType<AnimatedGraphicsComponent>()
-                .ForEach(graphicsComponent => _drawComponent?.Invoke(canvasDrawingSession, deltaTime, graphicsComponent));
+            _gameObjectManager.GameObjects
+                .Select(gameObject => gameObject.GetComponent<AnimatedGraphicsComponent>())
+                .Where(graphicsComponent => graphicsComponent != default)
+                .ForEach(graphicsComponent =>
+                {
+                    _drawComponent?.Invoke(canvasDrawingSession, deltaTime, graphicsComponent);
+                });
 
-            ShapeGraphicsComponentManager.Instance.Components
-                .ForEach(shapeGraphicsComponent => _drawShapeComponent?.Invoke(canvasDrawingSession, deltaTime, shapeGraphicsComponent));
+            _gameObjectManager.GameObjects
+                .Select(gameObject => gameObject.GetComponent<ShapeGraphicsComponent>())
+                .Where(shapeGraphicsComponent => shapeGraphicsComponent != default)
+                .ForEach(shapeGraphicsComponent =>
+                {
+                    _drawShapeComponent?.Invoke(canvasDrawingSession, deltaTime, shapeGraphicsComponent);
+                });
 
             _gameObjectManager.GameObjects
                 .ForEach(gameObject =>

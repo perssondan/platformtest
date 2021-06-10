@@ -20,7 +20,6 @@ namespace uwpPlatformer.Components.Particles
             NumberOfParticles = numberOfParticles;
             InitialVelocityFactor = initialVelocityFactor;
             ParticleEmitterType = particleEmitterType;
-            DustParticleEmitterComponentManager.Instance.AddComponent(this);
         }
 
         public TimeSpan TimeToLive;
@@ -33,7 +32,6 @@ namespace uwpPlatformer.Components.Particles
 
         public void Dispose()
         {
-            DustParticleEmitterComponentManager.Instance.RemoveComponent(this);
         }
 
         public override bool Equals(object obj)

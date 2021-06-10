@@ -7,6 +7,7 @@ using System.Numerics;
 using uwpPlatformer.Components;
 using uwpPlatformer.Events;
 using uwpPlatformer.Extensions;
+using uwpPlatformer.GameObjects;
 using uwpPlatformer.Numerics;
 using Windows.Foundation;
 
@@ -15,37 +16,26 @@ namespace uwpPlatformer.Systems
     public class ColliderSystem : SystemBase<ColliderSystem>
     {
         private readonly IEventSystem _eventSystem;
+        private readonly IGameObjectManager _gameObjectManager;
 
-        public ColliderSystem(IEventSystem eventSystem)
+        public ColliderSystem(IEventSystem eventSystem, IGameObjectManager gameObjectManager)
             : base()
         {
             _eventSystem = eventSystem;
+            _gameObjectManager = gameObjectManager;
         }
 
         public override void Update(TimingInfo timingInfo)
         {
-            DetectCollisions(timingInfo.ElapsedTime);
+            var colliderComponents = InitializeCollidersToTest();
+            DetectCollisions(colliderComponents, timingInfo.ElapsedTime);
         }
 
         public void ResolveCollisions(TimingInfo timingInfo)
         {
-            var fDeltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
-            var dynamicColliderComponents = ColliderComponentManager.Instance.Components
-                .Where(colliderComponent => colliderComponent.IsColliding == true)
-                .Where(colliderComponent => (colliderComponent.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) > 0)
-                .ToArray();
+            var colliderComponents = InitializeCollidersToTest();
 
-            foreach (var colliderComponent in dynamicColliderComponents)
-            {
-                var dynamicColliderWasMoved = TryResolveCollisions(colliderComponent, fDeltaTime)
-                    .Any(value => value == true);
-                if (dynamicColliderWasMoved)
-                {
-                    DetectCollisions(timingInfo.ElapsedTime);
-                    ResolveCollisions(timingInfo);
-                    return;
-                }
-            }
+            ResolveCollisions(colliderComponents, timingInfo);
         }
 
         public bool TryResolveCollision(ColliderComponent colliderComponent, CollisionInfo collisionInfo, float deltaTime)
@@ -68,39 +58,53 @@ namespace uwpPlatformer.Systems
             return true;
         }
 
-        public bool IsColliding(Vector2 futurePosition, ColliderComponent colliderComponent)
+        private void ResolveCollisions(ColliderComponent[] colliderComponents, TimingInfo timingInfo)
         {
-            var collidersToTest = ColliderComponentManager.Instance.Components.Where(collider => collider != colliderComponent);
-            var futureRect = colliderComponent.BoundingBox;
-            futureRect.X = futurePosition.X;
-            futureRect.Y = futurePosition.Y;
+            var fDeltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
+            var dynamicColliderComponents = colliderComponents
+                .Where(colliderComponent => colliderComponent.IsColliding == true)
+                .Where(colliderComponent => (colliderComponent.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) > 0)
+                .ToArray();
 
-            return collidersToTest.Any(collider => IsColliding(futureRect, collider.BoundingBox));
+            foreach (var colliderComponent in dynamicColliderComponents)
+            {
+                var dynamicColliderWasMoved = TryResolveCollisions(colliderComponent, fDeltaTime)
+                    .Any(value => value == true);
+                if (dynamicColliderWasMoved)
+                {
+                    DetectCollisions(colliderComponents, timingInfo.ElapsedTime);
+                    ResolveCollisions(timingInfo);
+                    return;
+                }
+            }
         }
 
-        public bool IsColliding(Rect sourceRect, Rect opponentRect)
+        private ColliderComponent[] InitializeCollidersToTest()
+        {
+            return _gameObjectManager.GameObjects
+                .Where(gameObject => gameObject.Has<ColliderComponent>())
+                .Select(gameObject => gameObject.GetComponent<ColliderComponent>())
+                .ToArray();
+        }
+
+        private bool IsColliding(Rect sourceRect, Rect opponentRect)
         {
             return (sourceRect.Left < opponentRect.Right && sourceRect.Right > opponentRect.Left) &&
                     (sourceRect.Top < opponentRect.Bottom && sourceRect.Bottom > opponentRect.Top);
         }
 
-        public bool IsColliding(ColliderComponent first, ColliderComponent second)
-        {
-            return IsColliding(first.BoundingBox, second.BoundingBox);
-        }
-
-        public bool IsColliding(ColliderComponent dynamicCollider, float deltaTime)
+        private bool IsColliding(ColliderComponent dynamicCollider, float deltaTime, ColliderComponent[] colliderComponents)
         {
             dynamicCollider.CollisionInfos = Array.Empty<CollisionInfo>();
 
             if ((dynamicCollider.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) == 0) return false;
 
-            var colliderComponents = ColliderComponentManager.Instance.Components
+            var staticColliderComponents = colliderComponents
                 .Where(collider => (collider.CollisionType & ColliderComponent.CollisionTypes.IsStaticMask) > 0)
                 .ToArray();
 
             // reset collision flag
-            colliderComponents
+            staticColliderComponents
                 .ForEach(collider => collider.IsColliding = false);
 
             var componentsInCollision = GetOverlappingColliders(dynamicCollider, deltaTime, colliderComponents);
@@ -129,10 +133,11 @@ namespace uwpPlatformer.Systems
             return false;
         }
 
-        private bool DetectCollisions(TimeSpan deltaTime)
+        private bool DetectCollisions(ColliderComponent[] colliderComponents, TimeSpan deltaTime)
         {
-            var dynamicColliders = ColliderComponentManager.Instance.Components
-                            .Where(collider => (collider.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) > 0);
+            var dynamicColliders = colliderComponents
+                .Where(collider => (collider.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) > 0);
+
             if (!dynamicColliders.Any()) return false;
 
             var isAnyColliding = false;
@@ -140,7 +145,7 @@ namespace uwpPlatformer.Systems
             {
                 dynamicCollider.IsColliding = false;
 
-                var isColliding = IsColliding(dynamicCollider, (float)deltaTime.TotalSeconds);
+                var isColliding = IsColliding(dynamicCollider, (float)deltaTime.TotalSeconds, colliderComponents);
                 isAnyColliding |= isColliding;
 
                 dynamicCollider.IsColliding = isColliding;

@@ -4,7 +4,7 @@ using Windows.UI;
 
 namespace uwpPlatformer.Components.Particles
 {
-    public class ParticleComponent : GameObjectComponent
+    public class ParticleComponent : ComponentBase
     {
         public ParticleComponent(GameObject gameObject,
                                  TimeSpan timeToLive,
@@ -19,7 +19,6 @@ namespace uwpPlatformer.Components.Particles
             TransitionBehavior = changeColorBehavior;
             TimeToLive = timeToLive;
             CreatedAt = createdAt;
-            ParticleComponentManager.Instance.AddComponent(this);
         }
 
         public TimeSpan TimeToLive { get; set; }
@@ -30,10 +29,5 @@ namespace uwpPlatformer.Components.Particles
         public ParticleSizeBehavior ParticleSizeBehavior { get; set; }
         public TimeSpan CreatedAt { get; }
         public TimeSpan EndOfLife => CreatedAt + TimeToLive;
-
-        protected override void OnDispose()
-        {
-            ParticleComponentManager.Instance.RemoveComponent(this);
-        }
     }
 }

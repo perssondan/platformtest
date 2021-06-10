@@ -30,7 +30,6 @@ namespace uwpPlatformer.Components.Particles
                     break;
             }
             ParticleOffset = particleOffset;
-            ParticleEmitterComponentManager.Instance.AddComponent(this);
         }
 
         public Vector2 ParticleOffset;
@@ -41,7 +40,6 @@ namespace uwpPlatformer.Components.Particles
 
         public void Dispose()
         {
-            ParticleEmitterComponentManager.Instance.RemoveComponent(this);
         }
 
         public override bool Equals(object obj)

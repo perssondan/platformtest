@@ -22,7 +22,10 @@ namespace uwpPlatformer.Systems
         public override void Update(TimingInfo timingInfo)
         {
             // Make a copy of the list before thus not to change the list we're iterating
-            var particles = ParticleComponentManager.Instance.Components.ToArray();
+            var particles = _gameObjectManager.GameObjects
+                .Where(gameObject => gameObject.Has<ParticleComponent>())
+                .Select(gameObject => gameObject.GetComponent<ParticleComponent>())
+                .ToArray();
 
             var now = timingInfo.TotalTime;
             foreach (var particle in particles)

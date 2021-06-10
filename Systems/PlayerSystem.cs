@@ -15,19 +15,22 @@ namespace uwpPlatformer.Systems
     public class PlayerSystem : SystemBase<PlayerSystem>
     {
         private readonly IEventSystem _eventSystem;
+        private readonly IGameObjectManager _gameObjectManager;
 
-        public PlayerSystem(IEventSystem eventSystem)
+        public PlayerSystem(IEventSystem eventSystem, IGameObjectManager gameObjectManager)
         {
             _eventSystem = eventSystem;
+            _gameObjectManager = gameObjectManager;
         }
 
         public override void Update(TimingInfo timingInfo)
         {
-            var playerGameObjects = PlayerComponentManager.Instance.Components.Select(c => c.GameObject);
-            playerGameObjects.ForEach(playerGameObject =>
-            {
-                UpdatePlayerGameObject(playerGameObject, timingInfo.ElapsedTime);
-            });
+            _gameObjectManager.GameObjects
+                .Where(gameObject => gameObject.Has<PlayerComponent>())
+                .ForEach(gameObject =>
+                {
+                    UpdatePlayerGameObject(gameObject, timingInfo.ElapsedTime);
+                });
         }
 
         private void UpdatePlayerGameObject(GameObject gameObject, TimeSpan deltatime)

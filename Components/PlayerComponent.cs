@@ -6,12 +6,11 @@ using Windows.Foundation;
 
 namespace uwpPlatformer.Components
 {
-    public class PlayerComponent : GameObjectComponent, IComponent
+    public class PlayerComponent : ComponentBase, IComponent
     {
         public PlayerComponent(GameObject gameObject)
             : base(gameObject)
         {
-            PlayerComponentManager.Instance.AddComponent(this);
         }
 
         public TimeSpan JumpPressedRememberTime => TimeSpan.FromMilliseconds(150);
@@ -35,10 +34,5 @@ namespace uwpPlatformer.Components
         /// Initial jump velocity
         /// </summary>
         public Vector2 InitialJumpVelocity { get; set; } = new Vector2(0, PlayerConstants.InitialVerticalVelocity);
-
-        protected override void OnDispose()
-        {
-            PlayerComponentManager.Instance.RemoveComponent(this);
-        }
     }
 }

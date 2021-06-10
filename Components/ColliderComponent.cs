@@ -5,12 +5,11 @@ using Windows.Foundation;
 
 namespace uwpPlatformer.Components
 {
-    public class ColliderComponent : GameObjectComponent, IComponent
+    public class ColliderComponent : ComponentBase, IComponent
     {
         public ColliderComponent(GameObject gameObject)
             : base(gameObject)
         {
-            ColliderComponentManager.Instance.AddComponent(this);
         }
 
         public bool IsColliding { get; set; }
@@ -25,11 +24,6 @@ namespace uwpPlatformer.Components
         public Vector2 Size { get; set; } = Vector2.Zero;
         public Rect BoundingBox => new Rect(Position.ToPoint(), Size.ToSize());
         public Vector2 Center => new Vector2(Position.X + Size.X / 2f, Position.Y + Size.Y / 2f);
-
-        protected override void OnDispose()
-        {
-            ColliderComponentManager.Instance.RemoveComponent(this);
-        }
 
         protected Vector2 Position => GameObject.TransformComponent.Position;
 
