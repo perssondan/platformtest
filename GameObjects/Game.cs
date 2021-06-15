@@ -30,14 +30,14 @@ namespace uwpPlatformer.GameObjects
         private readonly ParticleEmitterSystem _particleEmitterSystem;
         private readonly IEventSystem _eventSystem = new EventSystem();
         private readonly DustEntityFactory _dustEntityFactory;
-        // private readonly PerlinSystem _perlinSystem;
+        private readonly PerlinSystem _perlinSystem;
         private readonly World _world;
 
         public Game(Windows.UI.Xaml.Window current, CanvasBitmap[] canvasBitmaps, Map map, TileAtlas[] tileAtlases)
         {
             _colliderSystem = new ColliderSystem(_eventSystem, _gameObjectManager);
             _moveSystem = new MoveSystem(_gameObjectManager);
-            // _perlinSystem = new PerlinSystem(_gameObjectManager);
+            _perlinSystem = new PerlinSystem(_gameObjectManager);
             _physicsSystem = new PhysicsSystem(_gameObjectManager);
             _inputSystem = new InputSystem(_eventSystem, _gameObjectManager);
             _graphicsSystem = new GraphicsSystem(_eventSystem, _gameObjectManager);
@@ -63,7 +63,7 @@ namespace uwpPlatformer.GameObjects
             _hasCollisions = false;
 
             _inputSystem.Update(timingInfo);
-            // _perlinSystem.Update(timingInfo);
+            _perlinSystem.Update(timingInfo);
             _graphicsSystem.Update(timingInfo);
             _playerSystem.Update(timingInfo);
             _particleSystem.Update(timingInfo);

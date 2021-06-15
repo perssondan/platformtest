@@ -185,6 +185,7 @@
     <Compile Include="Systems\MoveSystem.cs" />
     <Compile Include="Systems\DustParticleEmitterSystem.cs" />
     <Compile Include="Systems\ParticleSystem.cs" />
+    <Compile Include="Systems\PerlinSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\PlayerSystem.cs" />
     <Compile Include="Systems\SimplifiedVelocityVerletPhysicsSystem.cs" />
