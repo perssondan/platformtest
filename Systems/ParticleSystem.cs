@@ -68,18 +68,24 @@ namespace uwpPlatformer.Systems
             var graphicsComponent = particle.GameObject.GetComponent<ShapeGraphicsComponent>();
             if (graphicsComponent is null) return;
 
-            var alpha = 0f;
-            if (particle.FadeBehavior == FadeBehavior.FadeOut)
-            {
-                alpha = GameMath.Lerp(255, 0, progressStatus.endPercentage);
-            }
-            else
-            {
-                alpha = GameMath.Lerp(0, 255, progressStatus.endPercentage);
-            }
+            var alpha = GetAlphaValue(particle, progressStatus);
 
             var currentColor = graphicsComponent.Color;
-            graphicsComponent.Color = Color.FromArgb((byte)alpha, currentColor.R, currentColor.G, currentColor.B);
+            graphicsComponent.Color = Color.FromArgb(alpha, currentColor.R, currentColor.G, currentColor.B);
+        }
+
+        private static byte GetAlphaValue(ParticleComponent particle, ProgressStatus progressStatus)
+        {
+            switch (particle.FadeBehavior)
+            {
+                case FadeBehavior.FadeIn:
+                    return (byte)GameMath.Lerp(0, 255, progressStatus.endPercentage);
+                case FadeBehavior.FadeOut:
+                    return (byte)GameMath.Lerp(255, 0, progressStatus.endPercentage);
+                case FadeBehavior.None:
+                default:
+                    return 255;
+            }
         }
 
         private struct ProgressStatus
