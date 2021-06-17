@@ -9,7 +9,7 @@ using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Systems
 {
-    public class PhysicsSystem : SystemBase<PhysicsSystem>
+    public class PhysicsSystem : ISystem
     {
         private readonly IGameObjectManager _gameObjectManager;
 
@@ -18,7 +18,9 @@ namespace uwpPlatformer.Systems
             _gameObjectManager = gameObjectManager;
         }
 
-        public override void Update(TimingInfo timingInfo)
+        public string Name => nameof(PhysicsSystem);
+
+        public void Update(TimingInfo timingInfo)
         {
             var deltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
 

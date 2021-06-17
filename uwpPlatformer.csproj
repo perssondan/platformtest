@@ -185,11 +185,10 @@
     <Compile Include="Systems\MoveSystem.cs" />
     <Compile Include="Systems\DustParticleEmitterSystem.cs" />
     <Compile Include="Systems\ParticleSystem.cs" />
-    <Compile Include="Systems\PerlinSystem.cs" />
+    <Compile Include="Systems\PerlinMoveSystem.cs" />
     <Compile Include="Systems\PhysicsSystem.cs" />
     <Compile Include="Systems\PlayerSystem.cs" />
     <Compile Include="Systems\SimplifiedVelocityVerletPhysicsSystem.cs" />
-    <Compile Include="Systems\SystemBase.cs" />
     <Compile Include="Systems\UserInput.cs" />
     <Compile Include="Systems\UserInputInfo.cs" />
     <Compile Include="Systems\VelocityVerletPhysicsSystem.cs" />

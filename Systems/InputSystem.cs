@@ -10,7 +10,7 @@ using Windows.UI.Xaml;
 
 namespace uwpPlatformer.Systems
 {
-    public class InputSystem : SystemBase<InputSystem>
+    public class InputSystem : ISystem
     {
         private Window _window;
         private UserInput _userInputs;
@@ -22,6 +22,8 @@ namespace uwpPlatformer.Systems
             _eventSystem = eventSystem;
             _gameObjectManager = gameObjectManager;
         }
+
+        public string Name => nameof(InputSystem);
 
         public Window Current
         {
@@ -36,7 +38,7 @@ namespace uwpPlatformer.Systems
             }
         }
 
-        public override void Update(TimingInfo timingInfo)
+        public void Update(TimingInfo timingInfo)
         {
             _gameObjectManager.GameObjects
                 .Select(gameObject => (gameObject, inputComponent: gameObject.GetComponent<InputComponent>()))

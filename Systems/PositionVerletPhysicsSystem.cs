@@ -17,7 +17,7 @@ namespace uwpPlatformer.Systems
     /// to make this to work in the specific setup of this game.
     /// However, the <see cref="PositionVerletPhysicsSystem"/> is added here for reference only.
     /// </remarks>
-    public class PositionVerletPhysicsSystem : SystemBase<PositionVerletPhysicsSystem>
+    public class PositionVerletPhysicsSystem : ISystem
     {
         private readonly IGameObjectManager _gameObjectManager;
 
@@ -26,7 +26,9 @@ namespace uwpPlatformer.Systems
             _gameObjectManager = gameObjectManager;
         }
 
-        public override void Update(TimingInfo timingInfo)
+        public string Name => nameof(PositionVerletPhysicsSystem);
+
+        public void Update(TimingInfo timingInfo)
         {
             _gameObjectManager.GameObjects
                 .Select(gameObject => (gameObject, gameObject.GetComponents<PhysicsComponent, TransformComponent>()))

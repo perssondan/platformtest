@@ -9,18 +9,20 @@ using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Systems
 {
-    public class PerlinSystem : SystemBase<PerlinSystem>
+    public class PerlinMoveSystem : ISystem
     {
         private readonly PerlinNoise _perlinNoise;
         private readonly IGameObjectManager _gameObjectManager;
 
-        public PerlinSystem(IGameObjectManager gameObjectManager)
+        public PerlinMoveSystem(IGameObjectManager gameObjectManager)
         {
             _perlinNoise = new PerlinNoise();
             _gameObjectManager = gameObjectManager;
         }
 
-        public override void Update(TimingInfo timingInfo)
+        public string Name => nameof(PerlinMoveSystem);
+
+        public void Update(TimingInfo timingInfo)
         {
             _gameObjectManager.GameObjects
                 .Select(gameObject => (gameObject, components: gameObject.GetComponents<PerlinMovementComponent, TransformComponent, PhysicsComponent>()))

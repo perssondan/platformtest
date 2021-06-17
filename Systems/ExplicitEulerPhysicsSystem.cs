@@ -10,7 +10,7 @@ namespace uwpPlatformer.Systems
     /// <summary>
     /// For reference, Explicit Euler integration
     /// </summary>
-    public class ExplicitEulerPhysicsSystem : SystemBase<ExplicitEulerPhysicsSystem>
+    public class ExplicitEulerPhysicsSystem : ISystem
     {
         private readonly IGameObjectManager _gameObjectManager;
 
@@ -19,7 +19,9 @@ namespace uwpPlatformer.Systems
             _gameObjectManager = gameObjectManager;
         }
 
-        public override void Update(TimingInfo timingInfo)
+        public string Name => nameof(ExplicitEulerPhysicsSystem);
+
+        public void Update(TimingInfo timingInfo)
         {
             var deltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
 

@@ -10,7 +10,7 @@ using Windows.UI;
 
 namespace uwpPlatformer.Systems
 {
-    public class ParticleSystem : SystemBase<ParticleSystem>
+    public class ParticleSystem : ISystem
     {
         private readonly IGameObjectManager _gameObjectManager;
 
@@ -19,7 +19,9 @@ namespace uwpPlatformer.Systems
             _gameObjectManager = gameObjectManager;
         }
 
-        public override void Update(TimingInfo timingInfo)
+        public string Name => nameof(ParticleSystem);
+
+        public void Update(TimingInfo timingInfo)
         {
             // Make a copy of the list before thus not to change the list we're iterating
             var particles = _gameObjectManager.GameObjects

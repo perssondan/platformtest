@@ -10,7 +10,7 @@ namespace uwpPlatformer.Systems
     /// <summary>
     /// For reference, Semi-implicit Euler integration
     /// </summary>
-    public class SemiImplicitEulerPhysicsSystem : SystemBase<SemiImplicitEulerPhysicsSystem>
+    public class SemiImplicitEulerPhysicsSystem : ISystem
     {
         private readonly IGameObjectManager _gameObjectManager;
 
@@ -19,7 +19,9 @@ namespace uwpPlatformer.Systems
             _gameObjectManager = gameObjectManager;
         }
 
-        public override void Update(TimingInfo timingInfo)
+        public string Name => nameof(SemiImplicitEulerPhysicsSystem);
+
+        public void Update(TimingInfo timingInfo)
         {
             var deltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
             _gameObjectManager.GameObjects

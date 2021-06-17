@@ -9,7 +9,7 @@ using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Systems
 {
-    public class ParticleEmitterSystem : SystemBase<ParticleEmitterSystem>
+    public class ParticleEmitterSystem : ISystem
     {
         private DustEntityFactory _dustEntityFactory;
         private readonly IGameObjectManager _gameObjectManager;
@@ -20,7 +20,9 @@ namespace uwpPlatformer.Systems
             _gameObjectManager = gameObjectManager;
         }
 
-        public override void Update(TimingInfo timingInfo)
+        public string Name => nameof(ParticleEmitterSystem);
+
+        public void Update(TimingInfo timingInfo)
         {
             _gameObjectManager.GameObjects
                 .Select(gameObject => gameObject.GetComponents<ParticleEmitterComponent, TransformComponent>())

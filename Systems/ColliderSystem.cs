@@ -13,19 +13,20 @@ using Windows.Foundation;
 
 namespace uwpPlatformer.Systems
 {
-    public class ColliderSystem : SystemBase<ColliderSystem>
+    public class ColliderSystem : ISystem
     {
         private readonly IEventSystem _eventSystem;
         private readonly IGameObjectManager _gameObjectManager;
 
         public ColliderSystem(IEventSystem eventSystem, IGameObjectManager gameObjectManager)
-            : base()
         {
             _eventSystem = eventSystem;
             _gameObjectManager = gameObjectManager;
         }
 
-        public override void Update(TimingInfo timingInfo)
+        public string Name => nameof(MoveSystem);
+
+        public void Update(TimingInfo timingInfo)
         {
             var colliderComponents = InitializeCollidersToTest();
             DetectCollisions(colliderComponents, timingInfo.ElapsedTime);

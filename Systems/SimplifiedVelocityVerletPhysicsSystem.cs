@@ -11,7 +11,11 @@ using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Systems
 {
-    public class SimplifiedVelocityVerletPhysicsSystem : SystemBase<SimplifiedVelocityVerletPhysicsSystem>
+    /// <summary>
+    /// For reference, Simplified Velocity Verlet integration
+    /// </summary>
+    /// <param name="timingInfo"></param>
+    public class SimplifiedVelocityVerletPhysicsSystem : ISystem
     {
         private readonly IGameObjectManager _gameObjectManager;
 
@@ -20,11 +24,9 @@ namespace uwpPlatformer.Systems
             _gameObjectManager = gameObjectManager;
         }
 
-        /// <summary>
-        /// For reference, Simplified Velocity Verlet integration
-        /// </summary>
-        /// <param name="timingInfo"></param>
-        public override void Update(TimingInfo timingInfo)
+        public string Name => nameof(SimplifiedVelocityVerletPhysicsSystem);
+
+        public void Update(TimingInfo timingInfo)
         {
             _gameObjectManager.GameObjects
                 .Select(gameObject => (gameObject, components: gameObject.GetComponents<PhysicsComponent, TransformComponent>()))

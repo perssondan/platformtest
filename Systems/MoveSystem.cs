@@ -7,7 +7,7 @@ using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Systems
 {
-    public class MoveSystem : SystemBase<MoveSystem>
+    public class MoveSystem : ISystem
     {
         private readonly IGameObjectManager _gameObjectManager;
 
@@ -16,7 +16,9 @@ namespace uwpPlatformer.Systems
             _gameObjectManager = gameObjectManager;
         }
 
-        public override void Update(TimingInfo timingInfo)
+        public string Name => nameof(MoveSystem);
+
+        public void Update(TimingInfo timingInfo)
         {
             float deltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
 

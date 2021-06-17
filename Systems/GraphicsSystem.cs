@@ -17,7 +17,7 @@ using Windows.UI;
 
 namespace uwpPlatformer.Systems
 {
-    public class GraphicsSystem : SystemBase<GraphicsSystem>
+    public class GraphicsSystem : ISystem
     {
         private readonly Dictionary<Color, CanvasSolidColorBrush> _brushes = new Dictionary<Color, CanvasSolidColorBrush>();
         private readonly List<CollisionEvent> _collisionArguments = new List<CollisionEvent>();
@@ -80,7 +80,9 @@ namespace uwpPlatformer.Systems
             });
         }
 
-        public override void Update(TimingInfo timingInfo)
+        public string Name => nameof(GraphicsSystem);
+
+        public void Update(TimingInfo timingInfo)
         {
         }
 

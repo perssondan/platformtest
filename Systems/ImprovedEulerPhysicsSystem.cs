@@ -11,7 +11,7 @@ namespace uwpPlatformer.Systems
     /// <summary>
     /// For reference, Improved Euler integration
     /// </summary>
-    public class ImprovedEulerPhysicsSystem : SystemBase<ImprovedEulerPhysicsSystem>
+    public class ImprovedEulerPhysicsSystem : ISystem
     {
         private readonly IGameObjectManager _gameObjectManager;
 
@@ -20,7 +20,9 @@ namespace uwpPlatformer.Systems
             _gameObjectManager = gameObjectManager;
         }
 
-        public override void Update(TimingInfo timingInfo)
+        public string Name => nameof(ImprovedEulerPhysicsSystem);
+
+        public void Update(TimingInfo timingInfo)
         {
             _gameObjectManager.GameObjects
                 .Select(gameObject => (gameObject, gameObject.GetComponents<PhysicsComponent, TransformComponent>()))

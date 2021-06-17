@@ -13,7 +13,7 @@ namespace uwpPlatformer.Systems
     /// <remarks>
     /// Due to the nature of <see cref="MoveSystem"/>, this won't work in our game
     /// </remarks>
-    public class VelocityVerletPhysicsSystem : SystemBase<VelocityVerletPhysicsSystem>
+    public class VelocityVerletPhysicsSystem : ISystem
     {
         private readonly IGameObjectManager _gameObjectManager;
 
@@ -22,7 +22,9 @@ namespace uwpPlatformer.Systems
             _gameObjectManager = gameObjectManager;
         }
 
-        public override void Update(TimingInfo timingInfo)
+        public string Name => nameof(VelocityVerletPhysicsSystem);
+
+        public void Update(TimingInfo timingInfo)
         {
             var deltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
 

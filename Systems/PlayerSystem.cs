@@ -12,7 +12,7 @@ using uwpPlatformer.GameObjects;
 
 namespace uwpPlatformer.Systems
 {
-    public class PlayerSystem : SystemBase<PlayerSystem>
+    public class PlayerSystem : ISystem
     {
         private readonly IEventSystem _eventSystem;
         private readonly IGameObjectManager _gameObjectManager;
@@ -23,7 +23,9 @@ namespace uwpPlatformer.Systems
             _gameObjectManager = gameObjectManager;
         }
 
-        public override void Update(TimingInfo timingInfo)
+        public string Name => nameof(PlayerSystem);
+
+        public void Update(TimingInfo timingInfo)
         {
             _gameObjectManager.GameObjects
                 .Where(gameObject => gameObject.Has<PlayerComponent>())
