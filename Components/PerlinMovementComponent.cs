@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using GamesLibrary.Utilities;
+using System.Runtime.CompilerServices;
 using uwpPlatformer.GameObjects;
 using Windows.Foundation;
 

@@ -121,7 +121,6 @@
     <Compile Include="Components\CollisionInfo.cs" />
     <Compile Include="Components\ComponentBase.cs" />
     <Compile Include="Components\ComponentManager.cs" />
-    <Compile Include="Components\HashCodeHelper.cs" />
     <Compile Include="Components\IComponent.cs" />
     <Compile Include="Components\InputComponent.cs" />
     <Compile Include="Components\Particles\ColorBehavior.cs" />
