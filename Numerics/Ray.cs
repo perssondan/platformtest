@@ -1,11 +1,13 @@
 ﻿using GamesLibrary.Utilities;
 using System;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using uwpPlatformer.Components;
 
 namespace uwpPlatformer.Numerics
 {
+    [DebuggerDisplay("(Origin:{Origin}, Direction:{Direction})")]
     public struct Ray : IEquatable<Ray>
     {
         public Ray(Vector2 origin, Vector2 direction)

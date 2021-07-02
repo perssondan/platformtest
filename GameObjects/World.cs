@@ -71,7 +71,7 @@ namespace uwpPlatformer.GameObjects
 
         private void InitializeHeroine()
         {
-            _heroFactory.CreateHero(_canvasBitmaps[0], new Vector2(288f, 256f), new Vector2(_tileAtlases[0].TileWidth - 1, _tileAtlases[0].TileHeight - 1));
+            _heroFactory.CreateHero(_canvasBitmaps[0], new Vector2(288f, 257f), new Vector2(_tileAtlases[0].TileWidth - 2, _tileAtlases[0].TileHeight - 2));
         }
 
         private void InitializeWorldBoundaries()
