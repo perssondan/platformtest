@@ -23,7 +23,7 @@ namespace uwpPlatformer.Factories
                                                        TimeSpan createdAt,
                                                        int numberOfParticles = 10,
                                                        TimeSpan? timeToLive = null,
-                                                       float initialVelocityFactor = 50f)
+                                                       float initialVelocityFactor = 4000f)
         {
             CreateDustParticleEntites(position,
                                       numberOfParticles,
@@ -37,26 +37,31 @@ namespace uwpPlatformer.Factories
                                                                  int numberOfParticles,
                                                                  TimeSpan timeToLive,
                                                                  TimeSpan createdAt,
-                                                                 float initialVelocityFactor = 75f)
+                                                                 float initialVelocityFactor)
         {
             for (var particleIndex = 0; particleIndex < numberOfParticles; particleIndex++)
             {
                 var gameObject = _gameObjectManager.CreateGameObject();
                 gameObject.TransformComponent.Position = position;
-                var velocity = CreateRandomVelocityVector();
-
-                // set a initial speed with some randomness
-                gameObject.TransformComponent.Velocity = (float)_random.NextDouble() * initialVelocityFactor * velocity;
 
                 // TODO: Where's a good place to have the color shading stuff, separate component?
                 gameObject.AddOrUpdateComponent(new ParticleComponent(gameObject, timeToLive, Colors.White, Colors.SandyBrown, TransitionBehavior.OverTime, createdAt) { FadeBehavior = FadeBehavior.FadeOut });
                 gameObject.AddOrUpdateComponent(new ShapeGraphicsComponent(gameObject, ShapeType.Rectangle, Colors.White, new Vector2(2f, 2f)));
 
+                var physicsComponent = new PhysicsComponent(gameObject) { Gravity = Vector2.Zero };
+
+                var forceVector = CreateRandomForceVector();
+
+                // set a initial force with some randomness
+                physicsComponent.ImpulseForce += (float)_random.NextDouble() * initialVelocityFactor * forceVector;
+
+                gameObject.AddOrUpdateComponent(physicsComponent);
+
                 yield return gameObject;
             }
         }
 
-        private static Vector2 CreateRandomVelocityVector()
+        private static Vector2 CreateRandomForceVector()
         {
             const double phi = 2f * Math.PI;
 

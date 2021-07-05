@@ -42,22 +42,24 @@ namespace uwpPlatformer.Systems
 
         private void Integrate(PhysicsComponent physicsComponent, TransformComponent transformComponent, float deltaTime)
         {
-            var newAcceleration = ApplyForces(physicsComponent);
-            var newVelocity = transformComponent.Velocity + ((physicsComponent.OldAcceleration + newAcceleration) * (deltaTime * 0.5f));
+            var currentPosition = transformComponent.Position;
+            var currentVelocity = physicsComponent.Velocity;
+            var currentAcceleration = physicsComponent.Acceleration;
 
-            physicsComponent.OldAcceleration = newAcceleration;
-            transformComponent.Velocity = newVelocity;
+            var newAcceleration = ApplyForces(physicsComponent);
+
+            var newPosition = currentPosition + (currentVelocity * deltaTime) + (currentAcceleration * (deltaTime * deltaTime * 0.5f));
+            var newVelocity = currentVelocity + ((newAcceleration + currentAcceleration) * (deltaTime * 0.5f));
+
+            physicsComponent.Acceleration = newAcceleration;
+            physicsComponent.Velocity = newVelocity;
+            physicsComponent.Position = newPosition;
+
             physicsComponent.ImpulseForce = Vector2.Zero;
         }
 
-        public enum IntegrationType
+        public void PostUpdate(TimingInfo timingInfo)
         {
-            None,
-            ExplicitEuler,
-            SemiImplicitEuler,
-            PositionVerlet,
-            VelocityVerlet,
-            SimplifiedVelocityVerlet,
         }
     }
 }

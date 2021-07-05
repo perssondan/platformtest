@@ -3,6 +3,7 @@ using GamesLibrary.Systems;
 using Microsoft.Graphics.Canvas;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using uwpPlatformer.Components;
 using uwpPlatformer.Events;
@@ -20,7 +21,7 @@ namespace uwpPlatformer.GameObjects
         private bool _hasCollisions = false;
         // TODO: DI time...
         private readonly ColliderSystem _colliderSystem;
-        private readonly MoveSystem _moveSystem;
+        private readonly TranslateTransformSystem _transformSystem;
         private readonly PhysicsSystem _physicsSystem;
         private readonly InputSystem _inputSystem;
         private readonly GraphicsSystem _graphicsSystem;
@@ -36,7 +37,7 @@ namespace uwpPlatformer.GameObjects
         public Game(Windows.UI.Xaml.Window current, CanvasBitmap[] canvasBitmaps, Map map, TileAtlas[] tileAtlases)
         {
             _colliderSystem = new ColliderSystem(_eventSystem, _gameObjectManager);
-            _moveSystem = new MoveSystem(_gameObjectManager);
+            _transformSystem = new TranslateTransformSystem(_gameObjectManager);
             _perlinSystem = new PerlinMoveSystem(_gameObjectManager);
             _physicsSystem = new PhysicsSystem(_gameObjectManager);
             _inputSystem = new InputSystem(_eventSystem, _gameObjectManager);
@@ -62,6 +63,8 @@ namespace uwpPlatformer.GameObjects
         {
             _hasCollisions = false;
 
+            _gameObjectManager.Update();
+
             _inputSystem.Update(timingInfo);
             _perlinSystem.Update(timingInfo);
             _graphicsSystem.Update(timingInfo);
@@ -70,16 +73,24 @@ namespace uwpPlatformer.GameObjects
 
             _physicsSystem.Update(timingInfo);
             _colliderSystem.Update(timingInfo);
+
             _dustParticleEmitterSystem.Update(timingInfo);
             _particleEmitterSystem.Update(timingInfo);
 
+            var resolveCounter = 5;
             // If we have collisions, resolve them now!
-            if (_hasCollisions)
+            while (_hasCollisions && resolveCounter >= 0)
             {
+                _hasCollisions = false;
                 _colliderSystem.ResolveCollisions(timingInfo);
+                // Detect new collisions after resolve
+                _colliderSystem.Update(timingInfo);
+                resolveCounter--;
+
+                //_physicsSystem.PostUpdate(timingInfo);
             }
 
-            _moveSystem.Update(timingInfo);
+            _transformSystem.Update(timingInfo);
         }
 
         public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)

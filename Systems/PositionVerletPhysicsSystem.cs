@@ -12,7 +12,7 @@ namespace uwpPlatformer.Systems
     /// Physics system that integrates with Position Verlet.
     /// </summary>
     /// <remarks>
-    /// Due to the nature of <see cref="MoveSystem"/>,
+    /// Due to the nature of <see cref="TranslateTransformSystem"/>,
     /// we need to estimate the actual velocity, var estimatedVelocity = (newPosition-currentPositon) * 0.5f;,
     /// to make this to work in the specific setup of this game.
     /// However, the <see cref="PositionVerletPhysicsSystem"/> is added here for reference only.

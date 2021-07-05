@@ -2,7 +2,7 @@
 {
     public class PlayerConstants
     {
-        public const float MaxJumpHeight = 68f;
+        public const float MaxJumpHeight = 72f;
         public const float TimeToReachMaxJumpHeight = 0.44f;
         public const float Gravity = 2f * MaxJumpHeight / (TimeToReachMaxJumpHeight * TimeToReachMaxJumpHeight);
         public const float MaxWalkWidth = 20f;

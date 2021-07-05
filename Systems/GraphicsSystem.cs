@@ -163,14 +163,14 @@ namespace uwpPlatformer.Systems
             var currentSourceRect = sourceRects[animatedGraphicsComponent.CurrentTileIndex];
             if (animatedGraphicsComponent.InvertTile)
             {
-                var invertedCenter = new Vector3(
+                var centerPoint = new Vector3(
                     position.X + (float)currentSourceRect.Width / 2f,
                     position.Y,
                     0f);
                 var invertMatrix = Matrix4x4.CreateScale(-1f,
                                                          1f,
                                                          0f,
-                                                         invertedCenter);
+                                                         centerPoint);
                 canvasDrawingSession.DrawImage(animatedGraphicsComponent.CanvasBitmap,
                                                position,
                                                currentSourceRect,
@@ -224,11 +224,13 @@ namespace uwpPlatformer.Systems
 
         private void DrawVelocityVector(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
         {
-            if (gameObject.TransformComponent.Velocity.LengthSquared() > 0f)
+            if (gameObject.PhysicsComponent == default) return;
+
+            if (gameObject.PhysicsComponent.Velocity.LengthSquared() > 0f)
             {
                 var center = gameObject.ColliderComponent?.Center ?? gameObject.TransformComponent.Position;
                 canvasDrawingSession.DrawLine(center,
-                                              center + (gameObject.TransformComponent.Velocity.Normalize() * 15f),
+                                              center + (gameObject.PhysicsComponent.Velocity.Normalize() * 15f),
                                               GetCachedBrush(canvasDrawingSession, Colors.Aquamarine));
             }
         }
@@ -240,7 +242,7 @@ namespace uwpPlatformer.Systems
             {
                 if ((collisionArgument.GameObject.ColliderComponent.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) > 0)
                 {
-                    var startPoint = collisionArgument.CollisionInfo.CollisionPoint - (collisionArgument.CollisionInfo.CollisionNormal * collisionArgument.GameObject.ColliderComponent.Size / 2f);
+                    var startPoint = collisionArgument.CollisionInfo.CollisionPoint - (collisionArgument.CollisionInfo.CollisionNormal * collisionArgument.GameObject.ColliderComponent.Size * .5f);
                     // draw collision point
                     canvasDrawingSession.FillCircle(startPoint,
                                                     2f,

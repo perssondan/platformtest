@@ -13,8 +13,6 @@ namespace uwpPlatformer.Components
         {
         }
 
-        public Vector2 Velocity { get; set; }
-
         public Vector2 Position
         {
             get => _position;
@@ -29,8 +27,15 @@ namespace uwpPlatformer.Components
             }
         }
 
+        public Vector2 Scale { get; set; } = Vector2.One;
+
+        public float Rotation { get; set; }
+
         public Vector2 PreviousPosition { get; private set; }
 
+        /// <summary>
+        /// Gets a number of historical position values, for debugging purpose
+        /// </summary>
         public Vector2[] PositionHistory => _historyStack.Items.ToArray();
     }
 }

@@ -181,7 +181,7 @@
     <Compile Include="Systems\GraphicsSystem.cs" />
     <Compile Include="Systems\InputSystem.cs" />
     <Compile Include="Systems\ISystem.cs" />
-    <Compile Include="Systems\MoveSystem.cs" />
+    <Compile Include="Systems\TranslateTransformSystem.cs" />
     <Compile Include="Systems\DustParticleEmitterSystem.cs" />
     <Compile Include="Systems\ParticleSystem.cs" />
     <Compile Include="Systems\PerlinMoveSystem.cs" />

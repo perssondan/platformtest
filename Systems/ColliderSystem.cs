@@ -24,7 +24,7 @@ namespace uwpPlatformer.Systems
             _gameObjectManager = gameObjectManager;
         }
 
-        public string Name => nameof(MoveSystem);
+        public string Name => nameof(TranslateTransformSystem);
 
         public void Update(TimingInfo timingInfo)
         {
@@ -39,24 +39,55 @@ namespace uwpPlatformer.Systems
             ResolveCollisions(colliderComponents, timingInfo);
         }
 
-        public bool TryResolveCollision(ColliderComponent colliderComponent, CollisionInfo collisionInfo, float deltaTime)
+        private bool TryResolveCollision(ColliderComponent colliderComponent, CollisionInfo collisionInfo, float deltaTime)
         {
-            var transformComponent = colliderComponent.GameObject.TransformComponent;
+            var physicsComponent = colliderComponent.GameObject.PhysicsComponent;
             if (!IsRectInRect(colliderComponent.BoundingBox,
-                              transformComponent.Velocity,
+                              physicsComponent.Position,
                               collisionInfo.ContactRect,
                               out var contactPoint,
                               out var contactNormal,
-                              out var contactTime,
-                              deltaTime))
+                              out var contactTime))
                 return false;
 
             // Nothing to resolve
             if (contactNormal == Vector2.Zero)
                 return false;
 
-            transformComponent.Velocity += contactNormal * new Vector2(Math.Abs(transformComponent.Velocity.X), Math.Abs(transformComponent.Velocity.Y)) * (1f - contactTime);
+            var position = physicsComponent.Position;
+            var offset = (colliderComponent.GameObject.ColliderComponent.Size * 0.5f);
+            // Calculate new position that moves the object out of collision
+            if (contactNormal.Y > 0 || contactNormal.Y < 0)
+            {
+                position.Y = contactPoint.Y - offset.Y;
+            }
+
+            if (contactNormal.X > 0 || contactNormal.X < 0)
+            {
+                position.X = contactPoint.X - offset.X;
+            }
+
+            physicsComponent.Position = position;
+            physicsComponent.Velocity += GetResponseVelocity(physicsComponent, contactNormal, 0f);
+
             return true;
+        }
+
+        // TODO: Move to physics system
+        private Vector2 GetLinearCollisionImpulse(PhysicsComponent physicsComponent, Vector2 normal, float coefficient)
+        {
+            var dot = Vector2.Dot(physicsComponent.LinearMomentum, normal);
+            var j = MathF.Max(-(1f + coefficient) * dot, 0);
+            var linearMomentum = j * normal;
+            return linearMomentum;
+        }
+
+        // TODO: Move to physics system
+        private Vector2 GetResponseVelocity(PhysicsComponent physicsComponent, Vector2 normal, float coefficient)
+        {
+            var linearMomentum = GetLinearCollisionImpulse(physicsComponent, normal, coefficient);
+
+            return linearMomentum * physicsComponent.MassInverted;
         }
 
         private void ResolveCollisions(ColliderComponent[] colliderComponents, TimingInfo timingInfo)
@@ -71,9 +102,12 @@ namespace uwpPlatformer.Systems
             {
                 var dynamicColliderWasMoved = TryResolveCollisions(colliderComponent, fDeltaTime)
                     .Any(value => value == true);
+
+                // If we've been moved we might have moved out of the collision, or hit a new one. Should we continue resolving?
                 if (dynamicColliderWasMoved)
                 {
                     DetectCollisions(colliderComponents, timingInfo.ElapsedTime);
+                    // TODO: Potentially stack overflow, since it's recursive
                     ResolveCollisions(timingInfo);
                     return;
                 }
@@ -100,20 +134,12 @@ namespace uwpPlatformer.Systems
 
             if ((dynamicCollider.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) == 0) return false;
 
-            var staticColliderComponents = colliderComponents
-                .Where(collider => (collider.CollisionType & ColliderComponent.CollisionTypes.IsStaticMask) > 0)
-                .ToArray();
-
-            // reset collision flag
-            staticColliderComponents
-                .ForEach(collider => collider.IsColliding = false);
-
             var componentsInCollision = GetOverlappingColliders(dynamicCollider, deltaTime, colliderComponents);
 
             var results = new List<CollisionInfo>();
             foreach (var componentInCollision in componentsInCollision)
             {
-                if (!IsRectInRect(dynamicCollider.BoundingBox, dynamicCollider.GameObject.TransformComponent.Velocity, componentInCollision.BoundingBox, out var contactPoint, out var contactNormal, out var contactTime, deltaTime))
+                if (!IsRectInRect(dynamicCollider.BoundingBox, dynamicCollider.GameObject.PhysicsComponent.Position, componentInCollision.BoundingBox, out var contactPoint, out var contactNormal, out var contactTime))
                     continue;
 
                 var collisionInfo = new CollisionInfo(contactPoint, contactNormal, contactTime)
@@ -134,18 +160,25 @@ namespace uwpPlatformer.Systems
             return false;
         }
 
+        private void ResetCollisionFlag(ColliderComponent[] colliderComponents)
+        {
+            colliderComponents
+                .ForEach(collider => collider.IsColliding = false);
+        }
+
         private bool DetectCollisions(ColliderComponent[] colliderComponents, TimeSpan deltaTime)
         {
+            ResetCollisionFlag(colliderComponents);
+
             var dynamicColliders = colliderComponents
-                .Where(collider => (collider.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) > 0);
+                .Where(collider => (collider.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) > 0)
+                .ToArray();
 
             if (!dynamicColliders.Any()) return false;
 
             var isAnyColliding = false;
             dynamicColliders.ForEach(dynamicCollider =>
             {
-                dynamicCollider.IsColliding = false;
-
                 var isColliding = IsColliding(dynamicCollider, (float)deltaTime.TotalSeconds, colliderComponents);
                 isAnyColliding |= isColliding;
 
@@ -175,7 +208,7 @@ namespace uwpPlatformer.Systems
         private ColliderComponent[] GetOverlappingColliders(ColliderComponent dynamicCollider, float deltaTime, ColliderComponent[] colliderComponents)
         {
             var movementBoundingBox = GetMovementBoundingBox(dynamicCollider, deltaTime);
-            return GetOverlappingColliders(movementBoundingBox, colliderComponents)
+            return GetOverlappingColliders(movementBoundingBox, colliderComponents.Except(new[] { dynamicCollider }).ToArray())
                 .ToArray();
         }
 
@@ -187,8 +220,8 @@ namespace uwpPlatformer.Systems
         /// <returns></returns>
         private static Rect GetMovementBoundingBox(ColliderComponent dynamicCollider, float deltaTime)
         {
-            var transform = dynamicCollider.GameObject.TransformComponent;
-            var futurePosition = transform.Position + transform.Velocity * deltaTime;
+            var physicsComponent = dynamicCollider.GameObject.PhysicsComponent;
+            var futurePosition = physicsComponent.Position;
             var unionDynamicRect = new Rect(futurePosition.X, futurePosition.Y, dynamicCollider.BoundingBox.Width, dynamicCollider.BoundingBox.Height);
             unionDynamicRect.Union(dynamicCollider.BoundingBox);
             return unionDynamicRect;
@@ -257,29 +290,22 @@ namespace uwpPlatformer.Systems
                 }
             }
 
-            //contactTime = Math.Clamp(contactTime, 0f, 1f);
-
             return true;
         }
 
         private bool IsRectInRect(Rect dynamicRect,
-                                  Vector2 sourceVelocity,
+                                  Vector2 newPosition,
                                   Rect staticRect,
                                   out Vector2 contactPoint,
                                   out Vector2 contactNormal,
-                                  out float contactTime,
-                                  float elapsedTime)
+                                  out float contactTime)
         {
-            contactPoint = Vector2.Zero;
-            contactNormal = Vector2.Zero;
-            contactTime = 0f;
-
-            if (sourceVelocity == Vector2.Zero) return false;
-
             var expandedStaticRect = staticRect.Add(dynamicRect.Size());
 
-            var centerPoint = dynamicRect.TopLeft() + (dynamicRect.Size() / 2f);
-            var ray = new Ray(centerPoint, sourceVelocity * elapsedTime);
+            var originPosition = dynamicRect.TopLeft();
+            var centerPoint = dynamicRect.Center();
+            var direction = newPosition - originPosition;
+            var ray = new Ray(centerPoint, direction);
             if (IsRayInRect(ray,
                             expandedStaticRect,
                             out contactPoint,
@@ -287,7 +313,6 @@ namespace uwpPlatformer.Systems
                             out contactTime))
             {
                 if (contactTime >= 0f && contactTime < 1f) return true;
-                else return false;
             }
 
             return false;

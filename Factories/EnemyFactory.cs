@@ -4,7 +4,6 @@ using System.Numerics;
 using uwpPlatformer.Components;
 using uwpPlatformer.GameObjects;
 using Windows.Foundation;
-using Windows.UI;
 
 namespace uwpPlatformer.Factories
 {
