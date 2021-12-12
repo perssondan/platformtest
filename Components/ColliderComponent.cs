@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using uwpPlatformer.GameObjects;
+using uwpPlatformer.Numerics;
 using Windows.Foundation;
 
 namespace uwpPlatformer.Components
@@ -14,7 +15,7 @@ namespace uwpPlatformer.Components
 
         public bool IsColliding { get; set; }
 
-        public CollisionInfo[] CollisionInfos { get; set; } = Array.Empty<CollisionInfo>();
+        public CollisionManifold[] CollisionManifolds { get; set; } = Array.Empty<CollisionManifold>();
 
         /// <summary>
         /// Get or set <see cref="CollisionTypes"/>. Default value is <see cref="CollisionTypes.StaticPlatform"/>
@@ -24,6 +25,8 @@ namespace uwpPlatformer.Components
         public Vector2 Size { get; set; } = Vector2.Zero;
         public Rect BoundingBox => new Rect(Position.ToPoint(), Size.ToSize());
         public Vector2 Center => new Vector2(Position.X + Size.X / 2f, Position.Y + Size.Y / 2f);
+
+        public LineSegment Line { get; set; }
 
         protected Vector2 Position => GameObject.TransformComponent.Position;
 
