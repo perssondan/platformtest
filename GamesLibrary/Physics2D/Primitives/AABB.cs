@@ -19,7 +19,8 @@ namespace GamesLibrary.Physics2D.Primitives
 
         public Vector2 Size
         {
-            get => _size; set
+            get => _size;
+            set
             {
                 _size = value;
                 HalfSize = _size * 0.5f;

@@ -14,6 +14,7 @@ namespace GamesLibrary.Physics2D.Primitives
         public Vector2 Origin { get; }
 
         public Vector2 Direction { get; }
+
         public Vector2 InvDirection { get; }
     }
 }
