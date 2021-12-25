@@ -9,10 +9,32 @@ namespace uwpPlatformer.Components
         private float _mass;
         private Vector2 _acceleration;
         private Vector2 _velocity;
+        private Vector2 _position;
 
         public PhysicsComponent(GameObject gameObject) : base(gameObject)
         {
             Mass = 1f;
+        }
+
+        public void Reset(Vector2 position)
+        {
+            Position = position;
+
+            Velocity = Vector2.Zero;
+
+            Acceleration = Vector2.Zero;
+
+            ImpulseForce = Vector2.Zero;
+        }
+
+        public Vector2 Position
+        {
+            get => _position;
+            set
+            {
+                PreviousPosition = _position;
+                _position = value;
+            }
         }
 
         public Vector2 Velocity
@@ -25,10 +47,6 @@ namespace uwpPlatformer.Components
             }
         }
 
-        public Vector2 Position { get; set; }
-
-        public Vector2 PreviousVelocity { get; private set; }
-
         public Vector2 Acceleration
         {
             get => _acceleration;
@@ -39,13 +57,17 @@ namespace uwpPlatformer.Components
             }
         }
 
+        public Vector2 PreviousPosition { get; private set; }
+
+        public Vector2 PreviousVelocity { get; private set; }
+
         public Vector2 PreviousAcceleration { get; private set; }
 
-        public Vector2 Gravity { get; set; } = new Vector2(0f, PlayerConstants.Gravity);
+        public Vector2 GravityForce { get; set; } = new Vector2(0f, PlayerConstants.Gravity);
 
         public Vector2 LinearMomentum => Mass * Velocity;
 
-        public float Drag { get; set; }
+        public float Drag { get; set; } = 5f;
 
         public float Mass
         {
