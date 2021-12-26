@@ -8,6 +8,8 @@ namespace uwpPlatformer.Systems
         None = 0,
         Left = 1,
         Right = 2,
-        Jump = 4
+        Jump = 4,
+        Up = 8,
+        Down = 16,
     }
 }

@@ -94,6 +94,16 @@ namespace uwpPlatformer.Systems
             switch (virtualKey)
             {
                 case VirtualKey.W:
+                case VirtualKey.GamepadDPadUp:
+                    userInput = UserInput.Up;
+                    break;
+
+                case VirtualKey.S:
+                case VirtualKey.GamepadDPadDown:
+                    userInput = UserInput.Down;
+                    break;
+
+                case VirtualKey.Space:
                 case VirtualKey.GamepadA:
                     userInput = UserInput.Jump;
                     break;
