@@ -105,6 +105,19 @@ namespace uwpPlatformer.GameObjects
             return default;
         }
 
+        public bool TryGetComponent<T>(out T componentT)
+            where T : IComponent
+        {
+            componentT = default;
+            if (_components.TryGetValue(typeof(T), out var compT))
+            {
+                componentT = (T)compT;
+                return true;
+            }
+
+            return default;
+        }
+
         public void Dispose()
         {
             foreach (var component in _components.Values)
