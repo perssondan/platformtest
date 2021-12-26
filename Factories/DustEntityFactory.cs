@@ -48,7 +48,11 @@ namespace uwpPlatformer.Factories
                 gameObject.AddOrUpdateComponent(new ParticleComponent(gameObject, timeToLive, Colors.White, Colors.SandyBrown, TransitionBehavior.OverTime, createdAt) { FadeBehavior = FadeBehavior.FadeOut });
                 gameObject.AddOrUpdateComponent(new ShapeGraphicsComponent(gameObject, ShapeType.Rectangle, Colors.White, new Vector2(2f, 2f)));
 
-                var physicsComponent = new PhysicsComponent(gameObject) { Gravity = Vector2.Zero };
+                var physicsComponent = new PhysicsComponent(gameObject)
+                {
+                    Position = position,
+                    GravityForce = Vector2.Zero
+                };
 
                 var forceVector = CreateRandomForceVector();
 

@@ -32,9 +32,10 @@ namespace uwpPlatformer.Factories
             };
             var animatedGraphicsComponent = new AnimatedGraphicsComponent(gameObject, canvasBitmap, sourceRects, TimeSpan.FromMilliseconds(150));
             gameObject.AddOrUpdateComponent(animatedGraphicsComponent);
-            gameObject.AddOrUpdateComponent(new PhysicsComponent(gameObject));
+            gameObject.AddOrUpdateComponent(new PhysicsComponent(gameObject) { Position = position });
             gameObject.AddOrUpdateComponent(new InputComponent(gameObject));
             gameObject.AddOrUpdateComponent(new PlayerComponent(gameObject));
+            gameObject.AddOrUpdateComponent(new HeroComponent(gameObject));
             var collider = new ColliderComponent(gameObject)
             {
                 Size = size,
