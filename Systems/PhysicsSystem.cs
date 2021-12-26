@@ -59,8 +59,6 @@ namespace uwpPlatformer.Systems
                 });
         }
 
-        private HashSet<(float, float, float)> _history = new HashSet<(float, float, float)>();
-
         public void PostUpdate(TimingInfo timingInfo)
         {
             _gameObjectManager.GameObjects
@@ -84,24 +82,31 @@ namespace uwpPlatformer.Systems
                         // Calculate new position that moves the object out of collision
                         if (contactNormal.Y > 0 || contactNormal.Y < 0)
                         {
-                            position.Y = collisionManifold.CollisionPoint.Y - colliderComponent.BoundingBox.Half().Y;
+                            position.Y = collisionManifold.CollisionPoint.Y - halfSize.Y;
                         }
                         else if (contactNormal.X > 0 || contactNormal.X < 0)
                         {
-                            position.X = collisionManifold.CollisionPoint.X - colliderComponent.BoundingBox.Half().X;
+                            position.X = collisionManifold.CollisionPoint.X - halfSize.X;
                         }
                         else
                         {
                             System.Diagnostics.Debug.WriteLine("No normal!");
-                            position = collisionManifold.CollisionPoint;
+                            //position = collisionManifold.CollisionPoint;
+                            continue;
                         }
 
+                        //position = position + contactNormal * (contactPoint - halfSize);
+
                         physicsComponent.Position = position;
-                        //var impulseForce = GetLinearCollisionImpulse(physicsComponent, contactNormal, 0f);
-                        //physicsComponent.ImpulseForce += impulseForce;
-                        //physicsComponent.Velocity = physicsComponent.Velocity + (impulseForce * physicsComponent.MassInverted);
+                        var j = -(1f + physicsComponent.RestitutionFactor) * Vector2.Dot(physicsComponent.Velocity, collisionManifold.CollisionNormal);
+                        j *= physicsComponent.MassInverted;
+                        var newVelocity = physicsComponent.Velocity + (j / physicsComponent.Mass * collisionManifold.CollisionNormal);
+                        physicsComponent.Velocity = newVelocity;
+                            //var impulseForce = GetLinearCollisionImpulse(physicsComponent, contactNormal, 0f);
+                            //physicsComponent.ImpulseForce += impulseForce;
+                            //physicsComponent.Velocity = physicsComponent.Velocity + (impulseForce * physicsComponent.MassInverted);
                     }
-                });
+            });
 
             _entitiesInContact.Clear();
         }
