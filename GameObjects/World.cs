@@ -1,11 +1,16 @@
-﻿using Microsoft.Graphics.Canvas;
+﻿using GamesLibrary.Models;
+using GamesLibrary.Systems;
+using Microsoft.Graphics.Canvas;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 using uwpPlatformer.Components;
+using uwpPlatformer.Events;
 using uwpPlatformer.Factories;
 using uwpPlatformer.Models;
+using uwpPlatformer.Systems;
 using Windows.Foundation;
+using Windows.System;
 
 namespace uwpPlatformer.GameObjects
 {
@@ -17,11 +22,16 @@ namespace uwpPlatformer.GameObjects
         private readonly Map _map;
         private readonly TileAtlas[] _tileAtlases;
         private readonly IGameObjectManager _gameObjectManager;
+        private readonly IEventSystem _eventSystem;
         private GameObject[] _tiles;
 
         private HeroFactory _heroFactory;
         private TileFactory _tileFactory;
         private EnemyFactory _enemyFactory;
+        private GameObject _hero;
+        private Vector2 _heroStartPosition = new Vector2(288f, 257f);
+        private bool _resetHeroPosition;
+        private List<GameObject> _boundaries = new List<GameObject>();
 
         private int[] _mapData = new[]
         {
@@ -37,10 +47,15 @@ namespace uwpPlatformer.GameObjects
             3, 3, 3, 3, 3, 3, 3, 0, 0, 3, 3, 3, 3, 3
         };
 
-        public World(CanvasBitmap[] canvasBitmaps, Map map, TileAtlas[] tileAtlases, IGameObjectManager gameObjectManager)
+        public World(
+            CanvasBitmap[] canvasBitmaps,
+            Map map,
+            TileAtlas[] tileAtlases,
+            IGameObjectManager gameObjectManager,
+            IEventSystem eventSystem)
         {
             _gameObjectManager = gameObjectManager;
-
+            _eventSystem = eventSystem;
             _heroFactory = new HeroFactory(_gameObjectManager);
             _tileFactory = new TileFactory(_gameObjectManager);
             _enemyFactory = new EnemyFactory(_gameObjectManager);
@@ -59,6 +74,26 @@ namespace uwpPlatformer.GameObjects
             InitializeTileMap();
             InitializeHeroine();
             CreateFlyingEnemy();
+
+            _eventSystem.Subscribe<UserInputInfo>(this, (sender, userInputInfo) =>
+            {
+                // when going outside window we need to be table to reset position
+                switch (userInputInfo.VirtualKey)
+                {
+                    case VirtualKey.Number0 when userInputInfo.IsPressed:
+                        _resetHeroPosition = true;
+                        break;
+                }
+            });
+
+            _eventSystem.Subscribe<CollisionEvent>(this, (sender, collision) =>
+            {
+                if (collision.GameObject == _hero && _boundaries.Contains(collision.IsCollidingWith))
+                {
+                    _gameObjectManager.DestroyGameObject(_hero);
+                    InitializeHeroine();
+                }
+            });
         }
 
         public int WorldPixelHeight => _map.Height * _map.TileHeight;
@@ -71,13 +106,12 @@ namespace uwpPlatformer.GameObjects
 
         private void InitializeHeroine()
         {
-            _heroFactory.CreateHero(_canvasBitmaps[0], new Vector2(288f, 257f), new Vector2(_tileAtlases[0].TileWidth - 2, _tileAtlases[0].TileHeight - 2));
+            _hero = _heroFactory.CreateHero(_canvasBitmaps[0], _heroStartPosition, new Vector2(_tileAtlases[0].TileWidth - 2, _tileAtlases[0].TileHeight - 2));
         }
 
         private void InitializeWorldBoundaries()
         {
             var leftBoundary = _gameObjectManager.CreateGameObject();
-
             leftBoundary.AddOrUpdateComponent(new TransformComponent(leftBoundary)
             {
                 Position = new Vector2(-32f, -32f)
@@ -113,6 +147,7 @@ namespace uwpPlatformer.GameObjects
             });
 
             var bottomBoundary = _gameObjectManager.CreateGameObject();
+            _boundaries.Add(bottomBoundary);
 
             bottomBoundary.AddOrUpdateComponent(new TransformComponent(bottomBoundary)
             {
@@ -123,6 +158,15 @@ namespace uwpPlatformer.GameObjects
                 CollisionType = ColliderComponent.CollisionTypes.StaticWorld,
                 Size = new Vector2(WorldPixelWidth + 32f + 32f, 32f)
             });
+        }
+
+        internal void Update(TimingInfo timingInfo)
+        {
+            if (_resetHeroPosition)
+            {
+                _hero.PhysicsComponent.Reset(_heroStartPosition);
+                _resetHeroPosition = false;
+            }
         }
 
         private void InitializeTileMap()
