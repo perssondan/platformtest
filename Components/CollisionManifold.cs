@@ -1,11 +1,13 @@
 ﻿using GamesLibrary.Utilities;
 using System;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Windows.Foundation;
 
 namespace uwpPlatformer.Components
 {
+    [DebuggerDisplay("CollisionPoint:{CollisionPoint}, CollisionNormal:{CollisionNormal}, CollisionTime:{CollisionTime}, ContactRect:{ContactRect}")]
     public struct CollisionManifold : IEquatable<CollisionManifold>, IFormattable
     {
         public static CollisionManifold Zero => new CollisionManifold();

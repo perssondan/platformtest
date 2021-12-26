@@ -5,15 +5,15 @@ namespace uwpPlatformer.Events
 {
     public struct CollisionEvent
     {
-        public CollisionEvent(GameObject gameObject, GameObject isCollidingWith, CollisionInfo collisionInfo)
+        public CollisionEvent(GameObject gameObject, GameObject isCollidingWith, CollisionManifold collisionManifold)
         {
             GameObject = gameObject;
             IsCollidingWith = isCollidingWith;
-            CollisionInfo = collisionInfo;
+            CollisionManifold = collisionManifold;
         }
 
         public readonly GameObject GameObject;
         public readonly GameObject IsCollidingWith;
-        public readonly CollisionInfo CollisionInfo;
+        public readonly CollisionManifold CollisionManifold;
     }
 }
