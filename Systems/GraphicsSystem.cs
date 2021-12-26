@@ -26,6 +26,7 @@ namespace uwpPlatformer.Systems
         private Action<CanvasDrawingSession, GameObject> _drawPositionHistory;
         private Action<CanvasDrawingSession, GameObject> _drawColliderBoundingBox;
         private Action<CanvasDrawingSession, GameObject> _drawVelocityVector;
+        private Action<CanvasDrawingSession, GameObject> _drawForceVector;
         private Action<CanvasDrawingSession, GameObject> _drawObjectId;
         private Action<CanvasDrawingSession, GameObject> _drawObjectPositionText;
         private Action<CanvasDrawingSession, TimeSpan, ShapeGraphicsComponent> _drawShapeComponent;
@@ -76,6 +77,10 @@ namespace uwpPlatformer.Systems
                     case VirtualKey.Number7 when userInputInfo.IsPressed:
                         _drawObjectPositionText = _drawObjectPositionText == null ? DrawObjectPositionText : default(Action<CanvasDrawingSession, GameObject>);
                         break;
+
+                    case VirtualKey.Number8 when userInputInfo.IsPressed:
+                        _drawForceVector  = _drawForceVector is null ? DrawForceVector : default(Action<CanvasDrawingSession, GameObject>);
+                        break;
                 }
             });
         }
@@ -112,6 +117,7 @@ namespace uwpPlatformer.Systems
                     _drawVelocityVector?.Invoke(canvasDrawingSession, gameObject);
                     _drawObjectId?.Invoke(canvasDrawingSession, gameObject);
                     _drawObjectPositionText?.Invoke(canvasDrawingSession, gameObject);
+                    _drawForceVector?.Invoke(canvasDrawingSession, gameObject);
                 });
 
             _drawCollisionInfos?.Invoke(canvasDrawingSession, _collisionArguments.ToArray());
@@ -203,10 +209,12 @@ namespace uwpPlatformer.Systems
 
         private void DrawObjectPositionText(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
         {
-            canvasDrawingSession.DrawText($"{gameObject.TransformComponent.Position}",
+            var x = gameObject?.ColliderComponent?.Center.X;
+            var y = gameObject?.ColliderComponent?.Center.Y;
+            canvasDrawingSession.DrawText($"{x:0.##} : {y:0.##}",
                                           gameObject.TransformComponent.Position + new Vector2(0f, 10f),
-                                          Colors.White,
-                                          new CanvasTextFormat { FontSize = 6 });
+                                          Colors.LightGray,
+                                          new CanvasTextFormat { FontSize = 7 });
         }
 
         private void DrawColliderBoundingBox(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
@@ -226,12 +234,33 @@ namespace uwpPlatformer.Systems
         {
             if (gameObject.PhysicsComponent == default) return;
 
-            if (gameObject.PhysicsComponent.Velocity.LengthSquared() > 0f)
+            canvasDrawingSession.DrawText($"Velocity <{gameObject.PhysicsComponent.Velocity.X}, {gameObject.PhysicsComponent.Velocity.Y}>",
+                                          new Vector2(375, 15),
+                                          Colors.White,
+                                          new CanvasTextFormat { FontSize = 8 });
+
+            var velocity = gameObject.PhysicsComponent.Velocity;
+            if (velocity.LengthSquared() > 0f)
             {
                 var center = gameObject.ColliderComponent?.Center ?? gameObject.TransformComponent.Position;
                 canvasDrawingSession.DrawLine(center,
-                                              center + (gameObject.PhysicsComponent.Velocity.Normalize() * 15f),
+                                              center + (velocity.Normalize() * 15f),
                                               GetCachedBrush(canvasDrawingSession, Colors.Aquamarine));
+            }
+        }
+
+        private void DrawForceVector(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
+        {
+            if (gameObject.PhysicsComponent == default) return;
+
+            var lengthSquared = gameObject.PhysicsComponent.Acceleration.LengthSquared();
+
+            if (lengthSquared > 0f)
+            {
+                var center = gameObject.ColliderComponent?.Center ?? gameObject.TransformComponent.Position;
+                canvasDrawingSession.DrawLine(center,
+                                              center + (gameObject.PhysicsComponent.Acceleration.Normalize() * 15f),
+                                              GetCachedBrush(canvasDrawingSession, Colors.Yellow), 1f);
             }
         }
 
@@ -242,7 +271,7 @@ namespace uwpPlatformer.Systems
             {
                 if ((collisionArgument.GameObject.ColliderComponent.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) > 0)
                 {
-                    var startPoint = collisionArgument.CollisionInfo.CollisionPoint - (collisionArgument.CollisionInfo.CollisionNormal * collisionArgument.GameObject.ColliderComponent.Size * .5f);
+                    var startPoint = collisionArgument.CollisionManifold.CollisionPoint - (collisionArgument.CollisionManifold.CollisionNormal * collisionArgument.GameObject.ColliderComponent.Size * .5f);
                     // draw collision point
                     canvasDrawingSession.FillCircle(startPoint,
                                                     2f,
@@ -251,17 +280,22 @@ namespace uwpPlatformer.Systems
                     // draw collision normal
 
                     canvasDrawingSession.DrawLine(startPoint,
-                                                  startPoint + (collisionArgument.CollisionInfo.CollisionNormal * 16f),
+                                                  startPoint + (collisionArgument.CollisionManifold.CollisionNormal * 16f),
                                                   GetCachedBrush(canvasDrawingSession, collisionColor));
                 }
 
                 // draw collision rectangle
-                canvasDrawingSession.DrawRectangle(collisionArgument.CollisionInfo.ContactRect, GetCachedBrush(canvasDrawingSession, collisionColor));
+                canvasDrawingSession.DrawRectangle(collisionArgument.CollisionManifold.ContactRect, GetCachedBrush(canvasDrawingSession, collisionColor));
             }
         }
 
         private void DrawPositionHistory(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
         {
+            canvasDrawingSession.DrawText("Position history on",
+                                          new Vector2(375, 5),
+                                          Colors.White,
+                                          new CanvasTextFormat { FontSize = 8 });
+
             if (gameObject.TransformComponent.PositionHistory.Length < 5) return;
 
             var canvasPathBuilder = new CanvasPathBuilder(canvasDrawingSession);
