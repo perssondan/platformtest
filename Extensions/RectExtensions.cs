@@ -46,6 +46,11 @@ namespace uwpPlatformer.Extensions
             return topLeft + (rect.Size() * 0.5f);
         }
 
+        public static Vector2 Half(this Rect rect)
+        {
+            return rect.Size() * 0.5f;
+        }
+
         public static Rect Add(this Rect target, Size source)
         {
             return new Rect(
