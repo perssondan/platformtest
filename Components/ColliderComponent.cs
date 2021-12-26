@@ -26,8 +26,6 @@ namespace uwpPlatformer.Components
         public Rect BoundingBox => new Rect(Position.ToPoint(), Size.ToSize());
         public Vector2 Center => new Vector2(Position.X + Size.X / 2f, Position.Y + Size.Y / 2f);
 
-        public LineSegment Line { get; set; }
-
         public Rect MovingBoundingBox { get; set; } = Rect.Empty;
 
         protected Vector2 Position => GameObject.TransformComponent.Position;
