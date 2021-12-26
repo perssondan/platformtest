@@ -39,11 +39,11 @@ namespace uwpPlatformer.GameObjects
             _colliderSystem = new ColliderSystem(_eventSystem, _gameObjectManager);
             _transformSystem = new TranslateTransformSystem(_gameObjectManager);
             _perlinSystem = new PerlinMoveSystem(_gameObjectManager);
-            _physicsSystem = new PhysicsSystem(_gameObjectManager);
+            _physicsSystem = new PhysicsSystem(_gameObjectManager, _eventSystem);
             _inputSystem = new InputSystem(_eventSystem, _gameObjectManager);
             _graphicsSystem = new GraphicsSystem(_eventSystem, _gameObjectManager);
             _particleSystem = new ParticleSystem(_gameObjectManager);
-            _world = new World(canvasBitmaps, map, tileAtlases, _gameObjectManager);
+            _world = new World(canvasBitmaps, map, tileAtlases, _gameObjectManager, _eventSystem);
             _dustEntityFactory = new DustEntityFactory(_gameObjectManager);
             _playerSystem = new PlayerSystem(_eventSystem, _gameObjectManager);
             _dustParticleEmitterSystem = new DustParticleEmitterSystem(_eventSystem, _dustEntityFactory, _gameObjectManager);
@@ -54,6 +54,14 @@ namespace uwpPlatformer.GameObjects
             _eventSystem.Subscribe<CollisionEvent>(this, (sender, collisionEvent) =>
             {
                 _hasCollisions = true;
+
+                var isHero = collisionEvent.GameObject.Has<HeroComponent>();
+                var isEnemy = collisionEvent.IsCollidingWith.Has<EnemyComponent>();
+
+                if (isHero && isEnemy)
+                {
+                    Debug.WriteLine("Hero collided with enemy!");
+                }
             });
         }
 
@@ -77,20 +85,20 @@ namespace uwpPlatformer.GameObjects
             _dustParticleEmitterSystem.Update(timingInfo);
             _particleEmitterSystem.Update(timingInfo);
 
-            var resolveCounter = 5;
-            // If we have collisions, resolve them now!
-            while (_hasCollisions && resolveCounter >= 0)
+            if (_hasCollisions)
             {
-                _hasCollisions = false;
-                _colliderSystem.ResolveCollisions(timingInfo);
-                // Detect new collisions after resolve
-                _colliderSystem.Update(timingInfo);
-                resolveCounter--;
-
-                //_physicsSystem.PostUpdate(timingInfo);
+                ResolveCollisions(timingInfo);
             }
 
             _transformSystem.Update(timingInfo);
+
+            _world.Update(timingInfo);
+        }
+
+        private void ResolveCollisions(TimingInfo timingInfo)
+        {
+            _physicsSystem.PostUpdate(timingInfo);
+            _hasCollisions = false;
         }
 
         public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
