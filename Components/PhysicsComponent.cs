@@ -69,6 +69,11 @@ namespace uwpPlatformer.Components
 
         public float Drag { get; set; } = 5f;
 
+        /// <summary>
+        /// Restitution factor. 0 is like clay. 1 is like a super bouncy ball.
+        /// </summary>
+        public float RestitutionFactor { get; set; } = 0f;
+
         public float Mass
         {
             get => _mass;
