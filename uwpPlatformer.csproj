@@ -118,9 +118,12 @@
   <ItemGroup>
     <Compile Include="Components\AnimatedGraphicsComponent.cs" />
     <Compile Include="Components\ColliderComponent.cs" />
-    <Compile Include="Components\CollisionInfo.cs" />
+    <Compile Include="Components\CollisionManifold.cs" />
+    <Compile Include="Components\CollisionManifoldComparer.cs" />
     <Compile Include="Components\ComponentBase.cs" />
     <Compile Include="Components\ComponentManager.cs" />
+    <Compile Include="Components\EnemyComponent.cs" />
+    <Compile Include="Components\HeroComponent.cs" />
     <Compile Include="Components\IComponent.cs" />
     <Compile Include="Components\InputComponent.cs" />
     <Compile Include="Components\Particles\ColorBehavior.cs" />
@@ -133,6 +136,7 @@
     <Compile Include="GameObjects\IGameObjectManager.cs" />
     <Compile Include="GameObjects\IScene.cs" />
     <Compile Include="GameObjects\PlatformScene.cs" />
+    <Compile Include="Numerics\LineSegment.cs" />
     <Compile Include="Systems\ImprovedEulerPhysicsSystem.cs" />
     <Compile Include="Systems\PositionVerletPhysicsSystem.cs" />
     <Compile Include="Systems\SemiImplicitEulerPhysicsSystem.cs" />
@@ -170,7 +174,7 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\AnimationFrame.cs" />
-    <Compile Include="Numerics\Ray.cs" />
+    <Compile Include="Numerics\Ray2D.cs" />
     <Compile Include="Models\Layer.cs" />
     <Compile Include="Models\Map.cs" />
     <Compile Include="Models\Tile.cs" />
