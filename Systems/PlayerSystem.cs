@@ -74,17 +74,16 @@ namespace uwpPlatformer.Systems
 
         private bool IsVerticallyStationary(Vector2 velocity)
         {
-            
-            return velocity.Y < .5f && velocity.Y > -.5f;
+            return Math.Abs(velocity.Y) < 2.1f;
         }
 
         private void WalkHandler(GameObject gameObject, UserInput userInputs, float deltaTime, Vector2 velocity)
         {
             var horizontalWalkOrientation = GetHorizontalWalkOrientationFromUserInput(userInputs);
-            var verticalWalkOrientation = GetVerticalWalkOrientationFromUserInput(userInputs);
+            //var verticalWalkOrientation = GetVerticalWalkOrientationFromUserInput(userInputs);
             UpdateWalkAnimation(gameObject.GraphicsComponent, gameObject.GetComponent<PlayerComponent>(), horizontalWalkOrientation);
-            //AddWalkImpulse(gameObject.PhysicsComponent, walkOrientation, deltaTime, velocity);
-            AddWalkImpulseSimple(gameObject.PhysicsComponent, new Vector2(horizontalWalkOrientation, verticalWalkOrientation));
+            AddWalkImpulse(gameObject.PhysicsComponent, horizontalWalkOrientation, deltaTime, velocity);
+            //AddWalkImpulseSimple(gameObject.PhysicsComponent, new Vector2(horizontalWalkOrientation, verticalWalkOrientation));
         }
 
         private float GetHorizontalWalkOrientationFromUserInput(UserInput userInputs)
@@ -107,11 +106,12 @@ namespace uwpPlatformer.Systems
 
         private void AddJumpImpulse(GameObject gameObject, Vector2 velocity, float deltaTime)
         {
-            var requiredForceScalar = ResolveRequiredForce(PlayerConstants.InitialVerticalVelocity, velocity.Y, deltaTime);
-            if (float.IsNaN(requiredForceScalar)) return;
+            //var requiredForceScalar = ResolveRequiredForce(PlayerConstants.InitialVerticalVelocity, velocity.Y, deltaTime);
+            //if (float.IsNaN(requiredForceScalar)) return;
 
-            var jumpImpulseForce = Vector2.UnitY * requiredForceScalar;
-            gameObject.PhysicsComponent.ImpulseForce += jumpImpulseForce;
+            //var jumpImpulseForce = Vector2.UnitY * requiredForceScalar;
+            //gameObject.PhysicsComponent.ImpulseForce += jumpImpulseForce;
+            gameObject.PhysicsComponent.Velocity += Vector2.UnitY * PlayerConstants.InitialVerticalVelocity;
 
             AddDustEmitter(gameObject);
             _eventSystem.Send(this, new JumpEvent(gameObject));
@@ -129,11 +129,13 @@ namespace uwpPlatformer.Systems
 
         private void AddWalkImpulse(PhysicsComponent physicsComponent, float orientation, float deltaTime, Vector2 velocity)
         {
-            var requiredForceScalar = ResolveRequiredForce((orientation * PlayerConstants.InitialHorizontalVelocity), velocity.X, deltaTime);
-            if (float.IsNaN(requiredForceScalar)) return;
+            //var requiredForceScalar = ResolveRequiredForce((orientation * PlayerConstants.InitialHorizontalVelocity), velocity.X, deltaTime);
+            //if (float.IsNaN(requiredForceScalar)) return;
 
-            var walkImpulseForce = Vector2.UnitX * requiredForceScalar;
-            physicsComponent.ImpulseForce += walkImpulseForce;
+            //var walkImpulseForce = Vector2.UnitX * requiredForceScalar;
+            // TODO: We need to know when walk impuls or velocity is finished and restore the initial velocit we added
+            physicsComponent.ImpulseForce += Vector2.UnitX * orientation * 200f;
+            //physicsComponent.Velocity += Vector2.UnitX * PlayerConstants.InitialHorizontalVelocity * orientation;
         }
 
         private static float WalkImpuls = 2000f;
