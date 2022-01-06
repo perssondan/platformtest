@@ -9,6 +9,7 @@ using uwpPlatformer.Events;
 using uwpPlatformer.Extensions;
 using uwpPlatformer.GameObjects;
 using Windows.Foundation;
+using uwpPlatformer.Utilities;
 
 namespace uwpPlatformer.Systems
 {
@@ -51,62 +52,153 @@ namespace uwpPlatformer.Systems
 
             _gameObjectManager.GameObjects
                 .Where(gameObject => gameObject.Has<PhysicsComponent>())
-                .Select(gameObject => gameObject.GetComponent<PhysicsComponent>())
+                .Select(gameObject => gameObject.GetComponents<PhysicsComponent, TransformComponent>())
                 .ToArray() // clone
-                .ForEach(physicsComponent =>
+                .ForEach(result =>
                 {
-                    Integrate(physicsComponent, deltaTime);
+                    Integrate(result.Item1, result.Item2, deltaTime);
                 });
         }
 
         public void PostUpdate(TimingInfo timingInfo)
         {
+            var deltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
+
             _gameObjectManager.GameObjects
-                .Where(gameObject => _entitiesInContact.ContainsKey(gameObject.Id))
-                .Select(gameObject => (gameObject, gameObject.GetComponents<PhysicsComponent, ColliderComponent>(), collisionManifolds: _entitiesInContact[gameObject.Id]))
-                .Where(result => result != default && result.Item2 != default)
+                .Where(gameObject => _entitiesInContact.ContainsKey(gameObject.Id) && gameObject.Has<PhysicsComponent, TransformComponent, ColliderComponent>())
+                .Select(gameObject => (entityId: gameObject.Id, gameObject.GetComponents<PhysicsComponent, TransformComponent, ColliderComponent>()))
                 .ToArray() // clone
                 .ForEach(result =>
                 {
                     var physicsComponent = result.Item2.Item1;
-                    var colliderComponent = result.Item2.Item2;
-
-                    var position = physicsComponent.Position;
+                    var transformComponent = result.Item2.Item2;
+                    var colliderComponent = result.Item2.Item3;
                     var halfSize = colliderComponent.BoundingBox.Half();
 
-                    foreach (var collisionManifold in result.collisionManifolds.OrderBy(collisionManifold => collisionManifold.CollisionTime))
+                    // if there is a collision, we should apply a force such that sum of forces avoids the collision
+                    // or responds in ways
+                    foreach (var collisionManifold in _entitiesInContact[result.entityId].OrderBy(collisionManifold => collisionManifold.CollisionTime))
                     {
-                        var contactNormal = collisionManifold.CollisionNormal;
-                        var contactPoint = collisionManifold.CollisionPoint;
-
-                        // Calculate new position that moves the object out of collision
-                        if (contactNormal.Y > 0 || contactNormal.Y < 0)
+                        if (!CollisionDetection.IsRectInRect(colliderComponent.BoundingBox,
+                              physicsComponent.Position,
+                              collisionManifold.ContactRect,
+                              out var contactPoint,
+                              out var contactNormal,
+                              out var contactTime))
                         {
-                            position.Y = collisionManifold.CollisionPoint.Y - halfSize.Y;
-                        }
-                        else if (contactNormal.X > 0 || contactNormal.X < 0)
-                        {
-                            position.X = collisionManifold.CollisionPoint.X - halfSize.X;
-                        }
-                        else
-                        {
-                            System.Diagnostics.Debug.WriteLine("No normal!");
-                            //position = collisionManifold.CollisionPoint;
                             continue;
                         }
 
-                        //position = position + contactNormal * (contactPoint - halfSize);
+                        // Push out of collision
+                        if (contactNormal.X != 0f)
+                        {
+                            physicsComponent.Position = new Vector2(contactPoint.X - halfSize.X, physicsComponent.Position.Y);
+                        }
 
-                        physicsComponent.Position = position;
-                        var j = -(1f + physicsComponent.RestitutionFactor) * Vector2.Dot(physicsComponent.Velocity, collisionManifold.CollisionNormal);
-                        j *= physicsComponent.MassInverted;
-                        var newVelocity = physicsComponent.Velocity + (j / physicsComponent.Mass * collisionManifold.CollisionNormal);
-                        physicsComponent.Velocity = newVelocity;
-                            //var impulseForce = GetLinearCollisionImpulse(physicsComponent, contactNormal, 0f);
-                            //physicsComponent.ImpulseForce += impulseForce;
-                            //physicsComponent.Velocity = physicsComponent.Velocity + (impulseForce * physicsComponent.MassInverted);
+                        if (contactNormal.Y != 0)
+                        {
+                            physicsComponent.Position = new Vector2(physicsComponent.Position.X, contactPoint.Y - halfSize.Y);
+                        }
+
+                        // Calculate new position that moves the object out of collision
+                        if (contactNormal.Y <= 0 && contactNormal.Y >= 0 && contactNormal.X <= 0 && contactNormal.X >= 0)
+                        {
+                            System.Diagnostics.Debug.WriteLine("No normal! {0}", collisionManifold.CollisionPoint);
+                            continue;
+                        }
+
+                        var remainingTime = 1f - contactTime;
+                        var velocity = physicsComponent.Velocity;
+                        var dotProductVelocity = Vector2.Dot(velocity, contactNormal) * remainingTime;
+                        var velocityChange = Math.Abs(dotProductVelocity) * contactNormal;
+                        physicsComponent.Velocity += velocityChange;
+
+                        // Sliding response
+                        //var currentVelocity = (physicsComponent.Position - transformComponent.Position) / deltaTime;
+                        //var previousVelocity = physicsComponent.PreviousVelocity;
+                        //var currentAcceleration = physicsComponent.PreviousAcceleration;
+                        //var remainingTime = 1f - collisionManifold.CollisionTime;
+                        //var dotProductVelocity = Vector2.Dot(currentVelocity, collisionManifold.CollisionNormal) * remainingTime;
+                        //var dotProductAcceleration = Vector2.Dot(currentAcceleration, collisionManifold.CollisionNormal) * remainingTime;
+                        //var velocityChange = Math.Abs(dotProductVelocity) * collisionManifold.CollisionNormal;
+                        //var accelerationChange = Math.Abs(dotProductAcceleration) * collisionManifold.CollisionNormal;
+
+                        //physicsComponent.ImpulseForce += accelerationChange * physicsComponent.Mass;
+                        //var resultingVelocity = currentVelocity + velocityChange;
+                        //var resultingAcceleration = currentAcceleration - accelerationChange;
+                        //var newPosition = transformComponent.Position + (float)timingInfo.ElapsedTime.TotalSeconds * resultingVelocity;
+                        //var newPosition = CalculatePosition(remainingTime, transformComponent.Position, resultingVelocity, resultingAcceleration);
+                        //physicsComponent.Velocity = resultingVelocity;// dotProduct * collisionManifold.CollisionNormal;// new Vector2(dotProduct * collisionManifold.CollisionNormal.Y, dotProduct * collisionManifold.CollisionNormal.X);
+                        //physicsComponent.Acceleration = resultingAcceleration;
+                        //physicsComponent.Position = newPosition;
                     }
-            });
+                });
+
+            //_gameObjectManager.GameObjects
+            //    .Where(gameObject => _entitiesInContact.ContainsKey(gameObject.Id))
+            //    .Select(gameObject => (gameObject, gameObject.GetComponents<PhysicsComponent, ColliderComponent, TransformComponent>(), collisionManifolds: _entitiesInContact[gameObject.Id]))
+            //    .Where(result => result != default && result.Item2 != default)
+            //    .ToArray() // clone
+            //    .ForEach(result =>
+            //    {
+            //        var physicsComponent = result.Item2.Item1;
+            //        var colliderComponent = result.Item2.Item2;
+            //        var transformComponent = result.Item2.Item3;
+
+            //        var position = physicsComponent.Position;
+            //        var halfSize = colliderComponent.BoundingBox.Half();
+
+            //        foreach (var collisionManifold in result.collisionManifolds.OrderBy(collisionManifold => collisionManifold.CollisionTime))
+            //        {
+            //            var contactNormal = collisionManifold.CollisionNormal;
+            //            var contactPoint = collisionManifold.CollisionPoint;
+
+            //            // Calculate new position that moves the object out of collision
+            //            if (contactNormal.Y > 0 || contactNormal.Y < 0)
+            //            {
+            //                position.Y = collisionManifold.CollisionPoint.Y - halfSize.Y;
+            //            }
+            //            else if (contactNormal.X > 0 || contactNormal.X < 0)
+            //            {
+            //                position.X = collisionManifold.CollisionPoint.X - halfSize.X;
+            //            }
+            //            else
+            //            {
+            //                System.Diagnostics.Debug.WriteLine("No normal! {0}", collisionManifold.CollisionPoint);
+            //                //position = collisionManifold.CollisionPoint;
+            //                continue;
+            //            }
+
+            //            //position = position + contactNormal * (contactPoint - halfSize);
+
+            //            //physicsComponent.Position = position;
+
+            //            // Sliding response
+            //            //var deltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;
+            //            var currentVelocity = (physicsComponent.Position - transformComponent.Position) / deltaTime;
+            //            var previousVelocity = physicsComponent.PreviousVelocity;
+            //            var currentAcceleration = physicsComponent.PreviousAcceleration;
+            //            var remainingTime = 1f - collisionManifold.CollisionTime;
+            //            var dotProductVelocity = Vector2.Dot(currentVelocity, collisionManifold.CollisionNormal) * remainingTime;
+            //            var dotProductAcceleration = Vector2.Dot(currentAcceleration, collisionManifold.CollisionNormal) * remainingTime;
+            //            var velocityChange = dotProductVelocity * collisionManifold.CollisionNormal;
+            //            var accelerationChange = dotProductAcceleration * collisionManifold.CollisionNormal;
+            //            var resultingVelocity = currentVelocity - velocityChange;
+            //            var resultingAcceleration = currentAcceleration - accelerationChange;
+            //            var newPosition = transformComponent.Position + (float)timingInfo.ElapsedTime.TotalSeconds * resultingVelocity;
+            //            //var newPosition = CalculatePosition(remainingTime, transformComponent.Position, resultingVelocity, resultingAcceleration);
+            //            physicsComponent.Velocity = resultingVelocity;// dotProduct * collisionManifold.CollisionNormal;// new Vector2(dotProduct * collisionManifold.CollisionNormal.Y, dotProduct * collisionManifold.CollisionNormal.X);
+            //            physicsComponent.Acceleration = resultingAcceleration;
+            //            physicsComponent.Position = newPosition;
+            //            break;
+
+            //            // Impulse based response
+            //            //var j = -(1f + physicsComponent.RestitutionFactor) * Vector2.Dot(physicsComponent.Velocity, collisionManifold.CollisionNormal);
+            //            //j *= physicsComponent.MassInverted;
+            //            //var newVelocity = physicsComponent.Velocity + (j / physicsComponent.Mass * collisionManifold.CollisionNormal);
+            //            //physicsComponent.Velocity = newVelocity;
+            //        }
+            //});
 
             _entitiesInContact.Clear();
         }
@@ -127,14 +219,6 @@ namespace uwpPlatformer.Systems
             return newLinearMomentum;
         }
 
-        //void ApplyLinearCollisionImpulse(StaticContact & contact, float e)
-        //{
-        //    //float mass = contact.rigidBody->mass;
-        //    //float d = dot(contact.rigidBody->linearMomentum, contact.normal);
-        //    //float j = max(-(1 + e) * d, 0);
-        //    //contact.rigidBody->linearMomentum += j * contact.normal;
-        //}
-
         private Vector2 ApplyForces(PhysicsComponent physicsComponent)
         {
             var dragForce = 0.5f * physicsComponent.Drag * (physicsComponent.Velocity * Vector2.Abs(physicsComponent.Velocity));
@@ -142,9 +226,9 @@ namespace uwpPlatformer.Systems
             return physicsComponent.Gravity + ((physicsComponent.ImpulseForce - dragForce) * physicsComponent.MassInverted);
         }
 
-        private void Integrate(PhysicsComponent physicsComponent, float deltaTime)
+        private void Integrate(PhysicsComponent physicsComponent, TransformComponent transformComponent, float deltaTime)
         {
-            var currentPosition = physicsComponent.Position;
+            var currentPosition = transformComponent.Position;
             var currentVelocity = physicsComponent.Velocity;
             var currentAcceleration = physicsComponent.Acceleration;
 
