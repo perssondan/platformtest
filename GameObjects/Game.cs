@@ -85,10 +85,7 @@ namespace uwpPlatformer.GameObjects
             _dustParticleEmitterSystem.Update(timingInfo);
             _particleEmitterSystem.Update(timingInfo);
 
-            if (_hasCollisions)
-            {
-                ResolveCollisions(timingInfo);
-            }
+            ResolveCollisions(timingInfo);
 
             _transformSystem.Update(timingInfo);
 
@@ -97,8 +94,13 @@ namespace uwpPlatformer.GameObjects
 
         private void ResolveCollisions(TimingInfo timingInfo)
         {
-            _physicsSystem.PostUpdate(timingInfo);
-            _hasCollisions = false;
+            var maxResolveAttempts = 5;
+            for (var currentResolveAttempt = 0; currentResolveAttempt < maxResolveAttempts && _hasCollisions; currentResolveAttempt++)
+            {
+                _hasCollisions = false;
+                _physicsSystem.PostUpdate(timingInfo);
+                _colliderSystem.Update(timingInfo);
+            }
         }
 
         public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
