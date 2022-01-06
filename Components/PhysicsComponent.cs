@@ -32,7 +32,6 @@ namespace uwpPlatformer.Components
             get => _position;
             set
             {
-                PreviousPosition = _position;
                 _position = value;
             }
         }
@@ -42,7 +41,6 @@ namespace uwpPlatformer.Components
             get => _velocity;
             set
             {
-                PreviousVelocity = _velocity;
                 _velocity = value;
             }
         }
@@ -57,13 +55,8 @@ namespace uwpPlatformer.Components
             }
         }
 
-        public Vector2 PreviousPosition { get; private set; }
-
-        public Vector2 PreviousVelocity { get; private set; }
-
         public Vector2 PreviousAcceleration { get; private set; }
 
-        public Vector2 LinearMomentum => Mass * Velocity;
         public Vector2 Gravity { get; set; } = new Vector2(0f, PlayerConstants.Gravity);
 
         public float Drag { get; set; } = 0f;
@@ -71,7 +64,7 @@ namespace uwpPlatformer.Components
         /// <summary>
         /// Restitution factor. 0 is like clay. 1 is like a super bouncy ball.
         /// </summary>
-        public float RestitutionFactor { get; set; } = 0.2f;
+        public float RestitutionFactor { get; set; } = 0f;
 
         public float Mass
         {
