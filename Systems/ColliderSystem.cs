@@ -8,7 +8,7 @@ using uwpPlatformer.Components;
 using uwpPlatformer.Events;
 using uwpPlatformer.Extensions;
 using uwpPlatformer.GameObjects;
-using uwpPlatformer.Numerics;
+using uwpPlatformer.Utilities;
 using Windows.Foundation;
 
 namespace uwpPlatformer.Systems
@@ -45,7 +45,6 @@ namespace uwpPlatformer.Systems
         /// Finds and updates collision infos
         /// </summary>
         /// <param name="dynamicCollider"></param>
-        /// <param name="deltaTime"></param>
         /// <param name="colliderComponents"></param>
         /// <returns>Returns true if there is collisions, otherwise false.</returns>
         private bool DetectAndUpdateCollisionInfos(ColliderComponent dynamicCollider, ColliderComponent[] colliderComponents)
@@ -61,10 +60,9 @@ namespace uwpPlatformer.Systems
             var results = new List<CollisionManifold>();
             foreach (var componentInCollision in componentsInCollision)
             {
-                if (!IsRectInRect(dynamicCollider.BoundingBox,
+                if (!CollisionDetection.IsRectInRect(dynamicCollider.BoundingBox,
                                   dynamicCollider.GameObject.PhysicsComponent.Position,
                                   componentInCollision.BoundingBox,
-                                  dynamicCollider,
                                   out var contactPoint,
                                   out var contactNormal,
                                   out var contactTime))
@@ -113,11 +111,7 @@ namespace uwpPlatformer.Systems
 
         private IEnumerable<ColliderComponent> GetOverlappingColliders(Rect dynamicRect, ColliderComponent[] collidersToTest)
         {
-            foreach (var collider in collidersToTest)
-            {
-                if (IsAABBColliding(dynamicRect, collider.BoundingBox))
-                    yield return collider;
-            }
+            return collidersToTest.Where(collider => CollisionDetection.IsAABBColliding(dynamicRect, collider.BoundingBox));
         }
 
         private ColliderComponent[] GetOverlappingColliders(ColliderComponent dynamicCollider, ColliderComponent[] colliderComponents)
@@ -143,170 +137,12 @@ namespace uwpPlatformer.Systems
             return unionDynamicRect;
         }
 
-        private bool IsRayInRect(LineSegment ray,
-                                 Rect staticRect,
-                                 out Vector2 contactPoint,
-                                 out Vector2 contactNormal,
-                                 out float contactTime)
-        {
-            contactPoint = Vector2.Zero;
-            contactNormal = Vector2.Zero;
-            contactTime = 0f;
-
-            var minPos = staticRect.TopLeft();
-            var maxPos = minPos + staticRect.Size();
-
-            // Calculate intersection with rectangle bounding axes
-            var minContactPoint = (minPos - ray.StartPoint) * ray.InvDirection;
-            var maxContactPoint = (maxPos - ray.StartPoint) * ray.InvDirection;
-
-            if (float.IsNaN(maxContactPoint.X) || float.IsNaN(maxContactPoint.Y)) return false;
-            if (float.IsNaN(minContactPoint.X) || float.IsNaN(minContactPoint.Y)) return false;
-
-            // Swap
-            if (minContactPoint.X > maxContactPoint.X) ObjectExtensions.Swap(ref minContactPoint.X, ref maxContactPoint.X);
-
-            // Swap
-            if (minContactPoint.Y > maxContactPoint.Y) ObjectExtensions.Swap(ref minContactPoint.Y, ref maxContactPoint.Y);
-
-            if (minContactPoint.X > maxContactPoint.Y || minContactPoint.Y > maxContactPoint.X) return false;
-
-            // Min 'time' will be the first contact
-            contactTime = Math.Max(minContactPoint.X, minContactPoint.Y);
-
-            // Max 'time' will contact on the opposite side of the target
-            var maxIntersectionLength = Math.Min(maxContactPoint.X, maxContactPoint.Y);
-
-            // if 'time' is less than zero, the segment started inside the box,
-            // we'd like to set the contact point on the oposite direction of the ray
-            // to push it out of the presumed direction it had when it entered.
-            if (contactTime < 0f)
-            {
-                contactTime = maxIntersectionLength;
-            }
-
-            // If negative it is pointing away from target
-            if (maxIntersectionLength < 0) return false;
-            
-            // Contact point of collision from parametric line equation
-            contactPoint = ray.StartPoint + contactTime * ray.Direction;
-
-            if (minContactPoint.X > minContactPoint.Y)
-            {
-                if (ray.InvDirection.X < 0f)
-                {
-                    contactNormal = new Vector2(1, 0);
-                }
-                else
-                {
-                    contactNormal = new Vector2(-1, 0);
-                }
-            }
-            else if (minContactPoint.X < minContactPoint.Y)
-            {
-                if (ray.InvDirection.Y < 0f)
-                {
-                    contactNormal = new Vector2(0, 1);
-                }
-                else
-                {
-                    contactNormal = new Vector2(0, -1);
-                }
-            }
-
-            return true;
-        }
-
-        private bool IsRectInRect(Rect dynamicRect,
-                                  Vector2 newPosition,
-                                  Rect staticRect,
-                                  ColliderComponent colliderComponent,
-                                  out Vector2 contactPoint,
-                                  out Vector2 contactNormal,
-                                  out float contactTime)
-        {
-            var originPosition = dynamicRect.TopLeft();
-            var centerPoint = dynamicRect.Center();
-            var centerOffset = centerPoint - originPosition;
-            var newCenterPoint = newPosition + centerOffset;
-
-            var expandedStaticRect = staticRect.Add(dynamicRect.Size());
-
-            var lineSegment = new LineSegment(centerPoint, newCenterPoint);
-
-            if (centerPoint == newCenterPoint)
-            {
-                System.Diagnostics.Debug.WriteLine("No movement!");
-            }
-
-            var isRayInRect = IsRayInRect(lineSegment,
-                            expandedStaticRect,
-                            out contactPoint,
-                            out contactNormal,
-                            out contactTime);
-
-            return isRayInRect && contactTime >= 0f && contactTime < 1f;
-        }
-
-        private bool IsAABBColliding(Rect sourceRect, Rect opponentRect)
-        {
-            return (sourceRect.Left < opponentRect.Right && sourceRect.Right > opponentRect.Left) &&
-                    (sourceRect.Top < opponentRect.Bottom && sourceRect.Bottom > opponentRect.Top);
-        }
-
-        private bool AABBvsAABB(Rect first, Rect other)
-        {
-            if (first.Left > other.Right)
-                return false;
-
-            if (first.Right < other.Left)
-                return false;
-
-            if (first.Bottom > other.Top)
-                return false;
-
-            if (first.Top < other.Bottom)
-                return false;
-
-            return true;
-        }
-
         public Rect GetMinkowskiDifference(Rect first, Rect other)
         {
             var topLeft = first.TopLeft() - other.TopRight();
             var fullSize = first.Size() + other.Size();
             var halfFullSize = fullSize / 2;
             return new Rect((topLeft + halfFullSize).ToPoint(), halfFullSize.ToSize());
-        }
-
-        public bool intersectAABB(Rect dynamicRect, Rect staticRect, out Vector2 normal, out Vector2 contactPoint)
-        {
-            normal = Vector2.Zero;
-            contactPoint = Vector2.Zero;
-            var dx = dynamicRect.Left - staticRect.Left;
-            var px = dynamicRect.Half().X + staticRect.Half().X - Math.Abs(dx);
-            if (px <= 0) return false;
-
-            var dy = dynamicRect.Top - staticRect.Top;
-            var py = dynamicRect.Half().Y + staticRect.Half().Y - Math.Abs(dy);
-            if (py <= 0) return false;
-
-            if (px < py)
-            {
-                var sx = Math.Sign(dx);
-                normal.X = sx;
-                contactPoint.X = (float)staticRect.Left + (staticRect.Half().X * sx);
-                contactPoint.Y = (float)dynamicRect.Center().Y;
-            }
-            else
-            {
-                var sy = Math.Sign(dy);
-                normal.Y = sy;
-                contactPoint.X = (float)dynamicRect.Center().X;
-                contactPoint.Y = (float)staticRect.Top + (staticRect.Half().Y * sy);
-            }
-
-            return true;
         }
     }
 }

@@ -195,6 +195,7 @@
     <Compile Include="Systems\UserInput.cs" />
     <Compile Include="Systems\UserInputInfo.cs" />
     <Compile Include="Systems\VelocityVerletPhysicsSystem.cs" />
+    <Compile Include="Utilities\CollisionDetection.cs" />
     <Compile Include="Utilities\GameStateManager.cs" />
     <Compile Include="Utilities\HistoryStack.cs" />
     <Compile Include="Utilities\TiledLoader.cs" />
