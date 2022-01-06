@@ -51,7 +51,7 @@ namespace uwpPlatformer.Factories
                 var physicsComponent = new PhysicsComponent(gameObject)
                 {
                     Position = position,
-                    GravityForce = Vector2.Zero
+                    Gravity = Vector2.Zero
                 };
 
                 var forceVector = CreateRandomForceVector();

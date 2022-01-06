@@ -139,7 +139,7 @@ namespace uwpPlatformer.Systems
         {
             var dragForce = 0.5f * physicsComponent.Drag * (physicsComponent.Velocity * Vector2.Abs(physicsComponent.Velocity));
             // acc = F/m (F*1/m)
-            return (physicsComponent.GravityForce + physicsComponent.ImpulseForce - dragForce) * physicsComponent.MassInverted;
+            return physicsComponent.Gravity + ((physicsComponent.ImpulseForce - dragForce) * physicsComponent.MassInverted);
         }
 
         private void Integrate(PhysicsComponent physicsComponent, float deltaTime)

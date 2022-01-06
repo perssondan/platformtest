@@ -61,7 +61,7 @@ namespace uwpPlatformer.Systems
 
         private Vector2 ApplyForces(PhysicsComponent physicsComponent, Vector2 currentPosition, float deltaTime)
         {
-            return (physicsComponent.GravityForce + physicsComponent.ImpulseForce) * physicsComponent.MassInverted;
+            return (physicsComponent.Gravity + physicsComponent.ImpulseForce) * physicsComponent.MassInverted;
         }
     }
 }
