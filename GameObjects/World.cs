@@ -73,7 +73,7 @@ namespace uwpPlatformer.GameObjects
             InitializeWorldBoundaries();
             InitializeTileMap();
             InitializeHeroine();
-            //CreateFlyingEnemy();
+            CreateFlyingEnemy();
 
             _eventSystem.Subscribe<UserInputInfo>(this, (sender, userInputInfo) =>
             {
