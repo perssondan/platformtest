@@ -136,12 +136,6 @@ namespace uwpPlatformer.GameObjects
             }
         }
 
-        public AnimatedGraphicsComponent GraphicsComponent => GetComponent<AnimatedGraphicsComponent>();
-        public PhysicsComponent PhysicsComponent => GetComponent<PhysicsComponent>();
-        public InputComponent InputComponent => GetComponent<InputComponent>();
-        public TransformComponent TransformComponent => GetComponent<TransformComponent>();
-        public ColliderComponent ColliderComponent => GetComponent<ColliderComponent>();
-
         private static int GenerateId()
         {
             return _idCounter++;

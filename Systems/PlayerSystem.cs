@@ -37,15 +37,13 @@ namespace uwpPlatformer.Systems
 
         private void UpdatePlayerGameObject(GameObject gameObject, TimeSpan deltatime)
         {
-            var userInputs = gameObject.InputComponent.UserInputs;
-            var velocity = gameObject.PhysicsComponent.Velocity;
-            WalkHandler(gameObject, userInputs, (float)deltatime.TotalSeconds, velocity);
-            JumpHandler(gameObject, userInputs, deltatime, velocity);
+            var userInputs = gameObject.GetComponent<InputComponent>()?.UserInputs ?? UserInput.None;
+            WalkHandler(gameObject, userInputs, deltatime);
+            JumpHandler(gameObject, userInputs, deltatime);
         }
 
-        private void JumpHandler(GameObject gameObject, UserInput userInputs, TimeSpan timeSpan, Vector2 velocity)
+        private bool IsJumpButtonPressed(PlayerComponent playerComponent, UserInput userInputs, TimeSpan timeSpan)
         {
-            var playerComponent = gameObject.GetComponent<PlayerComponent>();
             playerComponent.JumpPressedAt -= timeSpan;
 
             if ((userInputs & UserInput.Jump) == UserInput.Jump)
@@ -62,14 +60,26 @@ namespace uwpPlatformer.Systems
                 playerComponent.JumpPressedAt = TimeSpan.Zero;
             }
 
-            if (playerComponent.JumpPressedAt.TotalMilliseconds <= 0f) return;
+            return playerComponent.JumpPressedAt.TotalMilliseconds > 0f;
+        }
+
+        private void JumpHandler(GameObject gameObject, UserInput userInputs, TimeSpan timeSpan)
+        {
+            var playerComponent = gameObject.GetComponent<PlayerComponent>();
+            // If we didn't press the jump button but are still on the way up
+            // we could double the gravity force to make a short jump.
+            if (!IsJumpButtonPressed(playerComponent, userInputs, timeSpan)) return;
+
+            var physicsComponent = gameObject.GetComponent<PhysicsComponent>();
 
             //Only jump when grounded
-            if (!IsVerticallyStationary(velocity)) return;
+            if (!IsVerticallyStationary(physicsComponent.Velocity)) return;
 
             playerComponent.JumpPressedAt = TimeSpan.Zero;
 
-            AddJumpImpulse(gameObject, velocity, (float)timeSpan.TotalSeconds);
+            AddJumpImpulse(physicsComponent);
+            AddDustEmitter(gameObject);
+            _eventSystem.Send(this, new JumpEvent(gameObject));
         }
 
         private bool IsVerticallyStationary(Vector2 velocity)
@@ -77,17 +87,20 @@ namespace uwpPlatformer.Systems
             return Math.Abs(velocity.Y) < 2.1f;
         }
 
-        private void WalkHandler(GameObject gameObject, UserInput userInputs, float deltaTime, Vector2 velocity)
+        private void WalkHandler(GameObject gameObject, UserInput userInputs, TimeSpan deltaTime)
         {
-            var horizontalWalkOrientation = GetHorizontalWalkOrientationFromUserInput(userInputs);
-            //var verticalWalkOrientation = GetVerticalWalkOrientationFromUserInput(userInputs);
-            UpdateWalkAnimation(gameObject.GraphicsComponent, gameObject.GetComponent<PlayerComponent>(), horizontalWalkOrientation);
-            AddWalkImpulse(gameObject.PhysicsComponent, horizontalWalkOrientation, deltaTime, velocity);
-            //AddWalkImpulseSimple(gameObject.PhysicsComponent, new Vector2(horizontalWalkOrientation, verticalWalkOrientation));
+            var playerComponent = gameObject.GetComponent<PlayerComponent>();
+            var physicsComponent = gameObject.GetComponent<PhysicsComponent>();
+            var graphicsComponent = gameObject.GetComponent<AnimatedGraphicsComponent>();
+            var horizontalWalkOrientation = GetHorizontalWalkOrientationFromUserInput(playerComponent, userInputs, deltaTime);
+            UpdateWalkAnimation(graphicsComponent, playerComponent, horizontalWalkOrientation);
+            AddWalkImpulse(physicsComponent, horizontalWalkOrientation, deltaTime);
         }
 
-        private float GetHorizontalWalkOrientationFromUserInput(UserInput userInputs)
+        private float GetHorizontalWalkOrientationFromUserInput(PlayerComponent playerComponent, UserInput userInputs, TimeSpan timeSpan)
         {
+            playerComponent.WalkPressedAt -= timeSpan;
+
             if ((userInputs & UserInput.Right) == UserInput.Right) return 1f;
 
             if ((userInputs & UserInput.Left) == UserInput.Left) return -1f;
@@ -104,59 +117,27 @@ namespace uwpPlatformer.Systems
             return 0f;
         }
 
-        private void AddJumpImpulse(GameObject gameObject, Vector2 velocity, float deltaTime)
+        private void AddJumpImpulse(PhysicsComponent physicsComponent)
         {
-            //var requiredForceScalar = ResolveRequiredForce(PlayerConstants.InitialVerticalVelocity, velocity.Y, deltaTime);
-            //if (float.IsNaN(requiredForceScalar)) return;
-
-            //var jumpImpulseForce = Vector2.UnitY * requiredForceScalar;
-            //gameObject.PhysicsComponent.ImpulseForce += jumpImpulseForce;
-            gameObject.PhysicsComponent.Velocity += Vector2.UnitY * PlayerConstants.InitialVerticalVelocity;
-
-            AddDustEmitter(gameObject);
-            _eventSystem.Send(this, new JumpEvent(gameObject));
+            physicsComponent.Velocity += Vector2.UnitY * PlayerConstants.Vy;
         }
 
-        private static void AddDustEmitter(GameObject gameObject)
+        private void AddWalkImpulse(PhysicsComponent physicsComponent, float orientation, TimeSpan deltaTime)
         {
-            if (gameObject.Has<ParticleEmitterComponent>()) return;
+            if (!IsVerticallyStationary(physicsComponent.Velocity))
+            {
+                // Only half velocity to add
+            }
 
-            gameObject.AddOrUpdateComponent(new ParticleEmitterComponent(
-                gameObject,
-                ParticleTemplateType.Dust,
-                gameObject.ColliderComponent.BoundingBox.BottomCenterOffset()));
-        }
-
-        private void AddWalkImpulse(PhysicsComponent physicsComponent, float orientation, float deltaTime, Vector2 velocity)
-        {
-            //var requiredForceScalar = ResolveRequiredForce((orientation * PlayerConstants.InitialHorizontalVelocity), velocity.X, deltaTime);
-            //if (float.IsNaN(requiredForceScalar)) return;
-
-            //var walkImpulseForce = Vector2.UnitX * requiredForceScalar;
-            // TODO: We need to know when walk impuls or velocity is finished and restore the initial velocit we added
-            physicsComponent.ImpulseForce += Vector2.UnitX * orientation * 200f;
-            //physicsComponent.Velocity += Vector2.UnitX * PlayerConstants.InitialHorizontalVelocity * orientation;
-        }
-
-        private static float WalkImpuls = 2000f;
-        /// <summary>
-        /// This just add impulse, left or right, nothing more.
-        /// </summary>
-        /// <param name="physicsComponent"></param>
-        /// <param name="orientation"></param>
-        /// <param name="deltaTime"></param>
-        /// <param name="velocity"></param>
-        private void AddWalkImpulseSimple(PhysicsComponent physicsComponent, Vector2 orientation)
-        {
-            physicsComponent.ImpulseForce += (orientation * WalkImpuls);
-        }
-
-        private float ResolveRequiredForce(float wantedVelocity, float currentVelocity, float deltaTime)
-        {
-            var requiredHorizontalVelocity = wantedVelocity - currentVelocity;
-            var requiredForce = requiredHorizontalVelocity / deltaTime;
-
-            return requiredForce;
+            if (orientation == 0f)
+            {
+                // TODO: We need to know when walk impuls or velocity is finished and restore the initial velocit we added
+                physicsComponent.Velocity *= Vector2.UnitY;
+            }
+            else
+            {
+                physicsComponent.Velocity += Vector2.UnitX * orientation * PlayerConstants.Vx;
+            }
         }
 
         private void UpdateWalkAnimation(AnimatedGraphicsComponent graphicsComponent, PlayerComponent playerComponent, float walkOrientation)
@@ -175,6 +156,19 @@ namespace uwpPlatformer.Systems
             {
                 graphicsComponent.InvertTile = false;
                 graphicsComponent.SourceRects = playerComponent.StaticSourceRects;
+            }
+        }
+
+        private static void AddDustEmitter(GameObject gameObject)
+        {
+            if (gameObject.Has<ParticleEmitterComponent>()) return;
+
+            if (gameObject.TryGetComponent<ColliderComponent>(out var colliderComponent))
+            {
+                gameObject.AddOrUpdateComponent(new ParticleEmitterComponent(
+                gameObject,
+                ParticleTemplateType.Dust,
+                colliderComponent.BoundingBox.BottomCenterOffset()));
             }
         }
     }

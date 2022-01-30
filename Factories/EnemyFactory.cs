@@ -19,7 +19,7 @@ namespace uwpPlatformer.Factories
         public GameObject CreateFlyingEnemy(CanvasBitmap canvasBitmap, Vector2 position, Vector2 size, Rect bounds)
         {
             var gameObject = _gameObjectManager.CreateGameObject();
-            gameObject.TransformComponent.Position = position;
+            gameObject.GetComponent<TransformComponent>().Position = position;
 
             //gameObject.AddComponent(new ShapeGraphicsComponent(gameObject, ShapeType.Rectangle, Colors.Pink, size));
             gameObject.AddOrUpdateComponent(new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new Rect(new Point(0, 0), size.ToSize()) }, TimeSpan.Zero));

@@ -42,7 +42,8 @@ namespace uwpPlatformer.Factories
             for (var particleIndex = 0; particleIndex < numberOfParticles; particleIndex++)
             {
                 var gameObject = _gameObjectManager.CreateGameObject();
-                gameObject.TransformComponent.Position = position;
+
+                gameObject.GetComponent<TransformComponent>().Position = position;
 
                 // TODO: Where's a good place to have the color shading stuff, separate component?
                 gameObject.AddOrUpdateComponent(new ParticleComponent(gameObject, timeToLive, Colors.White, Colors.SandyBrown, TransitionBehavior.OverTime, createdAt) { FadeBehavior = FadeBehavior.FadeOut });

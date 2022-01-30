@@ -127,7 +127,8 @@ namespace uwpPlatformer.Systems
 
         private void DrawShapeComponent(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime, ShapeGraphicsComponent shapeGraphicsComponent)
         {
-            var position = shapeGraphicsComponent.GameObject.TransformComponent.Position;
+            if (!shapeGraphicsComponent.GameObject.TryGetComponent<TransformComponent>(out var transformComponent)) return;
+            var position = transformComponent.Position;
             switch (shapeGraphicsComponent.ShapeType)
             {
                 case ShapeType.None:
@@ -165,7 +166,9 @@ namespace uwpPlatformer.Systems
                 animatedGraphicsComponent.CurrentTileIndex = 0;
             }
 
-            var position = animatedGraphicsComponent.GameObject.TransformComponent.Position;
+            if (!animatedGraphicsComponent.GameObject.TryGetComponent<TransformComponent>(out var transformComponent)) return;
+
+            var position = transformComponent.Position;
             var currentSourceRect = sourceRects[animatedGraphicsComponent.CurrentTileIndex];
             if (animatedGraphicsComponent.InvertTile)
             {
@@ -201,26 +204,29 @@ namespace uwpPlatformer.Systems
 
         private void DrawObjectId(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
         {
+            if (!gameObject.TryGetComponent<TransformComponent>(out var transformComponent)) return;
             canvasDrawingSession.DrawText($"{gameObject.Id}",
-                                          gameObject.TransformComponent.Position + new Vector2(5f, 17f),
+                                          transformComponent.Position + new Vector2(5f, 17f),
                                           Colors.White,
                                           new CanvasTextFormat { FontSize = 6 });
         }
 
         private void DrawObjectPositionText(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
         {
-            var x = gameObject?.ColliderComponent?.Center.X;
-            var y = gameObject?.ColliderComponent?.Center.Y;
+            if (!gameObject.TryGetComponent<ColliderComponent>(out var colliderComponent)) return;
+            if (!gameObject.TryGetComponent<TransformComponent>(out var transformComponent)) return;
+
+            var x = colliderComponent.Center.X;
+            var y = colliderComponent.Center.Y;
             canvasDrawingSession.DrawText($"{x:0.##} : {y:0.##}",
-                                          gameObject.TransformComponent.Position + new Vector2(0f, 10f),
+                                          transformComponent.Position + new Vector2(0f, 10f),
                                           Colors.LightGray,
                                           new CanvasTextFormat { FontSize = 7 });
         }
 
         private void DrawColliderBoundingBox(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
         {
-            var colliderComponent = gameObject?.ColliderComponent;
-            if (colliderComponent == null) return;
+            if (!gameObject.TryGetComponent<ColliderComponent>(out var colliderComponent)) return;
 
             canvasDrawingSession.DrawRectangle(colliderComponent.BoundingBox, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
             canvasDrawingSession.FillCircle(colliderComponent.Center, 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
@@ -232,17 +238,18 @@ namespace uwpPlatformer.Systems
 
         private void DrawVelocityVector(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
         {
-            if (gameObject.PhysicsComponent == default) return;
+            if (!gameObject.TryGetComponent<PhysicsComponent>(out var physicsComponent)) return;
+            if (!gameObject.TryGetComponent<ColliderComponent>(out var colliderComponent)) return;
 
-            canvasDrawingSession.DrawText($"Velocity <{gameObject.PhysicsComponent.Velocity.X}, {gameObject.PhysicsComponent.Velocity.Y}>",
+            canvasDrawingSession.DrawText($"Velocity <{physicsComponent.Velocity.X}, {physicsComponent.Velocity.Y}>",
                                           new Vector2(375, 15),
                                           Colors.White,
                                           new CanvasTextFormat { FontSize = 8 });
 
-            var velocity = gameObject.PhysicsComponent.Velocity;
+            var velocity = physicsComponent.Velocity;
             if (velocity.LengthSquared() > 0f)
             {
-                var center = gameObject.ColliderComponent?.Center ?? gameObject.TransformComponent.Position;
+                var center = colliderComponent.Center;
                 canvasDrawingSession.DrawLine(center,
                                               center + (velocity.Normalize() * 15f),
                                               GetCachedBrush(canvasDrawingSession, Colors.Aquamarine));
@@ -251,15 +258,16 @@ namespace uwpPlatformer.Systems
 
         private void DrawForceVector(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
         {
-            if (gameObject.PhysicsComponent == default) return;
+            if (!gameObject.TryGetComponent<PhysicsComponent>(out var physicsComponent)) return;
+            if (!gameObject.TryGetComponent<ColliderComponent>(out var colliderComponent)) return;
 
-            var lengthSquared = gameObject.PhysicsComponent.Acceleration.LengthSquared();
+            var lengthSquared = physicsComponent.Acceleration.LengthSquared();
 
             if (lengthSquared > 0f)
             {
-                var center = gameObject.ColliderComponent?.Center ?? gameObject.TransformComponent.Position;
+                var center = colliderComponent.Center;
                 canvasDrawingSession.DrawLine(center,
-                                              center + (gameObject.PhysicsComponent.Acceleration.Normalize() * 15f),
+                                              center + (physicsComponent.Acceleration.Normalize() * 15f),
                                               GetCachedBrush(canvasDrawingSession, Colors.Yellow), 1f);
             }
         }
@@ -269,9 +277,11 @@ namespace uwpPlatformer.Systems
             var collisionColor = Colors.Orange;
             foreach (var collisionArgument in collisionArguments)
             {
-                if ((collisionArgument.GameObject.ColliderComponent.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) > 0)
+                if (!collisionArgument.GameObject.TryGetComponent<ColliderComponent>(out var colliderComponent)) continue;
+
+                if ((colliderComponent.CollisionType & ColliderComponent.CollisionTypes.IsDynamicMask) > 0)
                 {
-                    var startPoint = collisionArgument.CollisionManifold.CollisionPoint - (collisionArgument.CollisionManifold.CollisionNormal * collisionArgument.GameObject.ColliderComponent.Size * .5f);
+                    var startPoint = collisionArgument.CollisionManifold.CollisionPoint - (collisionArgument.CollisionManifold.CollisionNormal * colliderComponent.Size * .5f);
                     // draw collision point
                     canvasDrawingSession.FillCircle(startPoint,
                                                     2f,
@@ -296,15 +306,26 @@ namespace uwpPlatformer.Systems
                                           Colors.White,
                                           new CanvasTextFormat { FontSize = 8 });
 
-            if (gameObject.TransformComponent.PositionHistory.Length < 5) return;
+            var transformComponent = gameObject.GetComponent<TransformComponent>();
+
+            if (transformComponent.PositionHistory.Length < 5) return;
 
             var canvasPathBuilder = new CanvasPathBuilder(canvasDrawingSession);
 
-            var center = gameObject.ColliderComponent?.Center ?? gameObject.TransformComponent.Position;
-            var offset = center - gameObject.TransformComponent.Position;
+            var center = Vector2.Zero;
+            if (gameObject.TryGetComponent<ColliderComponent>(out var colliderComponent))
+            {
+                center = colliderComponent.Center;
+            }
+            else
+            {
+                center = transformComponent.Position;
+            }
 
-            canvasPathBuilder.BeginFigure(gameObject.TransformComponent.PositionHistory.First() + offset);
-            gameObject.TransformComponent.PositionHistory.Skip(1).All(vector =>
+            var offset = center - transformComponent.Position;
+
+            canvasPathBuilder.BeginFigure(transformComponent.PositionHistory.First() + offset);
+            transformComponent.PositionHistory.Skip(1).All(vector =>
             {
                 canvasPathBuilder.AddLine(vector + offset);
                 return true;

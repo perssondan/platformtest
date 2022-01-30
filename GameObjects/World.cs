@@ -164,7 +164,10 @@ namespace uwpPlatformer.GameObjects
         {
             if (_resetHeroPosition)
             {
-                _hero.PhysicsComponent.Reset(_heroStartPosition);
+                if (_hero.TryGetComponent<PhysicsComponent>(out var physicsComponent))
+                {
+                    physicsComponent.Reset(_heroStartPosition);
+                }
                 _resetHeroPosition = false;
             }
         }

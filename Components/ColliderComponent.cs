@@ -28,7 +28,7 @@ namespace uwpPlatformer.Components
 
         public Rect MovingBoundingBox { get; set; } = Rect.Empty;
 
-        protected Vector2 Position => GameObject.TransformComponent.Position;
+        protected Vector2 Position => GameObject.GetComponent<TransformComponent>().Position;
 
         [Flags]
         public enum CollisionTypes

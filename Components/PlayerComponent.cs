@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Numerics;
-using uwpPlatformer.Constants;
 using uwpPlatformer.GameObjects;
 using Windows.Foundation;
 
@@ -15,6 +13,7 @@ namespace uwpPlatformer.Components
 
         public TimeSpan JumpPressedRememberTime => TimeSpan.FromMilliseconds(150);
         public TimeSpan JumpPressedAt { get; set; }
+        public TimeSpan WalkPressedAt { get; set; }
         public bool IsJumpButtonPressed { get; set; }
 
         public Rect[] WalkSourceRects => new Rect[]
@@ -29,10 +28,5 @@ namespace uwpPlatformer.Components
             {
                 new Rect(0f, 96f, 32f, 32f)
             };
-
-        /// <summary>
-        /// Initial jump velocity
-        /// </summary>
-        public Vector2 InitialJumpVelocity { get; set; } = new Vector2(0, PlayerConstants.InitialVerticalVelocity);
     }
 }

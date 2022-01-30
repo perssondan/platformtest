@@ -58,10 +58,11 @@ namespace uwpPlatformer.Systems
 
             // Detail phase collision detection
             var results = new List<CollisionManifold>();
+            var physicsComponent = dynamicCollider.GameObject.GetComponent<PhysicsComponent>();
             foreach (var componentInCollision in componentsInCollision)
             {
                 if (!CollisionDetection.IsRectInRect(dynamicCollider.BoundingBox,
-                                  dynamicCollider.GameObject.PhysicsComponent.Position,
+                                  physicsComponent.Position,
                                   componentInCollision.BoundingBox,
                                   out var contactPoint,
                                   out var contactNormal,
@@ -130,7 +131,7 @@ namespace uwpPlatformer.Systems
         /// <returns></returns>
         private static Rect GetSweptBroadphaseRect(ColliderComponent dynamicCollider)
         {
-            var physicsComponent = dynamicCollider.GameObject.PhysicsComponent;
+            var physicsComponent = dynamicCollider.GameObject.GetComponent<PhysicsComponent>();
             var futurePosition = physicsComponent.Position;
             var unionDynamicRect = new Rect(futurePosition.X, futurePosition.Y, dynamicCollider.BoundingBox.Width, dynamicCollider.BoundingBox.Height);
             unionDynamicRect.Union(dynamicCollider.BoundingBox);
