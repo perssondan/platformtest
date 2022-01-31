@@ -16,5 +16,7 @@
         public const float Vx = Xh / TimeToReachMaxJumpHeight;
         public const float Vy = -2f * MaxJumpHeight * Vx / Xh;
         public const float Gravity = 2f * MaxJumpHeight * Vx * Vx / (Xh * Xh);
+
+        public const float VerticallyStationaryThreshold = 2.1f;
     }
 }

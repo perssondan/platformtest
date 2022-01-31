@@ -44,21 +44,25 @@ namespace uwpPlatformer.Systems
 
         private bool IsJumpButtonPressed(PlayerComponent playerComponent, UserInput userInputs, TimeSpan timeSpan)
         {
-            playerComponent.JumpPressedAt -= timeSpan;
-
-            if ((userInputs & UserInput.Jump) == UserInput.Jump)
-            {
-                if (playerComponent.IsJumpButtonPressed == false)
-                {
-                    playerComponent.IsJumpButtonPressed = true;
-                    playerComponent.JumpPressedAt = playerComponent.JumpPressedRememberTime;
-                }
-            }
-            else
+            // No jump input
+            if ((userInputs & UserInput.Jump) != UserInput.Jump)
             {
                 playerComponent.IsJumpButtonPressed = false;
                 playerComponent.JumpPressedAt = TimeSpan.Zero;
+                return false;
             }
+
+            // Subtract time from when we first pressed, in order to jump a bit later
+            playerComponent.JumpPressedAt -= timeSpan;
+
+            // If this is the first frame we press jump button, reset the jump countdown time.
+            // This also prevents from the player to holding the jump button in and jump continiously.
+            if (playerComponent.IsJumpButtonPressed == false)
+            {
+                playerComponent.JumpPressedAt = playerComponent.JumpPressedRememberTime;
+            }
+
+            playerComponent.IsJumpButtonPressed = true;
 
             return playerComponent.JumpPressedAt.TotalMilliseconds > 0f;
         }
@@ -84,14 +88,15 @@ namespace uwpPlatformer.Systems
 
         private bool IsVerticallyStationary(Vector2 velocity)
         {
-            return Math.Abs(velocity.Y) < 2.1f;
+            return Math.Abs(velocity.Y) < PlayerConstants.VerticallyStationaryThreshold;
         }
 
         private void WalkHandler(GameObject gameObject, UserInput userInputs, TimeSpan deltaTime)
         {
-            var playerComponent = gameObject.GetComponent<PlayerComponent>();
-            var physicsComponent = gameObject.GetComponent<PhysicsComponent>();
-            var graphicsComponent = gameObject.GetComponent<AnimatedGraphicsComponent>();
+            var components = gameObject.GetComponents<PlayerComponent, PhysicsComponent, AnimatedGraphicsComponent>();
+            var playerComponent = components.Item1;
+            var physicsComponent = components.Item2;
+            var graphicsComponent = components.Item3;
             var horizontalWalkOrientation = GetHorizontalWalkOrientationFromUserInput(playerComponent, userInputs, deltaTime);
             UpdateWalkAnimation(graphicsComponent, playerComponent, horizontalWalkOrientation);
             AddWalkImpulse(physicsComponent, horizontalWalkOrientation, deltaTime);
@@ -163,13 +168,12 @@ namespace uwpPlatformer.Systems
         {
             if (gameObject.Has<ParticleEmitterComponent>()) return;
 
-            if (gameObject.TryGetComponent<ColliderComponent>(out var colliderComponent))
-            {
-                gameObject.AddOrUpdateComponent(new ParticleEmitterComponent(
+            if (!gameObject.TryGetComponent<ColliderComponent>(out var colliderComponent)) return;
+
+            gameObject.AddOrUpdateComponent(new ParticleEmitterComponent(
                 gameObject,
                 ParticleTemplateType.Dust,
                 colliderComponent.BoundingBox.BottomCenterOffset()));
-            }
         }
     }
 }
