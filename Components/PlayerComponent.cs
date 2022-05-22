@@ -15,6 +15,7 @@ namespace uwpPlatformer.Components
         public TimeSpan JumpPressedAt { get; set; }
         public bool IsJumpButtonPressed { get; set; }
 
+        // TODO: Should be fetched from tile file
         public Rect[] WalkSourceRects => new Rect[]
             {
                 new Rect(0, 32f, 32f, 32f),
@@ -23,7 +24,8 @@ namespace uwpPlatformer.Components
                 new Rect(96f, 32f, 32f, 32f),
             };
 
-        public Rect[] StaticSourceRects => new Rect[]
+        // TODO: Should be fetched from tile file
+        public Rect[] StationarySourceRects => new Rect[]
             {
                 new Rect(0f, 96f, 32f, 32f)
             };
