@@ -1,20 +1,23 @@
 ﻿using GamesLibrary.Utilities;
 using System;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Windows.Foundation;
 
 namespace uwpPlatformer.Components
 {
-    public struct CollisionInfo : IEquatable<CollisionInfo>, IFormattable
+    [DebuggerDisplay("CollisionPoint:{CollisionPoint}, CollisionNormal:{CollisionNormal}, CollisionTime:{CollisionTime}, ContactRect:{ContactRect}")]
+    public struct CollisionManifold : IEquatable<CollisionManifold>, IFormattable
     {
-        public static CollisionInfo Zero => new CollisionInfo();
+        public static CollisionManifold Zero => new CollisionManifold();
 
-        public CollisionInfo(Vector2 collisionPoint, Vector2 collisionNormal, float collisionTime)
+        public CollisionManifold(Vector2 collisionPoint, Vector2 collisionNormal, float collisionTime, Rect contactRect)
         {
             CollisionPoint = collisionPoint;
             CollisionNormal = collisionNormal;
             CollisionTime = collisionTime;
+            ContactRect = contactRect;
         }
 
         public Vector2 CollisionPoint;
@@ -22,14 +25,16 @@ namespace uwpPlatformer.Components
         public float CollisionTime;
         public Rect ContactRect;
 
+        /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj)
         {
-            if (!(obj is CollisionInfo))
+            if (!(obj is CollisionManifold))
                 return false;
-            return Equals((CollisionInfo)obj);
+            return Equals((CollisionManifold)obj);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             int hash = CollisionPoint.GetHashCode();
@@ -38,29 +43,32 @@ namespace uwpPlatformer.Components
             return hash;
         }
 
-        public bool Equals(CollisionInfo other)
+        /// <inheritdoc />
+        public bool Equals(CollisionManifold other)
         {
             return CollisionNormal == other.CollisionNormal && CollisionPoint == other.CollisionPoint && CollisionTime == other.CollisionTime;
         }
 
+        /// <inheritdoc />
         public string ToString(string format, IFormatProvider formatProvider)
         {
             return $"{nameof(CollisionNormal)}:{CollisionNormal};{nameof(CollisionPoint)}:{CollisionPoint};{nameof(CollisionTime)}:{CollisionTime}";
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"{nameof(CollisionNormal)}:{CollisionNormal};{nameof(CollisionPoint)}:{CollisionPoint};{nameof(CollisionTime)}:{CollisionTime}";
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(CollisionInfo left, CollisionInfo right)
+        public static bool operator ==(CollisionManifold left, CollisionManifold right)
         {
             return left.Equals(right);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(CollisionInfo left, CollisionInfo right)
+        public static bool operator !=(CollisionManifold left, CollisionManifold right)
         {
             return !(left == right);
         }

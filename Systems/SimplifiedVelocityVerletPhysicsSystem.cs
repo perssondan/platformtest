@@ -46,13 +46,13 @@ namespace uwpPlatformer.Systems
             var deltaTime = (float)timeSpan.TotalSeconds;
 
             var currentPosition = transformComponent.Position;
-            var currentVelocity = transformComponent.Velocity;
+            var currentVelocity = physicsComponent.Velocity;
 
             var newPosition = currentPosition + deltaTime * (currentVelocity + (deltaTime * acceleration * 0.5f));
             var newVelocity = currentVelocity + acceleration * deltaTime;
 
             transformComponent.Position = newPosition;
-            transformComponent.Velocity = newVelocity;
+            physicsComponent.Velocity = newVelocity;
 
             physicsComponent.ImpulseForce = Vector2.Zero;
         }

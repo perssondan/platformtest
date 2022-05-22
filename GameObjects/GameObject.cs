@@ -50,6 +50,16 @@ namespace uwpPlatformer.GameObjects
                    _components.TryGetValue(typeof(U), out var _);
         }
 
+        public bool Has<T, U, V>()
+            where T : IComponent
+            where U : IComponent
+            where V : IComponent
+        {
+            return _components.TryGetValue(typeof(T), out var _) &&
+                   _components.TryGetValue(typeof(U), out var _) &&
+                   _components.TryGetValue(typeof(V), out var _);
+        }
+
         public void RemoveComponent<T>()
             where T : IComponent
         {
@@ -73,16 +83,16 @@ namespace uwpPlatformer.GameObjects
             return default;
         }
 
-        public (T, U, V) GetComponents<T, U, V>()
-            where T : IComponent
-            where U : IComponent
-            where V : IComponent
+        public (TComponent, UComponent, VComponent) GetComponents<TComponent, UComponent, VComponent>()
+            where TComponent : IComponent
+            where UComponent : IComponent
+            where VComponent : IComponent
         {
-            if (_components.TryGetValue(typeof(T), out var componentT)
-                && _components.TryGetValue(typeof(U), out var componentU)
-                && _components.TryGetValue(typeof(V), out var componentV))
+            if (_components.TryGetValue(typeof(TComponent), out var componentT)
+                && _components.TryGetValue(typeof(UComponent), out var componentU)
+                && _components.TryGetValue(typeof(VComponent), out var componentV))
             {
-                return ((T)componentT, (U)componentU, (V)componentV);
+                return ((TComponent)componentT, (UComponent)componentU, (VComponent)componentV);
             }
 
             return default;
@@ -105,6 +115,19 @@ namespace uwpPlatformer.GameObjects
             return default;
         }
 
+        public bool TryGetComponent<T>(out T componentT)
+            where T : IComponent
+        {
+            componentT = default;
+            if (_components.TryGetValue(typeof(T), out var compT))
+            {
+                componentT = (T)compT;
+                return true;
+            }
+
+            return default;
+        }
+
         public void Dispose()
         {
             foreach (var component in _components.Values)
@@ -112,12 +135,6 @@ namespace uwpPlatformer.GameObjects
                 component.Dispose();
             }
         }
-
-        public AnimatedGraphicsComponent GraphicsComponent => GetComponent<AnimatedGraphicsComponent>();
-        public PhysicsComponent PhysicsComponent => GetComponent<PhysicsComponent>();
-        public InputComponent InputComponent => GetComponent<InputComponent>();
-        public TransformComponent TransformComponent => GetComponent<TransformComponent>();
-        public ColliderComponent ColliderComponent => GetComponent<ColliderComponent>();
 
         private static int GenerateId()
         {

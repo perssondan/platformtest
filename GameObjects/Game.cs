@@ -3,6 +3,7 @@ using GamesLibrary.Systems;
 using Microsoft.Graphics.Canvas;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using uwpPlatformer.Components;
 using uwpPlatformer.Events;
@@ -20,7 +21,7 @@ namespace uwpPlatformer.GameObjects
         private bool _hasCollisions = false;
         // TODO: DI time...
         private readonly ColliderSystem _colliderSystem;
-        private readonly MoveSystem _moveSystem;
+        private readonly TranslateTransformSystem _transformSystem;
         private readonly PhysicsSystem _physicsSystem;
         private readonly InputSystem _inputSystem;
         private readonly GraphicsSystem _graphicsSystem;
@@ -36,13 +37,13 @@ namespace uwpPlatformer.GameObjects
         public Game(Windows.UI.Xaml.Window current, CanvasBitmap[] canvasBitmaps, Map map, TileAtlas[] tileAtlases)
         {
             _colliderSystem = new ColliderSystem(_eventSystem, _gameObjectManager);
-            _moveSystem = new MoveSystem(_gameObjectManager);
+            _transformSystem = new TranslateTransformSystem(_gameObjectManager);
             _perlinSystem = new PerlinMoveSystem(_gameObjectManager);
-            _physicsSystem = new PhysicsSystem(_gameObjectManager);
+            _physicsSystem = new PhysicsSystem(_gameObjectManager, _eventSystem);
             _inputSystem = new InputSystem(_eventSystem, _gameObjectManager);
             _graphicsSystem = new GraphicsSystem(_eventSystem, _gameObjectManager);
             _particleSystem = new ParticleSystem(_gameObjectManager);
-            _world = new World(canvasBitmaps, map, tileAtlases, _gameObjectManager);
+            _world = new World(canvasBitmaps, map, tileAtlases, _gameObjectManager, _eventSystem);
             _dustEntityFactory = new DustEntityFactory(_gameObjectManager);
             _playerSystem = new PlayerSystem(_eventSystem, _gameObjectManager);
             _dustParticleEmitterSystem = new DustParticleEmitterSystem(_eventSystem, _dustEntityFactory, _gameObjectManager);
@@ -53,6 +54,14 @@ namespace uwpPlatformer.GameObjects
             _eventSystem.Subscribe<CollisionEvent>(this, (sender, collisionEvent) =>
             {
                 _hasCollisions = true;
+
+                var isHero = collisionEvent.GameObject.Has<HeroComponent>();
+                var isEnemy = collisionEvent.IsCollidingWith.Has<EnemyComponent>();
+
+                if (isHero && isEnemy)
+                {
+                    Debug.WriteLine("Hero collided with enemy!");
+                }
             });
         }
 
@@ -62,6 +71,8 @@ namespace uwpPlatformer.GameObjects
         {
             _hasCollisions = false;
 
+            _gameObjectManager.Update();
+
             _inputSystem.Update(timingInfo);
             _perlinSystem.Update(timingInfo);
             _graphicsSystem.Update(timingInfo);
@@ -70,16 +81,26 @@ namespace uwpPlatformer.GameObjects
 
             _physicsSystem.Update(timingInfo);
             _colliderSystem.Update(timingInfo);
+
             _dustParticleEmitterSystem.Update(timingInfo);
             _particleEmitterSystem.Update(timingInfo);
 
-            // If we have collisions, resolve them now!
-            if (_hasCollisions)
-            {
-                _colliderSystem.ResolveCollisions(timingInfo);
-            }
+            ResolveCollisions(timingInfo);
 
-            _moveSystem.Update(timingInfo);
+            _transformSystem.Update(timingInfo);
+
+            _world.Update(timingInfo);
+        }
+
+        private void ResolveCollisions(TimingInfo timingInfo)
+        {
+            var maxResolveAttempts = 5;
+            for (var currentResolveAttempt = 0; currentResolveAttempt < maxResolveAttempts && _hasCollisions; currentResolveAttempt++)
+            {
+                _hasCollisions = false;
+                _physicsSystem.PostUpdate(timingInfo);
+                _colliderSystem.Update(timingInfo);
+            }
         }
 
         public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)

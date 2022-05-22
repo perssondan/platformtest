@@ -1,30 +1,47 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace uwpPlatformer.GameObjects
 {
     public class GameObjectManager : IGameObjectManager
     {
-        private List<GameObject> _gameObjects = new List<GameObject>();
+        private List<GameObject> _activeGameObjects = new List<GameObject>();
+        private List<GameObject> _destroyedGameObjects = new List<GameObject>();
+        private List<GameObject> _removedGameObjects = new List<GameObject>();
+        private List<GameObject> _addedGameObjects = new List<GameObject>();
 
         public GameObject CreateGameObject()
         {
             var gameObject = new GameObject();
-            _gameObjects.Add(gameObject);
+            _addedGameObjects.Add(gameObject);
             return gameObject;
         }
 
         public void RemoveGameObject(GameObject gameObject)
         {
-            // TODO: remove components
-            _gameObjects.Remove(gameObject);
+            _removedGameObjects.Add(gameObject);
         }
 
         public void DestroyGameObject(GameObject gameObject)
         {
-            _gameObjects.Remove(gameObject);
-            gameObject.Dispose();
+            _destroyedGameObjects.Add(gameObject);
         }
 
-        public IReadOnlyList<GameObject> GameObjects => _gameObjects.AsReadOnly();
+        public void Update()
+        {
+            _activeGameObjects.AddRange(_addedGameObjects);
+            _removedGameObjects.ForEach(go => _activeGameObjects.Remove(go));
+            _destroyedGameObjects.ForEach(go => _activeGameObjects.Remove(go));
+
+            _destroyedGameObjects.ForEach(go => go.Dispose());
+
+            _addedGameObjects.Clear();
+            _removedGameObjects.Clear();
+            _destroyedGameObjects.Clear();
+
+            GameObjects = _activeGameObjects.AsReadOnly();
+        }
+
+        public IReadOnlyList<GameObject> GameObjects { get; private set; } = Array.Empty<GameObject>();
     }
 }

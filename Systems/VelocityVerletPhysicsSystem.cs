@@ -11,7 +11,7 @@ namespace uwpPlatformer.Systems
     /// For reference, Velocity Verlet integration
     /// </summary>
     /// <remarks>
-    /// Due to the nature of <see cref="MoveSystem"/>, this won't work in our game
+    /// Due to the nature of <see cref="TranslateTransformSystem"/>, this won't work in our game
     /// </remarks>
     public class VelocityVerletPhysicsSystem : ISystem
     {
@@ -43,7 +43,7 @@ namespace uwpPlatformer.Systems
                                float deltaTime)
         {
             var currentPosition = transformComponent.Position;
-            var currentVelocity = transformComponent.Velocity;
+            var currentVelocity = physicsComponent.Velocity;
             // N.B 1. If acceleration is constant in regards to the position and time, we can omit one call to ApplyForces
             // and use the same force in both calculations
             // N.B 2. Store the first acceleration to be used in the next frame to save the extra calculation
@@ -53,7 +53,7 @@ namespace uwpPlatformer.Systems
             var newAcceleration = ApplyForces(physicsComponent, newPosition, deltaTime * 2);
             var newVelocity = currentVelocity + ((acceleration + newAcceleration) * (deltaTime * 0.5f));
 
-            transformComponent.Velocity = newVelocity;
+            physicsComponent.Velocity = newVelocity;
             transformComponent.Position = newPosition;
 
             physicsComponent.ImpulseForce = Vector2.Zero;

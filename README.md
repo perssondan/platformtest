@@ -12,7 +12,7 @@ Variables: g=gravity constant, t=time, v0=initial speed, p0=initial position
 Solve v0 when gravity and initial speed is equal(when parabolica is flat, the tangent, the top of the parabolica)
 f'(t)=g*t+v0 => v0=-g*t
 ## Calculate gravity
-Solve g, f(t)=h(eight)
+Solve g, f(t)=h(height)
 f(t)=1/2*g*t^2+v0*t+p0 => insert v0=-g*t, p0=0 => h=1/2*g*t^2+(-g*t)*t+0 => h=-1/2*g*t^2 => g=-2*h/t^2
 ## v0 with height
 v0=-g*t => insert solved g, g=-2*h/t^2 => v0=-(-2*h/t^2)*t => v0=2h/t

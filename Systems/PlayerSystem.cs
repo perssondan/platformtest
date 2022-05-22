@@ -1,6 +1,8 @@
 ﻿using GamesLibrary.Models;
 using GamesLibrary.Systems;
+using GamesLibrary.Utilities;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using uwpPlatformer.Components;
@@ -35,116 +37,163 @@ namespace uwpPlatformer.Systems
                 });
         }
 
+        // InputComponent,
+        // PlayerComponent,
+        // PhysicsComponent,
+        // AnimatedGraphicsComponent,
+        // ParticleEmitterComponent
+
         private void UpdatePlayerGameObject(GameObject gameObject, TimeSpan deltatime)
         {
-            var userInputs = gameObject.InputComponent.UserInputs;
-            WalkHandler(gameObject, userInputs);
+            var userInputs = gameObject.GetComponent<InputComponent>()?.UserInputs ?? UserInput.None;
+            RampDownHorizontalVelocity(gameObject, userInputs, deltatime);
+            WalkLeftHandler(gameObject, userInputs, deltatime);
+            WalkRightHandler(gameObject, userInputs, deltatime);
             JumpHandler(gameObject, userInputs, deltatime);
+            UpdateAnimation(gameObject);
+        }
+
+        private void UpdateAnimation(GameObject gameObject)
+        {
+            (PlayerComponent playerComponent, AnimatedGraphicsComponent graphicsComponent, PhysicsComponent physicsComponent) = gameObject.GetComponents<PlayerComponent, AnimatedGraphicsComponent, PhysicsComponent>();
+
+            var walkOrientation = physicsComponent.Velocity.X < 0f ? HorizontalMovement.Left : physicsComponent.Velocity.X > 0f ? HorizontalMovement.Right : HorizontalMovement.Stationary;
+            // Walk left
+            if (walkOrientation == HorizontalMovement.Left)
+            {
+                graphicsComponent.InvertTile = true;
+                graphicsComponent.SourceRects = playerComponent.WalkSourceRects;
+            } // Walk right
+            else if (walkOrientation == HorizontalMovement.Right)
+            {
+                graphicsComponent.InvertTile = false;
+                graphicsComponent.SourceRects = playerComponent.WalkSourceRects;
+            } // stand still
+            else
+            {
+                graphicsComponent.InvertTile = false;
+                graphicsComponent.SourceRects = playerComponent.StaticSourceRects;
+            }
+        }
+
+        private bool IsJumpButtonPressed(PlayerComponent playerComponent, UserInput userInputs, TimeSpan timeSpan)
+        {
+            // No jump input
+            if ((userInputs & UserInput.Jump) != UserInput.Jump)
+            {
+                playerComponent.IsJumpButtonPressed = false;
+                playerComponent.JumpPressedAt = TimeSpan.Zero;
+                return false;
+            }
+
+            // Subtract time from when we first pressed, in order to jump a bit later
+            playerComponent.JumpPressedAt -= timeSpan;
+
+            // If this is the first frame we press jump button, reset the jump countdown time.
+            // This also prevents from the player to holding the jump button in and jump continiously.
+            if (playerComponent.IsJumpButtonPressed == false)
+            {
+                playerComponent.JumpPressedAt = playerComponent.JumpPressedRememberTime;
+            }
+
+            playerComponent.IsJumpButtonPressed = true;
+
+            return playerComponent.JumpPressedAt.TotalMilliseconds > 0f;
         }
 
         private void JumpHandler(GameObject gameObject, UserInput userInputs, TimeSpan timeSpan)
         {
             var playerComponent = gameObject.GetComponent<PlayerComponent>();
-            playerComponent.JumpPressedAt -= timeSpan;
+            // If we didn't press the jump button but are still on the way up
+            // we could double the gravity force to make a short jump.
+            if (!IsJumpButtonPressed(playerComponent, userInputs, timeSpan)) return;
 
-            if ((userInputs & UserInput.Jump) == UserInput.Jump)
-            {
-                if (playerComponent.IsJumpButtonPressed == false)
-                {
-                    playerComponent.IsJumpButtonPressed = true;
-                    playerComponent.JumpPressedAt = playerComponent.JumpPressedRememberTime;
-                }
-            }
-            else
-            {
-                playerComponent.IsJumpButtonPressed = false;
-                playerComponent.JumpPressedAt = TimeSpan.Zero;
-            }
-
-            if (playerComponent.JumpPressedAt.TotalMilliseconds <= 0f) return;
+            var physicsComponent = gameObject.GetComponent<PhysicsComponent>();
 
             //Only jump when grounded
-            if (!IsVerticallyStationary(gameObject)) return;
+            if (!IsVerticallyStationary(physicsComponent.Velocity)) return;
 
             playerComponent.JumpPressedAt = TimeSpan.Zero;
 
-            Jump(gameObject);
-        }
-
-        private bool IsVerticallyStationary(GameObject gameObject)
-        {
-            return gameObject.TransformComponent.Velocity.Y < .1f && gameObject.TransformComponent.Velocity.Y > -.1f;
-        }
-
-        private void WalkHandler(GameObject gameObject, UserInput userInputs)
-        {
-            var walkOrientation = GetWalkOrientationFromUserInput(userInputs);
-            UpdateWalkAnimation(gameObject.GraphicsComponent, gameObject.GetComponent<PlayerComponent>(), walkOrientation);
-            Walk(gameObject, walkOrientation);
-        }
-
-        private float GetWalkOrientationFromUserInput(UserInput userInputs)
-        {
-            if ((userInputs & UserInput.Right) == UserInput.Right) return 1f;
-
-            if ((userInputs & UserInput.Left) == UserInput.Left) return -1f;
-
-            return 0f;
-        }
-
-        private void Jump(GameObject gameObject)
-        {
-            gameObject.TransformComponent.Velocity += gameObject.GetComponent<PlayerComponent>().InitialJumpVelocity;
+            AddJumpImpulse(physicsComponent);
             AddDustEmitter(gameObject);
             _eventSystem.Send(this, new JumpEvent(gameObject));
+        }
+
+        private bool IsVerticallyStationary(Vector2 velocity)
+        {
+            return Math.Abs(velocity.Y) < PlayerConstants.VerticallyStationaryThreshold;
+        }
+
+        private void WalkLeftHandler(GameObject gameObject, UserInput userInputs, TimeSpan deltaTime)
+        {
+            if ((userInputs & UserInput.Left) != UserInput.Left) return;
+
+
+            (PlayerComponent playerComponent, PhysicsComponent physicsComponent, AnimatedGraphicsComponent animatedGraphicsComponent)
+    components = gameObject.GetComponents<PlayerComponent, PhysicsComponent, AnimatedGraphicsComponent>();
+
+            var newVx = GameMath.Lerp(components.physicsComponent.Velocity.X, -PlayerConstants.V0x, 0.5f);
+            components.physicsComponent.Velocity = components.physicsComponent.Velocity * Vector2.UnitY + new Vector2(newVx, 0f);
+        }
+
+        private void RampDownHorizontalVelocity(GameObject gameObject, UserInput userInputs, TimeSpan deltaTime)
+        {
+            (PlayerComponent playerComponent, PhysicsComponent physicsComponent, AnimatedGraphicsComponent animatedGraphicsComponent)
+                components = gameObject.GetComponents<PlayerComponent, PhysicsComponent, AnimatedGraphicsComponent>();
+
+            var horizontalWalkOrientation = GetHorizontalWalkOrientationFromUserInput(components.playerComponent, userInputs);
+
+            if (horizontalWalkOrientation != HorizontalMovement.Stationary) return;
+
+            var lerpFactor = IsVerticallyStationary(components.physicsComponent.Velocity) ? 0.15f : 0f;
+
+            var newVx = GameMath.Lerp(components.physicsComponent.Velocity.X, 0f, lerpFactor);
+            components.physicsComponent.Velocity = components.physicsComponent.Velocity * Vector2.UnitY + new Vector2(newVx, 0f);
+        }
+
+        private void WalkRightHandler(GameObject gameObject, UserInput userInputs, TimeSpan deltaTime)
+        {
+            if ((userInputs & UserInput.Right) != UserInput.Right) return;
+
+            (PlayerComponent playerComponent, PhysicsComponent physicsComponent, AnimatedGraphicsComponent animatedGraphicsComponent)
+                components = gameObject.GetComponents<PlayerComponent, PhysicsComponent, AnimatedGraphicsComponent>();
+
+            var newVx = GameMath.Lerp(components.physicsComponent.Velocity.X, PlayerConstants.V0x, 0.5f);
+            components.physicsComponent.Velocity = components.physicsComponent.Velocity * Vector2.UnitY + new Vector2(newVx, 0f);
+        }
+
+        private HorizontalMovement GetHorizontalWalkOrientationFromUserInput(PlayerComponent playerComponent, UserInput userInputs)
+        {
+            if ((userInputs & UserInput.Right) == UserInput.Right) return HorizontalMovement.Right;
+
+            if ((userInputs & UserInput.Left) == UserInput.Left) return HorizontalMovement.Left;
+
+            return HorizontalMovement.Stationary;
+        }
+
+        private void AddJumpImpulse(PhysicsComponent physicsComponent)
+        {
+            physicsComponent.Velocity += Vector2.UnitY * PlayerConstants.V0y;
         }
 
         private static void AddDustEmitter(GameObject gameObject)
         {
             if (gameObject.Has<ParticleEmitterComponent>()) return;
 
+            if (!gameObject.TryGetComponent<ColliderComponent>(out var colliderComponent)) return;
+
             gameObject.AddOrUpdateComponent(new ParticleEmitterComponent(
                 gameObject,
                 ParticleTemplateType.Dust,
-                gameObject.ColliderComponent.BoundingBox.BottomCenterOffset()));
+                colliderComponent.BoundingBox.BottomCenterOffset()));
         }
 
-        private void Walk(GameObject gameObject, float orientation)
+        protected enum HorizontalMovement
         {
-            var transformComponent = gameObject.TransformComponent;
-            if (orientation > 0f || orientation < 0f)
-            {
-                var horizontalVector = new Vector2(orientation * PlayerConstants.InitialHorizontalVelocity, 0f);
-                transformComponent.Velocity = transformComponent.Velocity * Vector2.UnitY + horizontalVector;
-            }
-            else if ((transformComponent.Velocity.X < 0f && gameObject.PhysicsComponent.Gravity.X < 0)
-                || (transformComponent.Velocity.X > 0f && gameObject.PhysicsComponent.Gravity.X > 0))
-            {
-                transformComponent.Velocity *= Vector2.UnitY;
-            }
-            else
-            {
-                transformComponent.Velocity *= Vector2.UnitY;
-            }
-        }
-
-        private void UpdateWalkAnimation(AnimatedGraphicsComponent graphicsComponent, PlayerComponent playerComponent, float walkOrientation)
-        {
-            if (walkOrientation < 0f)
-            {
-                graphicsComponent.InvertTile = true;
-                graphicsComponent.SourceRects = playerComponent.WalkSourceRects;
-            }
-            else if (walkOrientation > 0f)
-            {
-                graphicsComponent.InvertTile = false;
-                graphicsComponent.SourceRects = playerComponent.WalkSourceRects;
-            }
-            else
-            {
-                graphicsComponent.InvertTile = false;
-                graphicsComponent.SourceRects = playerComponent.StaticSourceRects;
-            }
+            Left = -1,
+            Stationary = 0,
+            Right = 1,
         }
     }
 }

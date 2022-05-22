@@ -1,14 +1,19 @@
 ﻿using GamesLibrary.Utilities;
 using System;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using uwpPlatformer.Components;
 
 namespace uwpPlatformer.Numerics
 {
-    public struct Ray : IEquatable<Ray>
+    /// <summary>
+    /// Represents a ray. A ray has a starting point and a direction. The direction is presumed to be normalized.
+    /// </summary>
+    [DebuggerDisplay("(Origin:{Origin}, Direction:{Direction})")]
+    public struct Ray2D : IEquatable<Ray2D>
     {
-        public Ray(Vector2 origin, Vector2 direction)
+        public Ray2D(Vector2 origin, Vector2 direction)
         {
             Origin = origin;
             Direction = direction;
@@ -21,17 +26,17 @@ namespace uwpPlatformer.Numerics
         public Vector2 InvDirection { get; }
         public int[] Sign { get; }
 
-        public bool Equals(Ray other)
+        public bool Equals(Ray2D other)
         {
             return Origin == other.Origin && Direction == other.Direction && InvDirection == other.InvDirection;
         }
 
         public override bool Equals(object obj)
         {
-            if (!(obj is CollisionInfo collisionInfo))
+            if (!(obj is Ray2D ray2D))
                 return false;
 
-            return Equals(collisionInfo);
+            return Equals(ray2D);
         }
 
         public override int GetHashCode()
@@ -45,13 +50,13 @@ namespace uwpPlatformer.Numerics
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(Ray left, Ray right)
+        public static bool operator ==(Ray2D left, Ray2D right)
         {
             return left.Equals(right);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Ray left, Ray right)
+        public static bool operator !=(Ray2D left, Ray2D right)
         {
             return !(left == right);
         }

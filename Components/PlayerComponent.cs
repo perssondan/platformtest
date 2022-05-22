@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Numerics;
-using uwpPlatformer.Constants;
 using uwpPlatformer.GameObjects;
 using Windows.Foundation;
 
@@ -29,10 +27,5 @@ namespace uwpPlatformer.Components
             {
                 new Rect(0f, 96f, 32f, 32f)
             };
-
-        /// <summary>
-        /// Initial jump velocity
-        /// </summary>
-        public Vector2 InitialJumpVelocity { get; set; } = new Vector2(0, PlayerConstants.InitialVerticalVelocity);
     }
 }

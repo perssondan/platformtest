@@ -10,6 +10,8 @@ namespace uwpPlatformer.GameObjects
 
         void DestroyGameObject(GameObject gameObject);
 
+        void Update();
+
         IReadOnlyList<GameObject> GameObjects { get; }
     }
 }
