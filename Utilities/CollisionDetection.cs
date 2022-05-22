@@ -79,11 +79,6 @@ namespace uwpPlatformer.Utilities
 
             var lineSegment = new LineSegment(centerPoint, newCenterPoint);
 
-            if (centerPoint == newCenterPoint)
-            {
-                System.Diagnostics.Debug.WriteLine("No movement!");
-            }
-
             var isRayInRect = IsRayInRect(lineSegment,
                             expandedStaticRect,
                             out contactPoint,
