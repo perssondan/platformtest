@@ -137,6 +137,7 @@
     <Compile Include="GameObjects\IScene.cs" />
     <Compile Include="GameObjects\PlatformScene.cs" />
     <Compile Include="Numerics\LineSegment.cs" />
+    <Compile Include="Systems\DebugSystem.cs" />
     <Compile Include="Systems\ImprovedEulerPhysicsSystem.cs" />
     <Compile Include="Systems\PositionVerletPhysicsSystem.cs" />
     <Compile Include="Systems\SemiImplicitEulerPhysicsSystem.cs" />

@@ -31,5 +31,7 @@ namespace uwpPlatformer.Components
         public CanvasBitmap CanvasBitmap { get; private set; }
 
         public TimeSpan CurrentTime { get; set; }
+
+        public bool IsVisible { get; set; } = true;
     }
 }

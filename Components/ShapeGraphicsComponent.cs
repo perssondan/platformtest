@@ -22,6 +22,8 @@ namespace uwpPlatformer.Components
         public ShapeType ShapeType { get; set; }
         public Color Color { get; set; }
         public Vector2 Size { get; set; }
+
+        public bool IsVisible { get; set; } = true;
     }
 
     public enum ShapeType
