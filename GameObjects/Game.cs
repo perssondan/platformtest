@@ -32,6 +32,7 @@ namespace uwpPlatformer.GameObjects
         private readonly IEventSystem _eventSystem = new EventSystem();
         private readonly DustEntityFactory _dustEntityFactory;
         private readonly PerlinMoveSystem _perlinSystem;
+        private readonly DebugSystem _debugSystem;
         private readonly World _world;
 
         public Game(Windows.UI.Xaml.Window current, CanvasBitmap[] canvasBitmaps, Map map, TileAtlas[] tileAtlases)
@@ -41,13 +42,14 @@ namespace uwpPlatformer.GameObjects
             _perlinSystem = new PerlinMoveSystem(_gameObjectManager);
             _physicsSystem = new PhysicsSystem(_gameObjectManager, _eventSystem);
             _inputSystem = new InputSystem(_eventSystem, _gameObjectManager);
-            _graphicsSystem = new GraphicsSystem(_eventSystem, _gameObjectManager);
+            _graphicsSystem = new GraphicsSystem(_gameObjectManager);
             _particleSystem = new ParticleSystem(_gameObjectManager);
             _world = new World(canvasBitmaps, map, tileAtlases, _gameObjectManager, _eventSystem);
             _dustEntityFactory = new DustEntityFactory(_gameObjectManager);
             _playerSystem = new PlayerSystem(_eventSystem, _gameObjectManager);
             _dustParticleEmitterSystem = new DustParticleEmitterSystem(_eventSystem, _dustEntityFactory, _gameObjectManager);
             _particleEmitterSystem = new ParticleEmitterSystem(_dustEntityFactory, _gameObjectManager);
+            _debugSystem = new DebugSystem(_eventSystem, _gameObjectManager);
 
             _inputSystem.Current = current;
 
@@ -106,6 +108,7 @@ namespace uwpPlatformer.GameObjects
         public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
         {
             _graphicsSystem.Draw(canvasDrawingSession, timeSpan);
+            _debugSystem.Draw(canvasDrawingSession, timeSpan);
         }
     }
 }
