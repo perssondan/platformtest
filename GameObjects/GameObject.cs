@@ -83,16 +83,16 @@ namespace uwpPlatformer.GameObjects
             return default;
         }
 
-        public (T, U, V) GetComponents<T, U, V>()
-            where T : IComponent
-            where U : IComponent
-            where V : IComponent
+        public (TComponent, UComponent, VComponent) GetComponents<TComponent, UComponent, VComponent>()
+            where TComponent : IComponent
+            where UComponent : IComponent
+            where VComponent : IComponent
         {
-            if (_components.TryGetValue(typeof(T), out var componentT)
-                && _components.TryGetValue(typeof(U), out var componentU)
-                && _components.TryGetValue(typeof(V), out var componentV))
+            if (_components.TryGetValue(typeof(TComponent), out var componentT)
+                && _components.TryGetValue(typeof(UComponent), out var componentU)
+                && _components.TryGetValue(typeof(VComponent), out var componentV))
             {
-                return ((T)componentT, (U)componentU, (V)componentV);
+                return ((TComponent)componentT, (UComponent)componentU, (VComponent)componentV);
             }
 
             return default;
