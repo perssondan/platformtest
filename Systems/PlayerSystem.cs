@@ -1,6 +1,8 @@
 ﻿using GamesLibrary.Models;
 using GamesLibrary.Systems;
+using GamesLibrary.Utilities;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using uwpPlatformer.Components;
@@ -35,11 +37,43 @@ namespace uwpPlatformer.Systems
                 });
         }
 
+        // InputComponent,
+        // PlayerComponent,
+        // PhysicsComponent,
+        // AnimatedGraphicsComponent,
+        // ParticleEmitterComponent
+
         private void UpdatePlayerGameObject(GameObject gameObject, TimeSpan deltatime)
         {
             var userInputs = gameObject.GetComponent<InputComponent>()?.UserInputs ?? UserInput.None;
-            WalkHandler(gameObject, userInputs, deltatime);
+            RampDownHorizontalVelocity(gameObject, userInputs, deltatime);
+            WalkLeftHandler(gameObject, userInputs, deltatime);
+            WalkRightHandler(gameObject, userInputs, deltatime);
             JumpHandler(gameObject, userInputs, deltatime);
+            UpdateAnimation(gameObject);
+        }
+
+        private void UpdateAnimation(GameObject gameObject)
+        {
+            (PlayerComponent playerComponent, AnimatedGraphicsComponent graphicsComponent, PhysicsComponent physicsComponent) = gameObject.GetComponents<PlayerComponent, AnimatedGraphicsComponent, PhysicsComponent>();
+
+            var walkOrientation = physicsComponent.Velocity.X < 0f ? HorizontalMovement.Left : physicsComponent.Velocity.X > 0f ? HorizontalMovement.Right : HorizontalMovement.Stationary;
+            // Walk left
+            if (walkOrientation == HorizontalMovement.Left)
+            {
+                graphicsComponent.InvertTile = true;
+                graphicsComponent.SourceRects = playerComponent.WalkSourceRects;
+            } // Walk right
+            else if (walkOrientation == HorizontalMovement.Right)
+            {
+                graphicsComponent.InvertTile = false;
+                graphicsComponent.SourceRects = playerComponent.WalkSourceRects;
+            } // stand still
+            else
+            {
+                graphicsComponent.InvertTile = false;
+                graphicsComponent.SourceRects = playerComponent.StaticSourceRects;
+            }
         }
 
         private bool IsJumpButtonPressed(PlayerComponent playerComponent, UserInput userInputs, TimeSpan timeSpan)
@@ -91,77 +125,56 @@ namespace uwpPlatformer.Systems
             return Math.Abs(velocity.Y) < PlayerConstants.VerticallyStationaryThreshold;
         }
 
-        private void WalkHandler(GameObject gameObject, UserInput userInputs, TimeSpan deltaTime)
+        private void WalkLeftHandler(GameObject gameObject, UserInput userInputs, TimeSpan deltaTime)
         {
-            var components = gameObject.GetComponents<PlayerComponent, PhysicsComponent, AnimatedGraphicsComponent>();
-            var playerComponent = components.Item1;
-            var physicsComponent = components.Item2;
-            var graphicsComponent = components.Item3;
-            var horizontalWalkOrientation = GetHorizontalWalkOrientationFromUserInput(playerComponent, userInputs, deltaTime);
-            UpdateWalkAnimation(graphicsComponent, playerComponent, horizontalWalkOrientation);
-            AddWalkImpulse(physicsComponent, horizontalWalkOrientation, deltaTime);
+            if ((userInputs & UserInput.Left) != UserInput.Left) return;
+
+
+            (PlayerComponent playerComponent, PhysicsComponent physicsComponent, AnimatedGraphicsComponent animatedGraphicsComponent)
+    components = gameObject.GetComponents<PlayerComponent, PhysicsComponent, AnimatedGraphicsComponent>();
+
+            var newVx = GameMath.Lerp(components.physicsComponent.Velocity.X, -PlayerConstants.V0x, 0.5f);
+            components.physicsComponent.Velocity = components.physicsComponent.Velocity * Vector2.UnitY + new Vector2(newVx, 0f);
         }
 
-        private float GetHorizontalWalkOrientationFromUserInput(PlayerComponent playerComponent, UserInput userInputs, TimeSpan timeSpan)
+        private void RampDownHorizontalVelocity(GameObject gameObject, UserInput userInputs, TimeSpan deltaTime)
         {
-            playerComponent.WalkPressedAt -= timeSpan;
+            (PlayerComponent playerComponent, PhysicsComponent physicsComponent, AnimatedGraphicsComponent animatedGraphicsComponent)
+                components = gameObject.GetComponents<PlayerComponent, PhysicsComponent, AnimatedGraphicsComponent>();
 
-            if ((userInputs & UserInput.Right) == UserInput.Right) return 1f;
+            var horizontalWalkOrientation = GetHorizontalWalkOrientationFromUserInput(components.playerComponent, userInputs);
 
-            if ((userInputs & UserInput.Left) == UserInput.Left) return -1f;
+            if (horizontalWalkOrientation != HorizontalMovement.Stationary) return;
 
-            return 0f;
+            var lerpFactor = IsVerticallyStationary(components.physicsComponent.Velocity) ? 0.15f : 0f;
+
+            var newVx = GameMath.Lerp(components.physicsComponent.Velocity.X, 0f, lerpFactor);
+            components.physicsComponent.Velocity = components.physicsComponent.Velocity * Vector2.UnitY + new Vector2(newVx, 0f);
         }
 
-        private float GetVerticalWalkOrientationFromUserInput(UserInput userInputs)
+        private void WalkRightHandler(GameObject gameObject, UserInput userInputs, TimeSpan deltaTime)
         {
-            if ((userInputs & UserInput.Down) == UserInput.Down) return 1f;
+            if ((userInputs & UserInput.Right) != UserInput.Right) return;
 
-            if ((userInputs & UserInput.Up) == UserInput.Up) return -1f;
+            (PlayerComponent playerComponent, PhysicsComponent physicsComponent, AnimatedGraphicsComponent animatedGraphicsComponent)
+                components = gameObject.GetComponents<PlayerComponent, PhysicsComponent, AnimatedGraphicsComponent>();
 
-            return 0f;
+            var newVx = GameMath.Lerp(components.physicsComponent.Velocity.X, PlayerConstants.V0x, 0.5f);
+            components.physicsComponent.Velocity = components.physicsComponent.Velocity * Vector2.UnitY + new Vector2(newVx, 0f);
+        }
+
+        private HorizontalMovement GetHorizontalWalkOrientationFromUserInput(PlayerComponent playerComponent, UserInput userInputs)
+        {
+            if ((userInputs & UserInput.Right) == UserInput.Right) return HorizontalMovement.Right;
+
+            if ((userInputs & UserInput.Left) == UserInput.Left) return HorizontalMovement.Left;
+
+            return HorizontalMovement.Stationary;
         }
 
         private void AddJumpImpulse(PhysicsComponent physicsComponent)
         {
-            physicsComponent.Velocity += Vector2.UnitY * PlayerConstants.Vy;
-        }
-
-        private void AddWalkImpulse(PhysicsComponent physicsComponent, float orientation, TimeSpan deltaTime)
-        {
-            if (!IsVerticallyStationary(physicsComponent.Velocity))
-            {
-                // Only half velocity to add
-            }
-
-            if (orientation == 0f)
-            {
-                // TODO: We need to know when walk impuls or velocity is finished and restore the initial velocit we added
-                physicsComponent.Velocity *= Vector2.UnitY;
-            }
-            else
-            {
-                physicsComponent.Velocity += Vector2.UnitX * orientation * PlayerConstants.Vx;
-            }
-        }
-
-        private void UpdateWalkAnimation(AnimatedGraphicsComponent graphicsComponent, PlayerComponent playerComponent, float walkOrientation)
-        {
-            if (walkOrientation < 0f)
-            {
-                graphicsComponent.InvertTile = true;
-                graphicsComponent.SourceRects = playerComponent.WalkSourceRects;
-            }
-            else if (walkOrientation > 0f)
-            {
-                graphicsComponent.InvertTile = false;
-                graphicsComponent.SourceRects = playerComponent.WalkSourceRects;
-            }
-            else
-            {
-                graphicsComponent.InvertTile = false;
-                graphicsComponent.SourceRects = playerComponent.StaticSourceRects;
-            }
+            physicsComponent.Velocity += Vector2.UnitY * PlayerConstants.V0y;
         }
 
         private static void AddDustEmitter(GameObject gameObject)
@@ -174,6 +187,13 @@ namespace uwpPlatformer.Systems
                 gameObject,
                 ParticleTemplateType.Dust,
                 colliderComponent.BoundingBox.BottomCenterOffset()));
+        }
+
+        protected enum HorizontalMovement
+        {
+            Left = -1,
+            Stationary = 0,
+            Right = 1,
         }
     }
 }

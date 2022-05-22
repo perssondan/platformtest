@@ -57,7 +57,7 @@ namespace uwpPlatformer.Components
 
         public Vector2 PreviousAcceleration { get; private set; }
 
-        public Vector2 Gravity { get; set; } = new Vector2(0f, PlayerConstants.Gravity);
+        public Vector2 Gravity { get; set; } = new Vector2(0f, PlayerConstants.PlayerGravity);
 
         public float Drag { get; set; } = 0f;
 

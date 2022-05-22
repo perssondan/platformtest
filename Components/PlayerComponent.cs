@@ -13,7 +13,6 @@ namespace uwpPlatformer.Components
 
         public TimeSpan JumpPressedRememberTime => TimeSpan.FromMilliseconds(150);
         public TimeSpan JumpPressedAt { get; set; }
-        public TimeSpan WalkPressedAt { get; set; }
         public bool IsJumpButtonPressed { get; set; }
 
         public Rect[] WalkSourceRects => new Rect[]
