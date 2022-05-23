@@ -3,6 +3,7 @@ using System;
 using System.Numerics;
 using uwpPlatformer.Components;
 using uwpPlatformer.GameObjects;
+using uwpPlatformer.Numerics;
 using Windows.Foundation;
 
 namespace uwpPlatformer.Factories
@@ -23,12 +24,12 @@ namespace uwpPlatformer.Factories
             {
                 Position = position
             });
-            var sourceRects = new Rect[]
+            var sourceRects = new BoundingBox[]
             {
-                new Rect(0,32f,32,32),
-                new Rect(32f,32f,32f,32f),
-                new Rect(64f,32f,32f,32f),
-                new Rect(96f,32f,32f,32f),
+                new BoundingBox(0,32f,32,32),
+                new BoundingBox(32f,32f,32f,32f),
+                new BoundingBox(64f,32f,32f,32f),
+                new BoundingBox(96f,32f,32f,32f),
             };
             var animatedGraphicsComponent = new AnimatedGraphicsComponent(gameObject, canvasBitmap, sourceRects, TimeSpan.FromMilliseconds(150));
             gameObject.AddOrUpdateComponent(animatedGraphicsComponent);

@@ -3,13 +3,12 @@ using GamesLibrary.Systems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using uwpPlatformer.Components;
 using uwpPlatformer.Events;
 using uwpPlatformer.Extensions;
 using uwpPlatformer.GameObjects;
+using uwpPlatformer.Numerics;
 using uwpPlatformer.Utilities;
-using Windows.Foundation;
 
 namespace uwpPlatformer.Systems
 {
@@ -110,7 +109,7 @@ namespace uwpPlatformer.Systems
             return isAnyColliding;
         }
 
-        private IEnumerable<ColliderComponent> GetOverlappingColliders(Rect dynamicRect, ColliderComponent[] collidersToTest)
+        private IEnumerable<ColliderComponent> GetOverlappingColliders(BoundingBox dynamicRect, ColliderComponent[] collidersToTest)
         {
             return collidersToTest.Where(collider => CollisionDetection.IsAABBColliding(dynamicRect, collider.BoundingBox));
         }
@@ -129,21 +128,20 @@ namespace uwpPlatformer.Systems
         /// <param name="dynamicCollider"></param>
         /// <param name="deltaTime"></param>
         /// <returns></returns>
-        private static Rect GetSweptBroadphaseRect(ColliderComponent dynamicCollider)
+        private static BoundingBox GetSweptBroadphaseRect(ColliderComponent dynamicCollider)
         {
             var physicsComponent = dynamicCollider.GameObject.GetComponent<PhysicsComponent>();
             var futurePosition = physicsComponent.Position;
-            var unionDynamicRect = new Rect(futurePosition.X, futurePosition.Y, dynamicCollider.BoundingBox.Width, dynamicCollider.BoundingBox.Height);
-            unionDynamicRect.Union(dynamicCollider.BoundingBox);
-            return unionDynamicRect;
+            var unionDynamicRect = new BoundingBox(futurePosition.X, futurePosition.Y, dynamicCollider.BoundingBox.Width, dynamicCollider.BoundingBox.Height);
+            return unionDynamicRect.Union(dynamicCollider.BoundingBox);
         }
 
-        public Rect GetMinkowskiDifference(Rect first, Rect other)
+        public BoundingBox GetMinkowskiDifference(BoundingBox first, BoundingBox other)
         {
-            var topLeft = first.TopLeft() - other.TopRight();
-            var fullSize = first.Size() + other.Size();
-            var halfFullSize = fullSize / 2;
-            return new Rect((topLeft + halfFullSize).ToPoint(), halfFullSize.ToSize());
+            var topLeft = first.Position - other.TopRight;
+            var fullSize = first.Size + other.Size;
+            var halfFullSize = fullSize * 0.5f;
+            return new BoundingBox(topLeft + halfFullSize, halfFullSize);
         }
     }
 }

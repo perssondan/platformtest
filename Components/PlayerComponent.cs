@@ -1,5 +1,6 @@
 ﻿using System;
 using uwpPlatformer.GameObjects;
+using uwpPlatformer.Numerics;
 using Windows.Foundation;
 
 namespace uwpPlatformer.Components
@@ -16,18 +17,18 @@ namespace uwpPlatformer.Components
         public bool IsJumpButtonPressed { get; set; }
 
         // TODO: Should be fetched from tile file
-        public Rect[] WalkSourceRects => new Rect[]
+        public BoundingBox[] WalkSourceRects => new BoundingBox[]
             {
-                new Rect(0, 32f, 32f, 32f),
-                new Rect(32f, 32f, 32f, 32f),
-                new Rect(64f, 32f, 32f, 32f),
-                new Rect(96f, 32f, 32f, 32f),
+                new BoundingBox(0, 32f, 32f, 32f),
+                new BoundingBox(32f, 32f, 32f, 32f),
+                new BoundingBox(64f, 32f, 32f, 32f),
+                new BoundingBox(96f, 32f, 32f, 32f),
             };
 
         // TODO: Should be fetched from tile file
-        public Rect[] StationarySourceRects => new Rect[]
+        public BoundingBox[] StationarySourceRects => new BoundingBox[]
             {
-                new Rect(0f, 96f, 32f, 32f)
+                new BoundingBox(0f, 96f, 32f, 32f)
             };
     }
 }

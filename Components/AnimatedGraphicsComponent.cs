@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using uwpPlatformer.GameObjects;
-using Windows.Foundation;
+using uwpPlatformer.Numerics;
 
 namespace uwpPlatformer.Components
 {
@@ -11,7 +12,7 @@ namespace uwpPlatformer.Components
     {
         public AnimatedGraphicsComponent(GameObject gameObject,
                                  CanvasBitmap canvasBitmap,
-                                 IReadOnlyList<Rect> sourceRects,
+                                 IReadOnlyList<BoundingBox> sourceRects,
                                  TimeSpan animationInterval)
             : base(gameObject)
         {
@@ -26,7 +27,7 @@ namespace uwpPlatformer.Components
         public TimeSpan AnimationInterval { get; set; }
         public int CurrentTileIndex { get; set; } = 0;
         public bool InvertTile { get; set; }
-        public IReadOnlyList<Rect> SourceRects { get; set; }
+        public IReadOnlyList<BoundingBox> SourceRects { get; set; }
 
         public CanvasBitmap CanvasBitmap { get; private set; }
 

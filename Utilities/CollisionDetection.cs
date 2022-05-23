@@ -10,7 +10,7 @@ namespace uwpPlatformer.Utilities
 {
     public static class CollisionDetection
     {
-        public static bool IntersectAABB(Rect dynamicRect, Rect staticRect, out Vector2 normal, out Vector2 contactPoint)
+        public static bool IntersectAABB(BoundingBox dynamicRect, BoundingBox staticRect, out Vector2 normal, out Vector2 contactPoint)
         {
             normal = Vector2.Zero;
             contactPoint = Vector2.Zero;
@@ -27,26 +27,26 @@ namespace uwpPlatformer.Utilities
                 var sx = Math.Sign(dx);
                 normal.X = sx;
                 contactPoint.X = (float)staticRect.Left + (staticRect.Half().X * sx);
-                contactPoint.Y = (float)dynamicRect.Center().Y;
+                contactPoint.Y = (float)dynamicRect.Center.Y;
             }
             else
             {
                 var sy = Math.Sign(dy);
                 normal.Y = sy;
-                contactPoint.X = (float)dynamicRect.Center().X;
+                contactPoint.X = (float)dynamicRect.Center.X;
                 contactPoint.Y = (float)staticRect.Top + (staticRect.Half().Y * sy);
             }
 
             return true;
         }
 
-        public static bool IsAABBColliding(Rect sourceRect, Rect opponentRect)
+        public static bool IsAABBColliding(BoundingBox sourceRect, BoundingBox opponentRect)
         {
             return (sourceRect.Left < opponentRect.Right && sourceRect.Right > opponentRect.Left) &&
                     (sourceRect.Top < opponentRect.Bottom && sourceRect.Bottom > opponentRect.Top);
         }
 
-        public static bool AABBvsAABB(Rect first, Rect other)
+        public static bool AABBvsAABB(BoundingBox first, BoundingBox other)
         {
             if (first.Left > other.Right)
                 return false;
@@ -63,19 +63,19 @@ namespace uwpPlatformer.Utilities
             return true;
         }
 
-        public static bool IsRectInRect(Rect dynamicRect,
+        public static bool IsRectInRect(BoundingBox dynamicRect,
                                         Vector2 newPosition,
-                                        Rect staticRect,
+                                        BoundingBox staticRect,
                                         out Vector2 contactPoint,
                                         out Vector2 contactNormal,
                                         out float contactTime)
         {
-            var originPosition = dynamicRect.TopLeft();
-            var centerPoint = dynamicRect.Center();
+            var originPosition = dynamicRect.Position;
+            var centerPoint = dynamicRect.Center;
             var centerOffset = centerPoint - originPosition;
             var newCenterPoint = newPosition + centerOffset;
 
-            var expandedStaticRect = staticRect.Add(dynamicRect.Size());
+            var expandedStaticRect = staticRect.Add(dynamicRect);
 
             var lineSegment = new LineSegment(centerPoint, newCenterPoint);
 
@@ -89,7 +89,7 @@ namespace uwpPlatformer.Utilities
         }
 
         public static bool IsRayInRect(LineSegment ray,
-                                       Rect staticRect,
+                                       BoundingBox staticRect,
                                        out Vector2 contactPoint,
                                        out Vector2 contactNormal,
                                        out float contactTime)
@@ -98,8 +98,8 @@ namespace uwpPlatformer.Utilities
             contactNormal = Vector2.Zero;
             contactTime = 0f;
 
-            var minPos = staticRect.TopLeft();
-            var maxPos = minPos + staticRect.Size();
+            var minPos = staticRect.Position;
+            var maxPos = minPos + staticRect.Size;
 
             // Calculate intersection with rectangle bounding axes
             var minContactPoint = (minPos - ray.StartPoint) * ray.InvDirection;

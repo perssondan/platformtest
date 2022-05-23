@@ -8,8 +8,8 @@ using uwpPlatformer.Components;
 using uwpPlatformer.Events;
 using uwpPlatformer.Factories;
 using uwpPlatformer.Models;
+using uwpPlatformer.Numerics;
 using uwpPlatformer.Systems;
-using Windows.Foundation;
 using Windows.System;
 
 namespace uwpPlatformer.GameObjects
@@ -101,7 +101,7 @@ namespace uwpPlatformer.GameObjects
 
         private void CreateFlyingEnemy()
         {
-            _enemyFactory.CreateFlyingEnemy(_canvasBitmaps[1], new Vector2(100f, 100f), new Vector2(_tileAtlases[1].TileWidth - 1, _tileAtlases[1].TileHeight - 1), new Rect(0, 0, WorldPixelWidth, WorldPixelHeight));
+            _enemyFactory.CreateFlyingEnemy(_canvasBitmaps[1], new Vector2(100f, 100f), new Vector2(_tileAtlases[1].TileWidth - 1, _tileAtlases[1].TileHeight - 1), new BoundingBox(0, 0, WorldPixelWidth, WorldPixelHeight));
         }
 
         private void InitializeHeroine()

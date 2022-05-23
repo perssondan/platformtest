@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using uwpPlatformer.Components;
 using uwpPlatformer.GameObjects;
 using uwpPlatformer.Models;
+using uwpPlatformer.Numerics;
 using Windows.Foundation;
 
 namespace uwpPlatformer.Factories
@@ -51,16 +52,16 @@ namespace uwpPlatformer.Factories
                     return null;
 
                 case TileType.PlatformLeft:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new Rect(0, 0, 32f, 32f) }, TimeSpan.Zero);
+                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new BoundingBox(0, 0, 32f, 32f) }, TimeSpan.Zero);
 
                 case TileType.PlatformCenter:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new Rect(32f, 0, 32f, 32f) }, TimeSpan.Zero);
+                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new BoundingBox(32f, 0, 32f, 32f) }, TimeSpan.Zero);
 
                 case TileType.PlatformRight:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new Rect(64f, 0, 32f, 32f) }, TimeSpan.Zero);
+                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new BoundingBox(64f, 0, 32f, 32f) }, TimeSpan.Zero);
 
                 case TileType.Floor:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new Rect(96f, 0, 32f, 32f) }, TimeSpan.Zero);
+                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new BoundingBox(96f, 0, 32f, 32f) }, TimeSpan.Zero);
 
                 default:
                     return null;

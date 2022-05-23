@@ -2,7 +2,6 @@
 using System.Numerics;
 using uwpPlatformer.GameObjects;
 using uwpPlatformer.Numerics;
-using Windows.Foundation;
 
 namespace uwpPlatformer.Components
 {
@@ -23,10 +22,10 @@ namespace uwpPlatformer.Components
         public CollisionTypes CollisionType { get; set; } = CollisionTypes.StaticPlatform;
 
         public Vector2 Size { get; set; } = Vector2.Zero;
-        public Rect BoundingBox => new Rect(Position.ToPoint(), Size.ToSize());
+        public BoundingBox BoundingBox => new BoundingBox(Position, Size);
         public Vector2 Center => new Vector2(Position.X + Size.X / 2f, Position.Y + Size.Y / 2f);
 
-        public Rect MovingBoundingBox { get; set; } = Rect.Empty;
+        public BoundingBox MovingBoundingBox { get; set; } = BoundingBox.Empty;
 
         protected Vector2 Position => GameObject.GetComponent<TransformComponent>().Position;
 

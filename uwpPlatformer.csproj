@@ -132,10 +132,12 @@
     <Compile Include="Components\Particles\DustParticleEmitterComponent.cs" />
     <Compile Include="Components\Particles\ParticleEmitterComponent.cs" />
     <Compile Include="Components\PerlinMovementComponent.cs" />
+    <Compile Include="Extensions\BoundingBoxExtensions.cs" />
     <Compile Include="Factories\EnemyFactory.cs" />
     <Compile Include="GameObjects\IGameObjectManager.cs" />
     <Compile Include="GameObjects\IScene.cs" />
     <Compile Include="GameObjects\PlatformScene.cs" />
+    <Compile Include="Numerics\BoundingBox.cs" />
     <Compile Include="Numerics\LineSegment.cs" />
     <Compile Include="Systems\DebugSystem.cs" />
     <Compile Include="Systems\ImprovedEulerPhysicsSystem.cs" />

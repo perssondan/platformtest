@@ -159,12 +159,12 @@ namespace uwpPlatformer.Systems
         {
             if (!gameObject.TryGetComponent<ColliderComponent>(out var colliderComponent)) return;
 
-            canvasDrawingSession.DrawRectangle(colliderComponent.BoundingBox, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
+            canvasDrawingSession.DrawRectangle(colliderComponent.BoundingBox.ToRect(), GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
             canvasDrawingSession.FillCircle(colliderComponent.Center, 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
-            canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.TopLeft(), 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
-            canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.TopRight(), 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
-            canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.BottomLeft(), 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
-            canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.BottomRight(), 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
+            canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.TopLeft, 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
+            canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.TopRight, 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
+            canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.BottomLeft, 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
+            canvasDrawingSession.FillCircle(colliderComponent.BoundingBox.BottomRight, 1.5f, GetCachedBrush(canvasDrawingSession, Colors.LightBlue));
         }
 
         private void DrawVelocityVector(CanvasDrawingSession canvasDrawingSession, GameObject gameObject)
@@ -226,7 +226,7 @@ namespace uwpPlatformer.Systems
                 }
 
                 // draw collision rectangle
-                canvasDrawingSession.DrawRectangle(collisionArgument.CollisionManifold.ContactRect, GetCachedBrush(canvasDrawingSession, collisionColor));
+                canvasDrawingSession.DrawRectangle(collisionArgument.CollisionManifold.ContactRect.ToRect(), GetCachedBrush(canvasDrawingSession, collisionColor));
             }
         }
 

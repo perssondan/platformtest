@@ -1,13 +1,14 @@
 ﻿using GamesLibrary.Utilities;
 using System.Runtime.CompilerServices;
 using uwpPlatformer.GameObjects;
+using uwpPlatformer.Numerics;
 using Windows.Foundation;
 
 namespace uwpPlatformer.Components
 {
     public struct PerlinMovementComponent : IComponent
     {
-        public PerlinMovementComponent(GameObject gameObject, Rect bounds, float offsetX, float offsetY)
+        public PerlinMovementComponent(GameObject gameObject, BoundingBox bounds, float offsetX, float offsetY)
         {
             GameObject = gameObject;
             Bounds = bounds;
@@ -16,7 +17,7 @@ namespace uwpPlatformer.Components
         }
 
         public GameObject GameObject { get; set; }
-        public Rect Bounds;
+        public BoundingBox Bounds;
         public float OffsetX;
         public float OffsetY;
 

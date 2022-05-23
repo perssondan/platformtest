@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using Windows.Foundation;
+using uwpPlatformer.Numerics;
 
 namespace uwpPlatformer.Components
 {
@@ -12,7 +12,7 @@ namespace uwpPlatformer.Components
     {
         public static CollisionManifold Zero => new CollisionManifold();
 
-        public CollisionManifold(Vector2 collisionPoint, Vector2 collisionNormal, float collisionTime, Rect contactRect)
+        public CollisionManifold(Vector2 collisionPoint, Vector2 collisionNormal, float collisionTime, BoundingBox contactRect)
         {
             CollisionPoint = collisionPoint;
             CollisionNormal = collisionNormal;
@@ -23,7 +23,7 @@ namespace uwpPlatformer.Components
         public Vector2 CollisionPoint;
         public Vector2 CollisionNormal;
         public float CollisionTime;
-        public Rect ContactRect;
+        public BoundingBox ContactRect;
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

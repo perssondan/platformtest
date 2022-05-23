@@ -114,7 +114,7 @@ namespace uwpPlatformer.Systems
                                                          centerPoint);
                 canvasDrawingSession.DrawImage(animatedGraphicsComponent.CanvasBitmap,
                                                position,
-                                               currentSourceRect,
+                                               currentSourceRect.ToRect(),
                                                1f,
                                                CanvasImageInterpolation.NearestNeighbor,
                                                invertMatrix);
@@ -123,7 +123,7 @@ namespace uwpPlatformer.Systems
             {
                 canvasDrawingSession.DrawImage(animatedGraphicsComponent.CanvasBitmap,
                                                position,
-                                               currentSourceRect);
+                                               currentSourceRect.ToRect());
             }
 
             animatedGraphicsComponent.CurrentTime += deltaTime;

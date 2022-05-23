@@ -37,10 +37,14 @@ acc = new_acc
 - [ ] Move generic parts of the engine to library and make more parts generic
 - [ ] Improve and extend particles
 - [ ] Hud
-- [ ] Enemy
+- [ ] Flower Enemy
 - [ ] AI
 - [ ] Fight the enemy
 - [ ] Hud part II
+- [ ] Weapon to kill enemies
+- [ ] Enemy spawn points
+- [ ] Power ups
+- [ ] Animation component revisited
 
 # Licenses
 ## NUnit
