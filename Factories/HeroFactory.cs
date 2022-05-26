@@ -3,8 +3,6 @@ using System;
 using System.Numerics;
 using uwpPlatformer.Components;
 using uwpPlatformer.GameObjects;
-using uwpPlatformer.Numerics;
-using Windows.Foundation;
 
 namespace uwpPlatformer.Factories
 {

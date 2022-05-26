@@ -1,15 +1,9 @@
 ﻿using Microsoft.Graphics.Canvas;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using uwpPlatformer.Components;
 using uwpPlatformer.GameObjects;
 using uwpPlatformer.Models;
-using uwpPlatformer.Numerics;
-using Windows.Foundation;
 
 namespace uwpPlatformer.Factories
 {

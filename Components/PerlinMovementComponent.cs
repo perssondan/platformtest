@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using uwpPlatformer.GameObjects;
 using uwpPlatformer.Numerics;
-using Windows.Foundation;
 
 namespace uwpPlatformer.Components
 {
