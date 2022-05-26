@@ -50,7 +50,7 @@ namespace GamesLibrary.Physics2D.Primitives
             {
                 for (var index = 0; index < vertices.Length; index++)
                 {
-                    vertices[index] = Vector2.Transform(vertices[index], Matrix3x2.CreateRotation(Rigidbody2D.Rotation, Rigidbody2D.Position));
+                    vertices[index] = Vector2.Transform(vertices[index], Matrix3x2.CreateRotation(Rigidbody2D?.Rotation ?? 0f, Rigidbody2D?.Position ?? Vector2.Zero));
                     index++;
                 }
             }

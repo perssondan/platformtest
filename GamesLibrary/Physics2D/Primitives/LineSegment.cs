@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace uwpPlatformer.Numerics
+namespace GamesLibrary.Physics2D.Primitives
 {
     [DebuggerDisplay("(StartPoint:{StartPoint}, EndPoint:{EndPoint})")]
     public struct LineSegment : IEquatable<LineSegment>
@@ -16,7 +16,7 @@ namespace uwpPlatformer.Numerics
 
             Direction = endPoint - startPoint;
             InvDirection = Vector2.One / Direction;
-            Sign = new[] { MathF.Sign(InvDirection.X), MathF.Sign(InvDirection.Y) };
+            Sign = new[] { Math.Sign(InvDirection.X), Math.Sign(InvDirection.Y) };
         }
 
         public Vector2 StartPoint { get; }

@@ -138,7 +138,6 @@
     <Compile Include="GameObjects\IScene.cs" />
     <Compile Include="GameObjects\PlatformScene.cs" />
     <Compile Include="Numerics\BoundingBox.cs" />
-    <Compile Include="Numerics\LineSegment.cs" />
     <Compile Include="Systems\DebugSystem.cs" />
     <Compile Include="Systems\ImprovedEulerPhysicsSystem.cs" />
     <Compile Include="Systems\PositionVerletPhysicsSystem.cs" />
@@ -177,7 +176,6 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\AnimationFrame.cs" />
-    <Compile Include="Numerics\Ray2D.cs" />
     <Compile Include="Models\Layer.cs" />
     <Compile Include="Models\Map.cs" />
     <Compile Include="Models\Tile.cs" />

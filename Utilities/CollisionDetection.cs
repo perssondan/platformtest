@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using GamesLibrary.Physics2D.Primitives;
+using System;
 using System.Numerics;
 using uwpPlatformer.Extensions;
 using uwpPlatformer.Numerics;
-using Windows.Foundation;
 
 namespace uwpPlatformer.Utilities
 {
