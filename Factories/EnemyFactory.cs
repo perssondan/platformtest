@@ -22,7 +22,7 @@ namespace uwpPlatformer.Factories
             gameObject.GetComponent<TransformComponent>().Position = position;
 
             //gameObject.AddComponent(new ShapeGraphicsComponent(gameObject, ShapeType.Rectangle, Colors.Pink, size));
-            gameObject.AddOrUpdateComponent(new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new BoundingBox(new Vector2(0, 0), size) }, TimeSpan.Zero));
+            gameObject.AddOrUpdateComponent(new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { 0 }, TimeSpan.Zero));
             gameObject.AddOrUpdateComponent(new PerlinMovementComponent(gameObject, bounds, 0f, 10000f));
             gameObject.AddOrUpdateComponent(new PhysicsComponent(gameObject) { Gravity = Vector2.Zero, Drag = 0f });
             gameObject.AddOrUpdateComponent(new ColliderComponent(gameObject) { Size = size, CollisionType = ColliderComponent.CollisionTypes.DynamicWorld });

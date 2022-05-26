@@ -27,17 +27,19 @@ namespace uwpPlatformer.Numerics
         public float Top => Position.Y;
         public float Right => Position.X + Width;
         public float Bottom => Position.Y + Height;
-        public Vector2 Center => Position + (Size * 0.5f);
-        public Vector2 TopRight => new Vector2(Top, Right);
+        public Vector2 Center => Position + new Vector2(Size.X * 0.5f, (Size.Y * 0.5f));
+        public Vector2 TopRight => new Vector2(Right, Top);
         public Vector2 TopLeft => Position;
+        public Vector2 Min => Position;
+        public Vector2 Max => new Vector2(Right, Bottom);
         public Vector2 BottomLeft => new Vector2(Left, Bottom);
         public Vector2 BottomRight => new Vector2(Right, Bottom);
 
         public BoundingBox Add(BoundingBox boundingBox)
         {
             return new BoundingBox(
-                Left - boundingBox.Width * 0.5f,
-                Top - boundingBox.Height * 0.5f,
+                Left - (boundingBox.Width * 0.5f),
+                Top - (boundingBox.Height * 0.5f),
                 Width + boundingBox.Width,
                 Height + boundingBox.Height);
         }
@@ -49,9 +51,9 @@ namespace uwpPlatformer.Numerics
 
         public BoundingBox Union(BoundingBox boundingBox)
         {
-            var position = new Vector2(Math.Min(Left, boundingBox.Left), Math.Min(Top, boundingBox.Top));
             var minLeft = Math.Min(Left, boundingBox.Left);
             var minTop = Math.Min(Top, boundingBox.Top);
+
             var maxRight = Math.Max(Right, boundingBox.Right);
             var maxBottom = Math.Max(Bottom, boundingBox.Bottom);
 

@@ -24,14 +24,7 @@ namespace uwpPlatformer.Factories
             {
                 Position = position
             });
-            var sourceRects = new BoundingBox[]
-            {
-                new BoundingBox(0,32f,32,32),
-                new BoundingBox(32f,32f,32f,32f),
-                new BoundingBox(64f,32f,32f,32f),
-                new BoundingBox(96f,32f,32f,32f),
-            };
-            var animatedGraphicsComponent = new AnimatedGraphicsComponent(gameObject, canvasBitmap, sourceRects, TimeSpan.FromMilliseconds(150));
+            var animatedGraphicsComponent = new AnimatedGraphicsComponent(gameObject, canvasBitmap, PlayerComponent.StationarySourceSpriteIndexes, TimeSpan.FromMilliseconds(150));
             gameObject.AddOrUpdateComponent(animatedGraphicsComponent);
             gameObject.AddOrUpdateComponent(new PhysicsComponent(gameObject) { Position = position });
             gameObject.AddOrUpdateComponent(new InputComponent(gameObject));

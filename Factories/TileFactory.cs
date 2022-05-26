@@ -52,16 +52,16 @@ namespace uwpPlatformer.Factories
                     return null;
 
                 case TileType.PlatformLeft:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new BoundingBox(0, 0, 32f, 32f) }, TimeSpan.Zero);
+                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { 0 }, TimeSpan.Zero);
 
                 case TileType.PlatformCenter:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new BoundingBox(32f, 0, 32f, 32f) }, TimeSpan.Zero);
+                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { 1 }, TimeSpan.Zero);
 
                 case TileType.PlatformRight:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new BoundingBox(64f, 0, 32f, 32f) }, TimeSpan.Zero);
+                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { 2 }, TimeSpan.Zero);
 
                 case TileType.Floor:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { new BoundingBox(96f, 0, 32f, 32f) }, TimeSpan.Zero);
+                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { 3 }, TimeSpan.Zero);
 
                 default:
                     return null;

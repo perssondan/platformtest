@@ -62,15 +62,15 @@ namespace uwpPlatformer.Systems
             {
                 case HorizontalMovement.Left:
                     graphicsComponent.InvertTile = true;
-                    graphicsComponent.SourceRects = playerComponent.WalkSourceRects;
+                    graphicsComponent.SourceSpriteIndexes = PlayerComponent.WalkSourceSpriteIndexes;
                     break;
                 case HorizontalMovement.Right:
                     graphicsComponent.InvertTile = false;
-                    graphicsComponent.SourceRects = playerComponent.WalkSourceRects;
+                    graphicsComponent.SourceSpriteIndexes = PlayerComponent.WalkSourceSpriteIndexes;
                     break;
                 default:
                     graphicsComponent.InvertTile = false;
-                    graphicsComponent.SourceRects = playerComponent.StationarySourceRects;
+                    graphicsComponent.SourceSpriteIndexes = PlayerComponent.StationarySourceSpriteIndexes;
                     break;
             }
         }

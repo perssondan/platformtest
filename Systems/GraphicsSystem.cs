@@ -1,18 +1,14 @@
 ﻿using GamesLibrary.Models;
-using GamesLibrary.Systems;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
-using Microsoft.Graphics.Canvas.Geometry;
-using Microsoft.Graphics.Canvas.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using uwpPlatformer.Components;
-using uwpPlatformer.Events;
 using uwpPlatformer.Extensions;
 using uwpPlatformer.GameObjects;
-using Windows.System;
+using Windows.Foundation;
 using Windows.UI;
 
 namespace uwpPlatformer.Systems
@@ -88,33 +84,35 @@ namespace uwpPlatformer.Systems
 
         private void DrawAnimatedComponent(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime, AnimatedGraphicsComponent animatedGraphicsComponent)
         {
-            var sourceRects = animatedGraphicsComponent.SourceRects;
+            var sourceRects = animatedGraphicsComponent.SourceSpriteIndexes;
             var numberOfTiles = sourceRects.Count();
 
             if (numberOfTiles <= 0) return;
 
-            if (animatedGraphicsComponent.CurrentTileIndex >= numberOfTiles)
+            if (animatedGraphicsComponent.CurrentSpriteIndex >= numberOfTiles)
             {
-                animatedGraphicsComponent.CurrentTileIndex = 0;
+                animatedGraphicsComponent.CurrentSpriteIndex = 0;
             }
 
             if (!animatedGraphicsComponent.GameObject.TryGetComponent<TransformComponent>(out var transformComponent)) return;
 
             var position = transformComponent.Position;
-            var currentSourceRect = sourceRects[animatedGraphicsComponent.CurrentTileIndex];
+            var currentSourceIndex = sourceRects[animatedGraphicsComponent.CurrentSpriteIndex];
+            var spriteSourceRect = GetCurrentSourceRect(currentSourceIndex, animatedGraphicsComponent.SpriteMapColumns, animatedGraphicsComponent.SpriteSize);
             if (animatedGraphicsComponent.InvertTile)
             {
                 var centerPoint = new Vector3(
-                    position.X + (float)currentSourceRect.Width / 2f,
+                    position.X + animatedGraphicsComponent.SpriteSize.X * 0.5f,
                     position.Y,
                     0f);
+
                 var invertMatrix = Matrix4x4.CreateScale(-1f,
                                                          1f,
                                                          0f,
                                                          centerPoint);
                 canvasDrawingSession.DrawImage(animatedGraphicsComponent.CanvasBitmap,
                                                position,
-                                               currentSourceRect.ToRect(),
+                                               spriteSourceRect,
                                                1f,
                                                CanvasImageInterpolation.NearestNeighbor,
                                                invertMatrix);
@@ -123,14 +121,14 @@ namespace uwpPlatformer.Systems
             {
                 canvasDrawingSession.DrawImage(animatedGraphicsComponent.CanvasBitmap,
                                                position,
-                                               currentSourceRect.ToRect());
+                                               spriteSourceRect);
             }
 
             animatedGraphicsComponent.CurrentTime += deltaTime;
             if (animatedGraphicsComponent.CurrentTime >= animatedGraphicsComponent.AnimationInterval)
             {
                 animatedGraphicsComponent.CurrentTime = TimeSpan.Zero;
-                animatedGraphicsComponent.CurrentTileIndex++;
+                animatedGraphicsComponent.CurrentSpriteIndex++;
             }
         }
 
@@ -146,6 +144,13 @@ namespace uwpPlatformer.Systems
             _brushes[colors] = brush;
 
             return brush;
+        }
+
+        private Rect GetCurrentSourceRect(int index, int columns, Vector2 spriteSize)
+        {
+            var column = index % columns;
+            var row = (index - column) / columns;
+            return new Rect(column * spriteSize.X, row * spriteSize.Y, spriteSize.X, spriteSize.Y);
         }
     }
 }
