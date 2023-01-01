@@ -53,6 +53,10 @@ namespace uwpPlatformer.Systems
                 });
         }
 
+        public void Init()
+        {
+        }
+
         private void DrawShapeComponent(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime, ShapeGraphicsComponent shapeGraphicsComponent)
         {
             if (!shapeGraphicsComponent.GameObject.TryGetComponent<TransformComponent>(out var transformComponent)) return;

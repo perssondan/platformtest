@@ -86,6 +86,10 @@ namespace uwpPlatformer.Systems
         {
         }
 
+        public void Init()
+        {
+        }
+
         public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime)
         {
             _gameObjectManager.GameObjects

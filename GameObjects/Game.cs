@@ -1,114 +1,78 @@
 ﻿using GamesLibrary.Models;
 using GamesLibrary.Systems;
 using Microsoft.Graphics.Canvas;
+using Microsoft.Graphics.Canvas.UI.Xaml;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using uwpPlatformer.Components;
-using uwpPlatformer.Events;
-using uwpPlatformer.Factories;
-using uwpPlatformer.Models;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using uwpPlatformer.EventArguments;
+using uwpPlatformer.Platform;
 using uwpPlatformer.Systems;
 
 namespace uwpPlatformer.GameObjects
 {
-    public class Game
+    public class Game : INotifyPropertyChanged
     {
-        private IDictionary<string, IScene> _scenes = new Dictionary<string, IScene>();
-
-        private IGameObjectManager _gameObjectManager = new GameObjectManager();
-        private bool _hasCollisions = false;
-        // TODO: DI time...
-        private readonly ColliderSystem _colliderSystem;
-        private readonly TranslateTransformSystem _transformSystem;
-        private readonly PhysicsSystem _physicsSystem;
-        private readonly InputSystem _inputSystem;
-        private readonly GraphicsSystem _graphicsSystem;
-        private readonly ParticleSystem _particleSystem;
-        private readonly PlayerSystem _playerSystem;
-        private readonly DustParticleEmitterSystem _dustParticleEmitterSystem;
-        private readonly ParticleEmitterSystem _particleEmitterSystem;
         private readonly IEventSystem _eventSystem = new EventSystem();
-        private readonly DustEntityFactory _dustEntityFactory;
-        private readonly PerlinMoveSystem _perlinSystem;
-        private readonly DebugSystem _debugSystem;
-        private readonly World _world;
+        private readonly SceneSystem _sceneSystem;
+        private readonly ICanvasAnimatedControl _canvasControl;
+        private bool _isLoading = true;
 
-        public Game(Windows.UI.Xaml.Window current, CanvasBitmap[] canvasBitmaps, Map map, TileAtlas[] tileAtlases)
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public Game(ICanvasAnimatedControl canvasControl)
         {
-            _colliderSystem = new ColliderSystem(_eventSystem, _gameObjectManager);
-            _transformSystem = new TranslateTransformSystem(_gameObjectManager);
-            _perlinSystem = new PerlinMoveSystem(_gameObjectManager);
-            _physicsSystem = new PhysicsSystem(_gameObjectManager, _eventSystem);
-            _inputSystem = new InputSystem(_eventSystem, _gameObjectManager);
-            _graphicsSystem = new GraphicsSystem(_gameObjectManager);
-            _particleSystem = new ParticleSystem(_gameObjectManager);
-            _world = new World(canvasBitmaps, map, tileAtlases, _gameObjectManager, _eventSystem);
-            _dustEntityFactory = new DustEntityFactory(_gameObjectManager);
-            _playerSystem = new PlayerSystem(_eventSystem, _gameObjectManager);
-            _dustParticleEmitterSystem = new DustParticleEmitterSystem(_eventSystem, _dustEntityFactory, _gameObjectManager);
-            _particleEmitterSystem = new ParticleEmitterSystem(_dustEntityFactory, _gameObjectManager);
-            _debugSystem = new DebugSystem(_eventSystem, _gameObjectManager);
+            _sceneSystem = new SceneSystem(_eventSystem);
+            _canvasControl = canvasControl;
 
-            _inputSystem.Current = current;
-
-            _eventSystem.Subscribe<CollisionEvent>(this, (sender, collisionEvent) =>
+            _eventSystem.Subscribe<SplashSceneEvent>(this, (sender, splashSceneEvent) =>
             {
-                _hasCollisions = true;
+                _sceneSystem.FireTrigger(SceneSystem.GameTrigger.SplashShown);
+            });
 
-                var isHero = collisionEvent.GameObject.Has<HeroComponent>();
-                var isEnemy = collisionEvent.IsCollidingWith.Has<EnemyComponent>();
-
-                if (isHero && isEnemy)
-                {
-                    Debug.WriteLine("Hero collided with enemy!");
-                }
+            _eventSystem.Subscribe<MenuSceneEvent>(this, (sender, menuSceneEvent) =>
+            {
+                _sceneSystem.FireTrigger(SceneSystem.GameTrigger.StartGame);
             });
         }
 
-        public World World => _world;
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                _isLoading = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsLoading)));
+            }
+        }
+
+        public async Task InitAsync()
+        {
+            try
+            {
+                var gameAssetsProvider = new GameAssetsProvider(_canvasControl, "ms-appx:///Assets/GameAssets/images", "mytilemap.json");
+                var splashAssetsProvider = new GameAssetsProvider(_canvasControl, "ms-appx:///Assets/GameAssets/images", "splashscreenmap.json");
+                await gameAssetsProvider.LoadAssetsAsync();
+                await splashAssetsProvider.LoadAssetsAsync();
+
+                _sceneSystem.AddSplashScene(splashAssetsProvider);
+                _sceneSystem.AddPlatformScene(gameAssetsProvider);
+                _sceneSystem.Init();
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
 
         public void Update(TimingInfo timingInfo)
         {
-            _hasCollisions = false;
-
-            _gameObjectManager.Update();
-
-            _inputSystem.Update(timingInfo);
-            _perlinSystem.Update(timingInfo);
-            _graphicsSystem.Update(timingInfo);
-            _playerSystem.Update(timingInfo);
-            _particleSystem.Update(timingInfo);
-
-            _physicsSystem.Update(timingInfo);
-            _colliderSystem.Update(timingInfo);
-
-            _dustParticleEmitterSystem.Update(timingInfo);
-            _particleEmitterSystem.Update(timingInfo);
-
-            ResolveCollisions(timingInfo);
-
-            _transformSystem.Update(timingInfo);
-
-            _world.Update(timingInfo);
-        }
-
-        private void ResolveCollisions(TimingInfo timingInfo)
-        {
-            var maxResolveAttempts = 5;
-            for (var currentResolveAttempt = 0; currentResolveAttempt < maxResolveAttempts && _hasCollisions; currentResolveAttempt++)
-            {
-                _hasCollisions = false;
-                _physicsSystem.PostUpdate(timingInfo);
-                _colliderSystem.Update(timingInfo);
-            }
+            _sceneSystem.Update(timingInfo);
         }
 
         public void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
         {
-            _graphicsSystem.Draw(canvasDrawingSession, timeSpan);
-            _debugSystem.Draw(canvasDrawingSession, timeSpan);
+            _sceneSystem.Draw(canvasDrawingSession, timeSpan);
         }
     }
 }

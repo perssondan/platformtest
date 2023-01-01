@@ -132,15 +132,25 @@
     <Compile Include="Components\Particles\DustParticleEmitterComponent.cs" />
     <Compile Include="Components\Particles\ParticleEmitterComponent.cs" />
     <Compile Include="Components\PerlinMovementComponent.cs" />
+    <Compile Include="EventArguments\MenuSceneEvent.cs" />
+    <Compile Include="EventArguments\SplashSceneEvent.cs" />
     <Compile Include="Extensions\BoundingBoxExtensions.cs" />
     <Compile Include="Factories\EnemyFactory.cs" />
     <Compile Include="GameObjects\IGameObjectManager.cs" />
-    <Compile Include="GameObjects\IScene.cs" />
-    <Compile Include="GameObjects\PlatformScene.cs" />
+    <Compile Include="Platform\GameAssetsProvider.cs" />
+    <Compile Include="Platform\IGameAssetsProvider.cs" />
+    <Compile Include="Scenes\GameOverScene.cs" />
+    <Compile Include="Scenes\IScene.cs" />
+    <Compile Include="Scenes\LoadingScene.cs" />
+    <Compile Include="Scenes\MenuScene.cs" />
+    <Compile Include="Scenes\PlatformScene.cs" />
+    <Compile Include="Scenes\Scene.cs" />
+    <Compile Include="Scenes\SplashScene.cs" />
     <Compile Include="Numerics\BoundingBox.cs" />
     <Compile Include="Systems\DebugSystem.cs" />
     <Compile Include="Systems\ImprovedEulerPhysicsSystem.cs" />
     <Compile Include="Systems\PositionVerletPhysicsSystem.cs" />
+    <Compile Include="Systems\SceneSystem.cs" />
     <Compile Include="Systems\SemiImplicitEulerPhysicsSystem.cs" />
     <Compile Include="Systems\ExplicitEulerPhysicsSystem.cs" />
     <Compile Include="Systems\ParticleEmitterSystem.cs" />
@@ -209,6 +219,8 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\GameAssets\images\hero_sprites.png" />
+    <Content Include="Assets\GameAssets\images\splashscreen.png" />
     <Content Include="Assets\GameAssets\images\tiles.png" />
     <Content Include="Assets\GameAssets\images\wasp_sprites.png" />
     <Content Include="Properties\Default.rd.xml" />
@@ -253,6 +265,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\GameAssets\images\wasp_sprites.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\GameAssets\images\hero_sprites.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\GameAssets\images\splashscreenmap.json" />
+    <Content Include="Assets\GameAssets\images\splashscreen.json" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

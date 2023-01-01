@@ -26,6 +26,10 @@ namespace uwpPlatformer.Systems
 
         public string Name => nameof(SimplifiedVelocityVerletPhysicsSystem);
 
+        public void Init()
+        {
+        }
+
         public void Update(TimingInfo timingInfo)
         {
             _gameObjectManager.GameObjects

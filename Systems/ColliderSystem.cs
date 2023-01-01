@@ -32,6 +32,10 @@ namespace uwpPlatformer.Systems
             DetectCollisions(collidersToTest);
         }
 
+        public void Init()
+        {
+        }
+
         private ColliderComponent[] GetAllColliderComponents()
         {
             return _gameObjectManager.GameObjects

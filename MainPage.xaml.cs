@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using uwpPlatformer.GameObjects;
 using uwpPlatformer.Models;
+using uwpPlatformer.Platform;
 using uwpPlatformer.Utilities;
 using Windows.UI;
 using Windows.UI.Core;
@@ -29,6 +30,8 @@ namespace uwpPlatformer
 
             _scaling.SetScale();
         }
+
+        public Game Game => _game;
 
         private void OnWindowSizeChanged(object sender, WindowSizeChangedEventArgs e)
         {
@@ -61,7 +64,7 @@ namespace uwpPlatformer
 
             if (_game == null) return false;
 
-            EnforceOffScreenCreated(canvasDevice, _game.World.WorldPixelWidth, _game.World.WorldPixelHeight);
+            EnforceOffScreenCreated(canvasDevice, 32*14, 32*10);// _game.World.WorldPixelWidth, _game.World.WorldPixelHeight);
             if (_offscreen == null) return false;
 
             using (var drawingSession = _offscreen.CreateDrawingSession())
@@ -101,23 +104,15 @@ namespace uwpPlatformer
 
         private void OnGameCanvasCreateResources(ICanvasAnimatedControl canvasControl, CanvasCreateResourcesEventArgs args)
         {
-            args.TrackAsyncAction(CreateResourceAsync(canvasControl).AsAsyncAction());
+            args.TrackAsyncAction(InitGameAssetsAsync(canvasControl).AsAsyncAction());
         }
 
-        private async Task CreateResourceAsync(ICanvasAnimatedControl canvasControl)
+        private async Task InitGameAssetsAsync(ICanvasAnimatedControl canvasControl)
         {
-            var tiledLoader = new TiledLoader();
-            var map = await tiledLoader.LoadResourceAsync<Map>(new Uri("ms-appx:///Assets/GameAssets/images/mytilemap.json"));
-
-            var tileAtlases = await Task.WhenAll(map.TileSets
-                .Select(tileSet => tiledLoader.LoadResourceAsync<TileAtlas>(new Uri($"ms-appx:///Assets/GameAssets/images/{tileSet.Source}"))));
-
-            var bitmaps = await Task.WhenAll(tileAtlases
-                .Select(tileAtlas => CanvasBitmap.LoadAsync(canvasControl, new Uri($"ms-appx:///Assets/GameAssets/images/{tileAtlas.ImageSource}")).AsTask()));
-
             if (_game is null)
             {
-                _game = new Game(Window.Current, bitmaps, map, tileAtlases);
+                _game = new Game(canvasControl);
+                await _game.InitAsync();
             }
         }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using uwpPlatformer.Components;
 using uwpPlatformer.Extensions;
 using uwpPlatformer.GameObjects;
+using Windows.ApplicationModel.Core;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -12,7 +13,7 @@ namespace uwpPlatformer.Systems
 {
     public class InputSystem : ISystem
     {
-        private Window _window;
+        private CoreWindow _window;
         private UserInput _userInputs;
         private readonly IEventSystem _eventSystem;
         private readonly IGameObjectManager _gameObjectManager;
@@ -25,7 +26,7 @@ namespace uwpPlatformer.Systems
 
         public string Name => nameof(InputSystem);
 
-        public Window Current
+        protected CoreWindow Current
         {
             get => _window;
             set
@@ -47,7 +48,12 @@ namespace uwpPlatformer.Systems
                 .ForEach(result => result.inputComponent.UserInputs = UserInputs);
         }
 
-        private void HookdownKeyListener(Window current)
+        public void Init()
+        {
+            Current = CoreApplication.MainView.CoreWindow;
+        }
+
+        private void HookdownKeyListener(CoreWindow current)
         {
             if (current == null) return;
 
@@ -57,25 +63,21 @@ namespace uwpPlatformer.Systems
                 return;
             }
 
-            var coreWindow = current?.CoreWindow;
-            if (coreWindow == null) return;
-
-            coreWindow.KeyDown -= KeyDown;
-            coreWindow.KeyUp -= KeyUp;
+            current.KeyDown -= KeyDown;
+            current.KeyUp -= KeyUp;
         }
 
-        private void HookupKeyListener(Window current)
+        private void HookupKeyListener(CoreWindow current)
         {
+            if (current == null) return;
+
             if (!current.Dispatcher.HasThreadAccess)
             {
                 _ = _window.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => HookupKeyListener(current));
                 return;
             }
-            var coreWindow = current?.CoreWindow;
-            if (coreWindow == null) return;
-
-            coreWindow.KeyDown += KeyDown;
-            coreWindow.KeyUp += KeyUp;
+            current.KeyDown += KeyDown;
+            current.KeyUp += KeyUp;
         }
 
         private void KeyDown(object _, KeyEventArgs keyEventArgs)

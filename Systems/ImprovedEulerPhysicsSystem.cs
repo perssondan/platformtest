@@ -22,6 +22,10 @@ namespace uwpPlatformer.Systems
 
         public string Name => nameof(ImprovedEulerPhysicsSystem);
 
+        public void Init()
+        {
+        }
+
         public void Update(TimingInfo timingInfo)
         {
             _gameObjectManager.GameObjects

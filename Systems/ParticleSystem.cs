@@ -46,6 +46,10 @@ namespace uwpPlatformer.Systems
             }
         }
 
+        public void Init()
+        {
+        }
+
         private ProgressStatus CalculateProgress(ParticleComponent particle, TimeSpan elapsedTime)
         {
             var ticksDifference = Math.Clamp(particle.TimeToLive.Ticks - elapsedTime.Ticks, 0f, particle.TimeToLive.Ticks);

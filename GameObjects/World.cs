@@ -96,8 +96,8 @@ namespace uwpPlatformer.GameObjects
             });
         }
 
-        public int WorldPixelHeight => _map.Height * _map.TileHeight;
-        public int WorldPixelWidth => _map.Width * _map.TileWidth;
+        protected int WorldPixelHeight => _map.Height * _map.TileHeight;
+        protected int WorldPixelWidth => _map.Width * _map.TileWidth;
 
         private void CreateFlyingEnemy()
         {

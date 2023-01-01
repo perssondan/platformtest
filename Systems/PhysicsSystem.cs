@@ -74,6 +74,10 @@ namespace uwpPlatformer.Systems
             _entitiesInContact.Clear();
         }
 
+        public void Init()
+        {
+        }
+
         private void HandleCollision(PhysicsComponent physicsComponent, ColliderComponent colliderComponent, IEnumerable<CollisionManifold> collisionManifolds)
         {
             var halfSize = colliderComponent.BoundingBox.Half();
