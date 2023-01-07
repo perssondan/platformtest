@@ -220,6 +220,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\GameAssets\images\hero_sprites.png" />
+    <Content Include="Assets\GameAssets\images\level1_maptiles.png" />
     <Content Include="Assets\GameAssets\images\splashscreen.png" />
     <Content Include="Assets\GameAssets\images\tiles.png" />
     <Content Include="Assets\GameAssets\images\wasp_sprites.png" />
@@ -272,6 +273,9 @@
   <ItemGroup>
     <Content Include="Assets\GameAssets\images\splashscreenmap.json" />
     <Content Include="Assets\GameAssets\images\splashscreen.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\GameAssets\images\level1_maptiles.json" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

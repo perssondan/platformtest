@@ -1,0 +1,15 @@
+{ "columns":4,
+ "image":"level1_maptiles.png",
+ "imageheight":32,
+ "imagewidth":128,
+ "margin":0,
+ "name":"level1_maptiles",
+ "objectalignment":"topleft",
+ "spacing":0,
+ "tilecount":4,
+ "tiledversion":"1.5.0",
+ "tileheight":32,
+ "tilewidth":32,
+ "type":"tileset",
+ "version":1.5
+}
