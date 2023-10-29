@@ -24,6 +24,10 @@ namespace uwpPlatformer.Systems
 
         public string Name => nameof(VelocityVerletPhysicsSystem);
 
+        public void Init()
+        {
+        }
+
         public void Update(TimingInfo timingInfo)
         {
             var deltaTime = (float)timingInfo.ElapsedTime.TotalSeconds;

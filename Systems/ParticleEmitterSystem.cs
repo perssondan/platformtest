@@ -38,6 +38,10 @@ namespace uwpPlatformer.Systems
                 });
         }
 
+        public void Init()
+        {
+        }
+
         private void CreateParticles(ParticleEmitterComponent particleEmitterComponent,
                                      TransformComponent transformComponent,
                                      TimeSpan createdAt)

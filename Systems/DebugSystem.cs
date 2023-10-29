@@ -36,6 +36,8 @@ namespace uwpPlatformer.Systems
             _eventSystem = eventSystem;
             _gameObjectManager = gameObjectManager;
 
+            _drawPositionHistory = DrawPositionHistory;
+
             _eventSystem.Subscribe<CollisionEvent>(this, (sender, collision) =>
             {
                 _collisionArguments.Add(collision);
@@ -83,6 +85,10 @@ namespace uwpPlatformer.Systems
         public string Name => nameof(DebugSystem);
 
         public void Update(TimingInfo timingInfo)
+        {
+        }
+
+        public void Init()
         {
         }
 

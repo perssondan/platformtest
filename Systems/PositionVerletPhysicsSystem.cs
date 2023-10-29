@@ -28,6 +28,10 @@ namespace uwpPlatformer.Systems
 
         public string Name => nameof(PositionVerletPhysicsSystem);
 
+        public void Init()
+        {
+        }
+
         public void Update(TimingInfo timingInfo)
         {
             _gameObjectManager.GameObjects

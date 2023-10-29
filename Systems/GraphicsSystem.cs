@@ -41,6 +41,7 @@ namespace uwpPlatformer.Systems
                 .Where(graphicsComponent => graphicsComponent != default && graphicsComponent.IsVisible)
                 .ForEach(graphicsComponent =>
                 {
+                    var tagValue = graphicsComponent.GameObject.GetComponent<TagComponent>()?.Tag;
                     _drawComponent?.Invoke(canvasDrawingSession, deltaTime, graphicsComponent);
                 });
 
@@ -51,6 +52,25 @@ namespace uwpPlatformer.Systems
                 {
                     _drawShapeComponent?.Invoke(canvasDrawingSession, deltaTime, shapeGraphicsComponent);
                 });
+
+            var textFormat = new Microsoft.Graphics.Canvas.Text.CanvasTextFormat();
+            textFormat.FontSize = 8f;
+            _gameObjectManager.GameObjects
+                .Select(gameObject => gameObject.GetComponent<TagComponent>())
+                .Where(tagComponent => tagComponent != default)
+                .ForEach(tagComponent =>
+                {
+                    var tagValue = tagComponent.Tag;
+                    var transformComponent = tagComponent.GameObject.GetComponent<TransformComponent>();
+                    if (transformComponent != default)
+                    {
+                        canvasDrawingSession.DrawText(tagValue, transformComponent.Position, Colors.White, textFormat);
+                    }
+                });
+        }
+
+        public void Init()
+        {
         }
 
         private void DrawShapeComponent(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime, ShapeGraphicsComponent shapeGraphicsComponent)
@@ -84,8 +104,8 @@ namespace uwpPlatformer.Systems
 
         private void DrawAnimatedComponent(CanvasDrawingSession canvasDrawingSession, TimeSpan deltaTime, AnimatedGraphicsComponent animatedGraphicsComponent)
         {
-            var sourceRects = animatedGraphicsComponent.SourceSpriteIndexes;
-            var numberOfTiles = sourceRects.Count();
+            var sourceRectIndexes = animatedGraphicsComponent.SourceSpriteIndexes;
+            var numberOfTiles = sourceRectIndexes.Count;
 
             if (numberOfTiles <= 0) return;
 
@@ -97,7 +117,7 @@ namespace uwpPlatformer.Systems
             if (!animatedGraphicsComponent.GameObject.TryGetComponent<TransformComponent>(out var transformComponent)) return;
 
             var position = transformComponent.Position;
-            var currentSourceIndex = sourceRects[animatedGraphicsComponent.CurrentSpriteIndex];
+            var currentSourceIndex = sourceRectIndexes[animatedGraphicsComponent.CurrentSpriteIndex];
             var spriteSourceRect = GetCurrentSourceRect(currentSourceIndex, animatedGraphicsComponent.SpriteMapColumns, animatedGraphicsComponent.SpriteSize);
             if (animatedGraphicsComponent.InvertTile)
             {

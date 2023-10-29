@@ -34,6 +34,10 @@ namespace uwpPlatformer.Systems
                 });
         }
 
+        public void Init()
+        {
+        }
+
         private void UpdateEntityForce(GameObject gameObject,
                                        PerlinMovementComponent perlinComponent,
                                        TransformComponent transform,

@@ -4,11 +4,56 @@
  "imagewidth":24,
  "margin":0,
  "name":"wasp_sprites",
+ "objectalignment":"topleft",
+ "properties":[
+        {
+         "name":"tileSetType",
+         "type":"string",
+         "value":"enemy_wasp"
+        }],
  "spacing":0,
  "tilecount":1,
- "tiledversion":"1.5.0",
+ "tiledversion":"1.9.2",
  "tileheight":24,
+ "tiles":[
+        {
+         "id":0,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "class":"",
+                     "height":24,
+                     "id":1,
+                     "name":"",
+                     "rotation":0,
+                     "visible":true,
+                     "width":24,
+                     "x":0,
+                     "y":0
+                    }, 
+                    {
+                     "class":"",
+                     "height":21,
+                     "id":2,
+                     "name":"",
+                     "rotation":0,
+                     "visible":true,
+                     "width":24,
+                     "x":0,
+                     "y":0
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
+        }],
  "tilewidth":24,
  "type":"tileset",
- "version":1.5
+ "version":"1.9"
 }

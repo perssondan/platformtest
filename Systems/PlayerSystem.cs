@@ -42,6 +42,10 @@ namespace uwpPlatformer.Systems
         // AnimatedGraphicsComponent,
         // ParticleEmitterComponent
 
+        public void Init()
+        {
+        }
+
         private void UpdatePlayerGameObject(GameObject gameObject, TimeSpan deltatime)
         {
             var userInputs = gameObject.GetComponent<InputComponent>()?.UserInputs ?? UserInput.None;

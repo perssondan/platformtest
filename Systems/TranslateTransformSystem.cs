@@ -28,6 +28,10 @@ namespace uwpPlatformer.Systems
                 .ForEach(components => Translate(components.Item1, components.Item2));
         }
 
+        public void Init()
+        {
+        }
+
         private void Translate(TransformComponent transformComponent, PhysicsComponent physicsComponent)
         {
             transformComponent.Position = physicsComponent.Position;
