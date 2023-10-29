@@ -12,6 +12,11 @@ namespace uwpPlatformer.Scenes
         string Name { get; }
 
         /// <summary>
+        /// Gets if the scene is active
+        /// </summary>
+        bool IsActive { get; }
+
+        /// <summary>
         /// Update method
         /// </summary>
         /// <param name="timingInfo"></param>
@@ -28,5 +33,15 @@ namespace uwpPlatformer.Scenes
         /// Init method
         /// </summary>
         void Init();
+
+        /// <summary>
+        /// Activates the scene
+        /// </summary>
+        void Activate();
+
+        /// <summary>
+        /// Deactivates the scene
+        /// </summary>
+        void Deactivate();
     }
 }

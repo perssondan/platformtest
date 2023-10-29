@@ -1,10 +1,6 @@
 ﻿using GamesLibrary.Models;
 using Microsoft.Graphics.Canvas;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace uwpPlatformer.Scenes
 {
@@ -14,12 +10,11 @@ namespace uwpPlatformer.Scenes
 
         public override void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
         {
-            throw new NotImplementedException();
+            canvasDrawingSession.DrawText(Name, new System.Numerics.Vector2(100, 100), Windows.UI.Colors.AntiqueWhite);
         }
 
         public override void Update(TimingInfo timingInfo)
         {
-            throw new NotImplementedException();
         }
     }
 }

@@ -3,49 +3,42 @@ using GamesLibrary.Systems;
 using Microsoft.Graphics.Canvas;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using uwpPlatformer.Platform;
 using uwpPlatformer.Scenes;
-using static uwpPlatformer.Systems.SceneSystem;
+using uwpPlatformer.Utilities;
 
 namespace uwpPlatformer.Systems
 {
     public class SceneSystem : ISystem
     {
-        private Dictionary<GameTrigger, List<Func<GameTrigger, GameState, GameState?>>> _allowedTransitions = new Dictionary<GameTrigger, List<Func<GameTrigger, GameState, GameState?>>>();
         private IDictionary<string, IScene> _scenes = new Dictionary<string, IScene>();
         private IEventSystem _eventSystem;
         private IScene _scene;
-        private GameState _state;
+        private StateMachine<GameTrigger, GameState> _stateMachine;
 
         public SceneSystem(IEventSystem eventSystem)
         {
             _eventSystem = eventSystem;
-            AddTransitions();
+            _stateMachine = new StateMachine<GameTrigger, GameState>(GameState.Splash);
+            _stateMachine.OnStateChanged += (trigger, fromState, toState) =>
+            {
+                UpdateActiveScene();
+            };
+            InitializeStateMachine();
         }
 
         public string Name => nameof(SceneSystem);
 
-        public GameState State
-        {
-            get => _state;
-            private set
-            {
-                _state = value;
-                UpdateActiveScene();
-            }
-        }
+        public GameState State => _stateMachine.State;
 
         public void Init()
         {
-            _scenes.Add(nameof(MenuScene), new MenuScene(_eventSystem));
-            if (_scenes.TryGetValue(nameof(SplashScene), out var scene))
-            {
-                scene.Init();
-            }
+            UpdateActiveScene();
+        }
 
-            _scene = scene;
+        public void AddMenuScene(IGameAssetsProvider gameAssetsProvider)
+        {
+            _scenes.Add(nameof(MenuScene), new MenuScene(gameAssetsProvider, _eventSystem));
         }
 
         public void AddSplashScene(IGameAssetsProvider gameAssetsProvider)
@@ -53,9 +46,9 @@ namespace uwpPlatformer.Systems
             _scenes.Add(nameof(SplashScene), new SplashScene(gameAssetsProvider, _eventSystem));
         }
 
-        public void AddPlatformScene(IGameAssetsProvider gameAssetsProvider)
+        public void AddLevelOneScene(IGameAssetsProvider gameAssetsProvider)
         {
-            _scenes.Add(nameof(PlatformScene), new PlatformScene(gameAssetsProvider));
+            _scenes.Add(nameof(LevelOneScene), new LevelOneScene(gameAssetsProvider));
         }
 
         public void Update(TimingInfo timingInfo)
@@ -65,52 +58,15 @@ namespace uwpPlatformer.Systems
 
         public void FireTrigger(GameTrigger gameTrigger)
         {
-            if (!_allowedTransitions.TryGetValue(gameTrigger, out var transitions))
-            {
-                Debug.WriteLine($"{gameTrigger} has no configured transition");
-                return;
-            }
-
-            var nextState = transitions
-                .Select(x => x.Invoke(gameTrigger, _state))
-                .Where(x => x != null)
-                .SingleOrDefault();
-
-            if (!nextState.HasValue)
-            {
-                Debug.WriteLine($"{gameTrigger} has no configured transition");
-                return;
-            }
-
-            State = nextState.Value;
+            _stateMachine.FireTrigger(gameTrigger);
         }
 
-        private void AddTransitions()
+        private void InitializeStateMachine()
         {
-            CreateTransition(GameTrigger.SplashShown, GameState.Splash, GameState.Menu);
-            CreateTransition(GameTrigger.StartGame, GameState.Menu, GameState.GamePlay);
-            CreateTransition(GameTrigger.GameOver, GameState.GamePlay, GameState.GameOver);
-            CreateTransition(GameTrigger.ActivateMenu, GameState.GameOver, GameState.Menu);
-        }
-
-        private void CreateTransition(GameTrigger trigger, GameState fromState, GameState toState)
-        {
-            if (!_allowedTransitions.TryGetValue(trigger, out var transitions))
-            {
-                _allowedTransitions[trigger] = new List<Func<GameTrigger, GameState, GameState?>>();
-            }
-            var func = new Func<GameTrigger, GameState, GameState?>((firedTrigger, currentState) =>
-            {
-                if (firedTrigger != trigger) throw new InvalidOperationException("Missmatch firedTrigger and trigger! Pfff coders...");
-                if (currentState != fromState)
-                {
-                    Debug.WriteLine($"Transition from {currentState} to {toState} with {firedTrigger} not allowed!");
-                    return default;
-                }
-
-                return toState;
-            });
-            _allowedTransitions[trigger].Add(func);
+            _stateMachine.ConfigureState(GameState.Splash, GameTrigger.SplashShown, GameState.Menu);
+            _stateMachine.ConfigureState(GameState.Menu, GameTrigger.StartGame, GameState.GamePlay);
+            _stateMachine.ConfigureState(GameState.GamePlay, GameTrigger.GameOver, GameState.GameOver);
+            _stateMachine.ConfigureState(GameState.GameOver, GameTrigger.ActivateMenu, GameState.Menu);
         }
 
         internal void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
@@ -120,19 +76,23 @@ namespace uwpPlatformer.Systems
 
         private void UpdateActiveScene()
         {
-            switch (_state)
+            _scene?.Deactivate();
+            switch (State)
             {
                 case GameState.Splash:
                     _scene = _scenes[nameof(SplashScene)];
+                    _scene.Init();
                     break;
                 case GameState.Menu:
                     _scene = _scenes[nameof(MenuScene)];
+                    _scene.Init();
                     break;
                 case GameState.Loading:
                     _scene = _scenes[nameof(LoadingScene)];
+                    _scene.Init();
                     break;
                 case GameState.GamePlay:
-                    _scene = _scenes[nameof(PlatformScene)];
+                    _scene = _scenes[nameof(LevelOneScene)];
                     _scene.Init();
                     break;
                 case GameState.GamePlayMenu:
@@ -142,6 +102,8 @@ namespace uwpPlatformer.Systems
                     _scene = _scenes[nameof(GameOverScene)];
                     break;
             }
+
+            _scene?.Activate();
         }
 
         public enum GameState

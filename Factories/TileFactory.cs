@@ -16,7 +16,7 @@ namespace uwpPlatformer.Factories
             _gameObjectManager = gameObjectManager;
         }
 
-        public GameObject CreateTile(CanvasBitmap canvasBitmap, Vector2 position, Vector2 size, TileType tileType)
+        public GameObject CreateTile(TileSet tileSet, Vector2 position, int tileId)
         {
             var gameObject = _gameObjectManager.CreateGameObject();
             var transformComponent = new TransformComponent(gameObject)
@@ -26,40 +26,21 @@ namespace uwpPlatformer.Factories
 
             gameObject.AddOrUpdateComponent(transformComponent);
 
-            var graphicsComponent = CreateGraphicsComponent(gameObject, tileType, canvasBitmap);
+            var graphicsComponent = CreateGraphicsComponent(gameObject, tileSet, tileId);
             gameObject.AddOrUpdateComponent(graphicsComponent);
             // TODO: The currently loaded tiles are all collidables, so when making the sky or what ever we need to fix this
             gameObject.AddOrUpdateComponent(new ColliderComponent(gameObject)
             {
-                Size = size,
+                Size = new Vector2(tileSet.TileAtlas.TileWidth, tileSet.TileAtlas.TileHeight),
                 CollisionType = ColliderComponent.CollisionTypes.StaticPlatform
             });
 
             return gameObject;
         }
 
-        private AnimatedGraphicsComponent CreateGraphicsComponent(GameObject gameObject, TileType tileType, CanvasBitmap canvasBitmap)
+        private AnimatedGraphicsComponent CreateGraphicsComponent(GameObject gameObject, TileSet tileSet, int tileId)
         {
-            switch (tileType)
-            {
-                case TileType.Nothing:
-                    return null;
-
-                case TileType.PlatformLeft:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { 0 }, TimeSpan.Zero);
-
-                case TileType.PlatformCenter:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { 1 }, TimeSpan.Zero);
-
-                case TileType.PlatformRight:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { 2 }, TimeSpan.Zero);
-
-                case TileType.Floor:
-                    return new AnimatedGraphicsComponent(gameObject, canvasBitmap, new[] { 3 }, TimeSpan.Zero);
-
-                default:
-                    return null;
-            }
+            return new AnimatedGraphicsComponent(gameObject, tileSet.TileAtlas.Bitmap, new[] { tileId - tileSet.FirstGid }, TimeSpan.Zero, tileSet.TileAtlas.Columns);
         }
     }
 }

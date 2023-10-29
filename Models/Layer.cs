@@ -15,8 +15,14 @@ namespace uwpPlatformer.Models
         public string LayerType { get; set; }
 
         public int Opacity { get; set; }
+
         public bool Visibile { get; set; }
+
         public int X { get; set; }
+
         public int Y { get; set; }
+
+        [JsonProperty("objects")]
+        public LayerObject[] LayerObjects { get; set; } = Array.Empty<LayerObject>();
     }
 }

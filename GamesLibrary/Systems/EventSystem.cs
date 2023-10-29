@@ -12,32 +12,32 @@ namespace GamesLibrary.Systems
         public static EventSystem Instance { get; } = new EventSystem();
 
         /// <inheritdoc />
-        public void Subscribe<TArgument>(object observer, Action<object, TArgument> onEventTriggered)
+        public void Subscribe<TEvent>(object observer, Action<object, TEvent> onEventTriggered)
         {
-            if (!_observers.TryGetValue(typeof(TArgument), out var list))
+            if (!_observers.TryGetValue(typeof(TEvent), out var list))
             {
                 list = new List<ObserverInfo>();
-                _observers.Add(typeof(TArgument), list);
+                _observers.Add(typeof(TEvent), list);
             }
 
-            list.Add(new ObserverInfo<TArgument> { Observer = observer, ObserverEvent = onEventTriggered });
+            list.Add(new ObserverInfo<TEvent> { Observer = observer, ObserverEvent = onEventTriggered });
         }
 
         /// <inheritdoc />
-        public void Send<TArgument>(object sender, TArgument eventInstance)
+        public void Send<TEvent>(object sender, TEvent eventInstance)
         {
-            if (!_observers.TryGetValue(typeof(TArgument), out var list)) return;
+            if (!_observers.TryGetValue(typeof(TEvent), out var list)) return;
 
-            foreach (var observerInfo in list.OfType<ObserverInfo<TArgument>>())
+            foreach (var observerInfo in list.OfType<ObserverInfo<TEvent>>())
             {
                 observerInfo.ObserverEvent?.Invoke(sender, eventInstance);
             }
         }
 
         /// <inheritdoc />
-        public void Unsubscribe<TArgument>(object observer)
+        public void Unsubscribe<TEvent>(object observer)
         {
-            if (!_observers.TryGetValue(typeof(TArgument), out var list)) return;
+            if (!_observers.TryGetValue(typeof(TEvent), out var list)) return;
 
             var observersToRemove = list
                 .Where(observerInfo => observerInfo.Observer == observer)

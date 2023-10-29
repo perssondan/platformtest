@@ -2,43 +2,74 @@
 using GamesLibrary.Systems;
 using Microsoft.Graphics.Canvas;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using uwpPlatformer.EventArguments;
+using uwpPlatformer.GameObjects;
+using uwpPlatformer.Platform;
+using uwpPlatformer.Systems;
 
 namespace uwpPlatformer.Scenes
 {
     public class MenuScene : Scene
     {
+        private readonly IGameAssetsProvider _gameAssetsProvider;
+        private readonly IGameObjectManager _gameObjectManager;
         private readonly IEventSystem _eventSystem;
-        private TimeSpan? _startTime;
+        private readonly World _world;
+        private readonly GraphicsSystem _graphicsSystem;
+        private TimeSpan _startTime = TimeSpan.Zero;
 
-        public MenuScene(IEventSystem eventSystem)
+        public MenuScene(IGameAssetsProvider gameAssetsProvider, IEventSystem eventSystem)
         {
+            _gameAssetsProvider = gameAssetsProvider;
             _eventSystem = eventSystem;
+
+            _gameObjectManager = new GameObjectManager();
+
+            _world = new World(_gameAssetsProvider, _gameObjectManager);
+            _graphicsSystem = new GraphicsSystem(_gameObjectManager);
         }
 
         public override string Name => nameof(MenuScene);
 
+        private TimeSpan TimePassed { get; set; }
+
         public override void Draw(CanvasDrawingSession canvasDrawingSession, TimeSpan timeSpan)
         {
-            canvasDrawingSession.DrawText(nameof(MenuScene), new System.Numerics.Vector2(100, 100), Windows.UI.Colors.AntiqueWhite);
+            _graphicsSystem.Draw(canvasDrawingSession, timeSpan);
         }
 
         public override void Update(TimingInfo timingInfo)
         {
-            if (_startTime is null)
+            if (IsFinished(timingInfo))
+            {
+                _eventSystem.Send(this, new MenuSceneEvent(true));
+            }
+
+            _gameObjectManager.Update();
+            _graphicsSystem.Update(timingInfo);
+        }
+
+        private bool IsFinished(TimingInfo timingInfo)
+        {
+            if (_startTime == TimeSpan.Zero)
             {
                 _startTime = timingInfo.TotalTime;
             }
 
-            if ((timingInfo.TotalTime - _startTime) > TimeSpan.FromSeconds(5))
+            TimePassed = timingInfo.TotalTime - _startTime;
+            if (TimePassed > TimeSpan.FromSeconds(5))
             {
-                _eventSystem.Send(this, new MenuSceneEvent(true));
-                _startTime = null;
+                _startTime = TimeSpan.Zero;
+                return true;
             }
+
+            return false;
+        }
+
+        public override void Init()
+        {
+            _graphicsSystem.Init();
+            base.Init();
         }
     }
 }

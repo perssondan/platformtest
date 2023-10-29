@@ -50,13 +50,16 @@ namespace uwpPlatformer.GameObjects
         {
             try
             {
-                var gameAssetsProvider = new GameAssetsProvider(_canvasControl, "ms-appx:///Assets/GameAssets/images", "mytilemap.json");
+                var levelOneGameAssetsProvider = new GameAssetsProvider(_canvasControl, "ms-appx:///Assets/GameAssets/images", "level1_tilemap.json");
                 var splashAssetsProvider = new GameAssetsProvider(_canvasControl, "ms-appx:///Assets/GameAssets/images", "splashscreenmap.json");
-                await gameAssetsProvider.LoadAssetsAsync();
+                var menuAssetsProvider = new GameAssetsProvider(_canvasControl, "ms-appx:///Assets/GameAssets/images", "menuscreenmap.json");
+                await levelOneGameAssetsProvider.LoadAssetsAsync();
                 await splashAssetsProvider.LoadAssetsAsync();
+                await menuAssetsProvider.LoadAssetsAsync();
 
                 _sceneSystem.AddSplashScene(splashAssetsProvider);
-                _sceneSystem.AddPlatformScene(gameAssetsProvider);
+                _sceneSystem.AddMenuScene(menuAssetsProvider);
+                _sceneSystem.AddLevelOneScene(levelOneGameAssetsProvider);
                 _sceneSystem.Init();
             }
             finally

@@ -12,29 +12,55 @@ namespace uwpPlatformer.Platform
     {
         private readonly ICanvasAnimatedControl _canvasControl;
         private readonly string _rootPath;
-        private readonly string _tilmapFileName;
+        private readonly string _tileMapFileName;
 
-        public GameAssetsProvider(ICanvasAnimatedControl canvasControl, string rootPath, string tilmapFileName)
+        public GameAssetsProvider(ICanvasAnimatedControl canvasControl, string rootPath, string tileMapFileName)
         {
             _canvasControl = canvasControl;
             _rootPath = rootPath;
-            _tilmapFileName = tilmapFileName;
+            _tileMapFileName = tileMapFileName;
         }
+
+        public Map Map { get; private set; }
 
         public async Task LoadAssetsAsync()
         {
             var tiledLoader = new TiledLoader();
-            Map = await tiledLoader.LoadResourceAsync<Map>(new Uri($"{_rootPath}/{_tilmapFileName}"));
+            Map = await tiledLoader.LoadResourceAsync<Map>(new Uri($"{_rootPath}/{_tileMapFileName}"));
 
-            TileAtlases = await Task.WhenAll(Map.TileSets
-                .Select(tileSet => tiledLoader.LoadResourceAsync<TileAtlas>(new Uri($"{_rootPath}/{tileSet.Source}"))));
-
-            Bitmaps = await Task.WhenAll(TileAtlases
-                .Select(tileAtlas => CanvasBitmap.LoadAsync(_canvasControl, new Uri($"{_rootPath}/{tileAtlas.ImageSource}")).AsTask()));
+            foreach (var tileSet in Map.TileSets)
+            {
+                tileSet.TileAtlas = await tiledLoader.LoadResourceAsync<TileAtlas>(new Uri($"{_rootPath}/{tileSet.Source}"));
+                tileSet.TileAtlas.Bitmap = await CanvasBitmap.LoadAsync(_canvasControl, new Uri($"{_rootPath}/{tileSet.TileAtlas.ImageSource}")).AsTask();
+            }
         }
 
-        public CanvasBitmap[] Bitmaps { get; private set; }
-        public Map Map { get; private set; }
-        public TileAtlas[] TileAtlases { get; private set; }
+        public bool TryGetTileSet(int id, out TileSet tileSet)
+        {
+            tileSet = default;
+
+            var matchingTileSet = Map.TileSets
+                .FirstOrDefault(x => id >= x.FirstGid && id < (x.FirstGid + x.TileAtlas.TileCount));
+
+            if (matchingTileSet is null)
+            {
+                return false;
+            }
+
+            tileSet = matchingTileSet;
+
+            return true;
+        }
+
+        public bool TryGetTileSet(string name, out TileSet tileSet)
+        {
+            tileSet = default;
+
+            tileSet = Map.TileSets
+                .Where(x => x.TileAtlas.CustomProperties.Any(p => string.Equals(p.Name, name, StringComparison.InvariantCultureIgnoreCase)))
+                .FirstOrDefault();
+
+            return tileSet != null;
+        }
     }
 }

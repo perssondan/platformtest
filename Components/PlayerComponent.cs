@@ -16,15 +16,15 @@ namespace uwpPlatformer.Components
 
         public static int[] WalkSourceSpriteIndexes => new int[]
             {
-                4,
-                5,
-                6,
-                7,
+                0,
+                1,
+                2,
+                3,
             };
 
         public static int[] StationarySourceSpriteIndexes => new int[]
             {
-                12
+                8
             };
     }
 }

@@ -132,18 +132,24 @@
     <Compile Include="Components\Particles\DustParticleEmitterComponent.cs" />
     <Compile Include="Components\Particles\ParticleEmitterComponent.cs" />
     <Compile Include="Components\PerlinMovementComponent.cs" />
+    <Compile Include="Components\TagComponent.cs" />
     <Compile Include="EventArguments\MenuSceneEvent.cs" />
     <Compile Include="EventArguments\SplashSceneEvent.cs" />
     <Compile Include="Extensions\BoundingBoxExtensions.cs" />
+    <Compile Include="Extensions\MapExtensions.cs" />
+    <Compile Include="Extensions\TileSetExtensions.cs" />
     <Compile Include="Factories\EnemyFactory.cs" />
     <Compile Include="GameObjects\IGameObjectManager.cs" />
+    <Compile Include="Models\CollisionObject.cs" />
+    <Compile Include="Models\LayerObject.cs" />
+    <Compile Include="Models\ObjectGroup.cs" />
     <Compile Include="Platform\GameAssetsProvider.cs" />
     <Compile Include="Platform\IGameAssetsProvider.cs" />
     <Compile Include="Scenes\GameOverScene.cs" />
     <Compile Include="Scenes\IScene.cs" />
     <Compile Include="Scenes\LoadingScene.cs" />
     <Compile Include="Scenes\MenuScene.cs" />
-    <Compile Include="Scenes\PlatformScene.cs" />
+    <Compile Include="Scenes\LevelOneScene.cs" />
     <Compile Include="Scenes\Scene.cs" />
     <Compile Include="Scenes\SplashScene.cs" />
     <Compile Include="Numerics\BoundingBox.cs" />
@@ -209,6 +215,7 @@
     <Compile Include="Utilities\CollisionDetection.cs" />
     <Compile Include="Utilities\GameStateManager.cs" />
     <Compile Include="Utilities\HistoryStack.cs" />
+    <Compile Include="Utilities\StateMachine.cs" />
     <Compile Include="Utilities\TiledLoader.cs" />
     <Compile Include="Utilities\Scaling.cs" />
     <Compile Include="ViewModels\MainPageViewModel.cs" />
@@ -219,8 +226,10 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\GameAssets\images\charactertiles.png" />
     <Content Include="Assets\GameAssets\images\hero_sprites.png" />
     <Content Include="Assets\GameAssets\images\level1_maptiles.png" />
+    <Content Include="Assets\GameAssets\images\menu_tiles.png" />
     <Content Include="Assets\GameAssets\images\splashscreen.png" />
     <Content Include="Assets\GameAssets\images\tiles.png" />
     <Content Include="Assets\GameAssets\images\wasp_sprites.png" />
@@ -276,6 +285,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\GameAssets\images\level1_maptiles.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\GameAssets\images\level1_tilemap.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\GameAssets\images\menuscreenmap.json" />
+    <Content Include="Assets\GameAssets\images\menu_tiles.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\GameAssets\images\charactertiles.json" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
